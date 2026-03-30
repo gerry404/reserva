@@ -1,0 +1,39 @@
+# Dependencies
+frontend/node_modules
+backend/vendor
+
+# Build outputs
+frontend/dist
+frontend/dev-dist
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+backend/storage/logs/*
+!backend/storage/logs/.gitkeep
+
+# Laravel cache
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/bootstrap/cache/*
+!backend/bootstrap/cache/.gitkeep
+
+# Claude
+.claude
