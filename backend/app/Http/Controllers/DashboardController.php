@@ -72,6 +72,7 @@ class DashboardController extends Controller
             'plan'               => $request->user()->plan,
             'plan_limit'         => $request->user()->getMonthlyBookingLimit(),
             'plan_used'          => $currentMonthTotal,
+            'has_services'       => $business->services()->count() > 0,
         ]);
     }
 
@@ -109,20 +110,16 @@ class DashboardController extends Controller
             $values[] = $data[$day] ?? 0;
         }
 
-        // Monthly chart (last 6 months)
-        $monthly = Booking::forBusiness($business->id)
-            ->where('date', '>=', now()->subMonths(5)->startOfMonth())
-            ->select(DB::raw("TO_CHAR(date, 'YYYY-MM') as month, count(*) as total"))
-            ->groupBy('month')
-            ->orderBy('month')
-            ->pluck('total', 'month');
-
+        // Monthly chart (last 6 months) — database-agnostic
         $monthLabels = [];
         $monthValues = [];
         for ($i = 5; $i >= 0; $i--) {
-            $m            = now()->subMonths($i)->format('Y-m');
-            $monthLabels[] = now()->subMonths($i)->locale('fr')->isoFormat('MMM YY');
-            $monthValues[] = $monthly[$m] ?? 0;
+            $start = now()->subMonths($i)->startOfMonth();
+            $end   = now()->subMonths($i)->endOfMonth();
+            $monthLabels[] = $start->locale('fr')->isoFormat('MMM YY');
+            $monthValues[] = Booking::forBusiness($business->id)
+                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->count();
         }
 
         return response()->json([
