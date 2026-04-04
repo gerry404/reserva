@@ -2,19 +2,43 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { businessApi } from '@/api'
+import api from '@/api'
 import {
   LinkIcon,
   CheckCircleIcon,
   DevicePhoneMobileIcon,
   ClockIcon,
   GlobeAltIcon,
+  CameraIcon,
+  PhotoIcon,
 } from '@heroicons/vue/24/outline'
+
+const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || ''
 
 const auth    = useAuthStore()
 const saving  = ref(false)
 const saved   = ref(false)
 const linkCopied = ref(false)
 const errors  = ref({})
+
+const logoFile    = ref(null)
+const coverFile   = ref(null)
+const logoPreview  = ref(null)
+const coverPreview = ref(null)
+
+function onLogoChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  logoFile.value = file
+  logoPreview.value = URL.createObjectURL(file)
+}
+
+function onCoverChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  coverFile.value = file
+  coverPreview.value = URL.createObjectURL(file)
+}
 
 const form = reactive({
   name:                '',
@@ -28,6 +52,7 @@ const form = reactive({
   booking_notice:      60,
   notifications_whatsapp: true,
   notifications_sms:   false,
+  notifications_email: true,
   accent_color:        '#6366f1',
   working_hours:       {},
 })
@@ -73,9 +98,12 @@ onMounted(() => {
     booking_notice:      b.booking_notice ?? 60,
     notifications_whatsapp: b.notifications_whatsapp ?? true,
     notifications_sms:   b.notifications_sms ?? false,
+    notifications_email: b.notifications_email ?? true,
     accent_color:        b.accent_color ?? '#6366f1',
     working_hours:       b.working_hours ?? defaultWorkingHours(),
   })
+  if (b.logo) logoPreview.value = backendUrl + '/storage/' + b.logo
+  if (b.cover_image) coverPreview.value = backendUrl + '/storage/' + b.cover_image
 })
 
 function defaultWorkingHours() {
@@ -90,8 +118,33 @@ async function save() {
   errors.value = {}
   saving.value = true
   try {
-    const { data } = await businessApi.update(form)
+    let response
+    if (logoFile.value || coverFile.value) {
+      const fd = new FormData()
+      fd.append('_method', 'PUT')
+      for (const [key, val] of Object.entries(form)) {
+        if (key === 'working_hours') {
+          fd.append(key, JSON.stringify(val))
+        } else if (typeof val === 'boolean') {
+          fd.append(key, val ? '1' : '0')
+        } else {
+          fd.append(key, val ?? '')
+        }
+      }
+      if (logoFile.value) fd.append('logo', logoFile.value)
+      if (coverFile.value) fd.append('cover_image', coverFile.value)
+      response = await api.post('/business', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+    } else {
+      response = await businessApi.update(form)
+    }
+    const { data } = response
     auth.updateBusiness(data)
+    logoFile.value = null
+    coverFile.value = null
+    if (data.logo) logoPreview.value = backendUrl + '/storage/' + data.logo
+    if (data.cover_image) coverPreview.value = backendUrl + '/storage/' + data.cover_image
     saved.value = true
     setTimeout(() => saved.value = false, 3000)
   } catch (e) {
@@ -136,6 +189,43 @@ async function copyLink() {
     </div>
 
     <form @submit.prevent="save" class="space-y-6">
+      <!-- Profil visuel -->
+      <div class="card overflow-hidden">
+        <!-- Cover image -->
+        <div class="relative w-full h-[200px] bg-gray-100">
+          <img v-if="coverPreview" :src="coverPreview" class="w-full h-full object-cover" alt="Cover" />
+          <div v-else class="w-full h-full border-2 border-dashed border-gray-300 flex items-center justify-center">
+            <div class="text-center text-gray-400">
+              <PhotoIcon class="w-10 h-10 mx-auto mb-1" />
+              <span class="text-sm">Ajouter une bannière</span>
+            </div>
+          </div>
+          <label class="absolute bottom-3 right-3 bg-white/90 backdrop-blur rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 cursor-pointer hover:bg-white transition shadow-sm flex items-center gap-1.5">
+            <CameraIcon class="w-4 h-4" />
+            Changer la bannière
+            <input type="file" accept="image/*" class="hidden" @change="onCoverChange" />
+          </label>
+        </div>
+
+        <!-- Logo -->
+        <div class="relative px-6 pb-5">
+          <label class="absolute -top-10 left-6 cursor-pointer group">
+            <div class="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200 flex items-center justify-center">
+              <img v-if="logoPreview" :src="logoPreview" class="w-full h-full object-cover" alt="Logo" />
+              <span v-else class="text-2xl font-bold text-gray-400">{{ form.name?.charAt(0)?.toUpperCase() || '?' }}</span>
+            </div>
+            <div class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+              <CameraIcon class="w-5 h-5 text-white" />
+            </div>
+            <input type="file" accept="image/*" class="hidden" @change="onLogoChange" />
+          </label>
+          <div class="pt-12 pl-1">
+            <p class="text-sm font-semibold text-gray-700">Profil visuel</p>
+            <p class="text-xs text-gray-400">Logo et image de couverture de votre commerce</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Commerce info -->
       <div class="card p-6 space-y-5">
         <h3 class="font-bold text-gray-900 flex items-center gap-2">
@@ -269,6 +359,19 @@ async function copyLink() {
             :class="['relative inline-flex h-6 w-11 rounded-full transition-colors cursor-pointer', form.notifications_whatsapp ? 'bg-primary-600' : 'bg-gray-200']"
           >
             <span :class="['absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform', form.notifications_whatsapp ? 'translate-x-5' : 'translate-x-0']" />
+          </div>
+        </label>
+
+        <label class="flex items-center justify-between cursor-pointer group">
+          <div>
+            <p class="font-medium text-gray-900 text-sm">Email</p>
+            <p class="text-xs text-gray-400">Recevez un email à chaque nouvelle réservation</p>
+          </div>
+          <div
+            @click="form.notifications_email = !form.notifications_email"
+            :class="['relative inline-flex h-6 w-11 rounded-full transition-colors cursor-pointer', form.notifications_email ? 'bg-primary-600' : 'bg-gray-200']"
+          >
+            <span :class="['absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform', form.notifications_email ? 'translate-x-5' : 'translate-x-0']" />
           </div>
         </label>
 

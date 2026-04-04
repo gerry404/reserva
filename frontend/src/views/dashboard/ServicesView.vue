@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, reactive, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { servicesApi } from '@/api'
 import {
@@ -9,6 +9,10 @@ import {
   Squares2X2Icon,
   ClockIcon,
   BanknotesIcon,
+  PhotoIcon,
+  XMarkIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from '@heroicons/vue/24/outline'
 
 const auth    = useAuthStore()
@@ -20,9 +24,42 @@ const deleting = ref(null)
 const errors   = ref({})
 const saving   = ref(false)
 
+// Gallery state
+const gallery = ref(null)  // { images: [], index: 0 }
+
+function openGallery(svc, startIndex = 0) {
+  gallery.value = { images: svc.images, name: svc.name, index: startIndex }
+}
+
+function galleryNext() {
+  if (!gallery.value) return
+  gallery.value.index = (gallery.value.index + 1) % gallery.value.images.length
+}
+
+function galleryPrev() {
+  if (!gallery.value) return
+  gallery.value.index = (gallery.value.index - 1 + gallery.value.images.length) % gallery.value.images.length
+}
+
+function onGalleryKey(e) {
+  if (!gallery.value) return
+  if (e.key === 'ArrowRight') galleryNext()
+  else if (e.key === 'ArrowLeft') galleryPrev()
+  else if (e.key === 'Escape') gallery.value = null
+}
+
 const form = reactive({
   name: '', description: '', duration: 30, price: 0, category: '', color: '#6366f1',
 })
+
+// Images state
+const newImages = ref([])        // File objects to upload
+const existingImages = ref([])   // paths already saved on server
+const imagePreviews = ref([])    // preview URLs for display
+
+const MAX_IMAGES = 5
+const totalImages = computed(() => existingImages.value.length + newImages.value.length)
+const canAddMore = computed(() => totalImages.value < MAX_IMAGES)
 
 const colors = [
   '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b',
@@ -35,6 +72,14 @@ const durations = [
   { v: 180, l: '3h' },    { v: 240, l: '4h' },
 ]
 
+const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || ''
+
+function imageUrl(path) {
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  return `${backendUrl}/storage/${path}`
+}
+
 async function loadServices() {
   loading.value = true
   try {
@@ -45,12 +90,26 @@ async function loadServices() {
   }
 }
 
-onMounted(loadServices)
+onMounted(() => {
+  loadServices()
+  document.addEventListener('keydown', onGalleryKey)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', onGalleryKey)
+})
+
+function resetImageState() {
+  newImages.value = []
+  existingImages.value = []
+  imagePreviews.value = []
+}
 
 function openCreate() {
   editing.value = null
   Object.assign(form, { name: '', description: '', duration: 30, price: 0, category: '', color: '#6366f1' })
   errors.value = {}
+  resetImageState()
   modal.value  = true
 }
 
@@ -61,19 +120,71 @@ function openEdit(svc) {
     price: svc.price, category: svc.category ?? '', color: svc.color ?? '#6366f1',
   })
   errors.value = {}
+  resetImageState()
+  existingImages.value = svc.images ? [...svc.images] : []
+  imagePreviews.value = existingImages.value.map(p => ({ url: imageUrl(p), isExisting: true, path: p }))
   modal.value  = true
+}
+
+function onFilesSelected(e) {
+  const files = Array.from(e.target.files)
+  const remaining = MAX_IMAGES - totalImages.value
+  const toAdd = files.slice(0, remaining)
+
+  for (const file of toAdd) {
+    if (!file.type.startsWith('image/')) continue
+    if (file.size > 2 * 1024 * 1024) continue // 2MB max
+    newImages.value.push(file)
+    imagePreviews.value.push({ url: URL.createObjectURL(file), isExisting: false, file })
+  }
+  e.target.value = ''
+}
+
+function removeImage(index) {
+  const preview = imagePreviews.value[index]
+  if (preview.isExisting) {
+    existingImages.value = existingImages.value.filter(p => p !== preview.path)
+  } else {
+    newImages.value = newImages.value.filter(f => f !== preview.file)
+    URL.revokeObjectURL(preview.url)
+  }
+  imagePreviews.value.splice(index, 1)
+}
+
+function buildFormData() {
+  const fd = new FormData()
+  fd.append('name', form.name)
+  fd.append('description', form.description || '')
+  fd.append('duration', form.duration)
+  fd.append('price', form.price)
+  fd.append('category', form.category || '')
+  fd.append('color', form.color)
+
+  for (const file of newImages.value) {
+    fd.append('images[]', file)
+  }
+
+  if (editing.value) {
+    fd.append('_method', 'PUT')
+    for (const path of existingImages.value) {
+      fd.append('existing_images[]', path)
+    }
+  }
+
+  return fd
 }
 
 async function save() {
   errors.value = {}
   saving.value = true
   try {
+    const fd = buildFormData()
     if (editing.value) {
-      const { data } = await servicesApi.update(editing.value, form)
+      const { data } = await servicesApi.update(editing.value, fd)
       const idx = services.value.findIndex(s => s.id === editing.value)
       if (idx !== -1) services.value[idx] = data
     } else {
-      const { data } = await servicesApi.create(form)
+      const { data } = await servicesApi.create(fd)
       services.value.unshift(data)
     }
     modal.value = false
@@ -151,48 +262,61 @@ function formatDuration(min) {
       <div
         v-for="svc in services"
         :key="svc.id"
-        :class="['card p-5 flex flex-col gap-4 transition-all', !svc.is_active && 'opacity-60']"
+        :class="['card overflow-hidden flex flex-col transition-all', !svc.is_active && 'opacity-60']"
       >
-        <div class="flex items-start justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shrink-0"
-              :style="{ backgroundColor: svc.color ?? '#6366f1' }">
-              ✦
-            </div>
-            <div>
-              <h3 class="font-bold text-gray-900 text-sm">{{ svc.name }}</h3>
-              <p v-if="svc.category" class="text-xs text-gray-400">{{ svc.category }}</p>
-            </div>
+        <!-- Image banner (click to open gallery) -->
+        <div v-if="svc.images && svc.images.length" class="relative h-36 overflow-hidden bg-gray-100 cursor-pointer group/img" @click.stop="openGallery(svc)">
+          <img :src="imageUrl(svc.images[0])" :alt="svc.name" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
+          <div class="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors flex items-center justify-center">
+            <PhotoIcon class="w-6 h-6 text-white opacity-0 group-hover/img:opacity-100 transition-opacity drop-shadow-lg" />
           </div>
-          <!-- Active toggle -->
-          <button
-            @click="toggleService(svc)"
-            :class="['relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-200', svc.is_active ? 'bg-primary-600' : 'bg-gray-200']"
-          >
-            <span :class="['absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200', svc.is_active ? 'translate-x-4' : 'translate-x-0']" />
-          </button>
+          <span v-if="svc.images.length > 1" class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
+            +{{ svc.images.length - 1 }}
+          </span>
         </div>
 
-        <p v-if="svc.description" class="text-xs text-gray-500 leading-relaxed">{{ svc.description }}</p>
-
-        <div class="flex items-center gap-4 text-sm">
-          <div class="flex items-center gap-1.5 text-gray-600">
-            <ClockIcon class="w-4 h-4 text-gray-400" />
-            {{ formatDuration(svc.duration) }}
+        <div class="p-5 flex flex-col gap-4 flex-1">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shrink-0"
+                :style="{ backgroundColor: svc.color ?? '#6366f1' }">
+                ✦
+              </div>
+              <div>
+                <h3 class="font-bold text-gray-900 text-sm">{{ svc.name }}</h3>
+                <p v-if="svc.category" class="text-xs text-gray-400">{{ svc.category }}</p>
+              </div>
+            </div>
+            <!-- Active toggle -->
+            <button
+              @click="toggleService(svc)"
+              :class="['relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-200', svc.is_active ? 'bg-primary-600' : 'bg-gray-200']"
+            >
+              <span :class="['absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200', svc.is_active ? 'translate-x-4' : 'translate-x-0']" />
+            </button>
           </div>
-          <div class="flex items-center gap-1.5 font-semibold text-gray-900">
-            <BanknotesIcon class="w-4 h-4 text-gray-400" />
-            {{ formatPrice(svc.price) }}
-          </div>
-        </div>
 
-        <div class="flex gap-2 pt-1 border-t border-gray-50">
-          <button @click="openEdit(svc)" class="btn-ghost text-xs flex-1 py-1.5">
-            <PencilIcon class="w-3.5 h-3.5" /> Modifier
-          </button>
-          <button @click="deleting = svc.id" class="btn-ghost text-xs text-red-500 hover:text-red-700 hover:bg-red-50 flex-1 py-1.5">
-            <TrashIcon class="w-3.5 h-3.5" /> Supprimer
-          </button>
+          <p v-if="svc.description" class="text-xs text-gray-500 leading-relaxed">{{ svc.description }}</p>
+
+          <div class="flex items-center gap-4 text-sm">
+            <div class="flex items-center gap-1.5 text-gray-600">
+              <ClockIcon class="w-4 h-4 text-gray-400" />
+              {{ formatDuration(svc.duration) }}
+            </div>
+            <div class="flex items-center gap-1.5 font-semibold text-gray-900">
+              <BanknotesIcon class="w-4 h-4 text-gray-400" />
+              {{ formatPrice(svc.price) }}
+            </div>
+          </div>
+
+          <div class="flex gap-2 pt-1 border-t border-gray-50 mt-auto">
+            <button @click="openEdit(svc)" class="btn-ghost text-xs flex-1 py-1.5">
+              <PencilIcon class="w-3.5 h-3.5" /> Modifier
+            </button>
+            <button @click="deleting = svc.id" class="btn-ghost text-xs text-red-500 hover:text-red-700 hover:bg-red-50 flex-1 py-1.5">
+              <TrashIcon class="w-3.5 h-3.5" /> Supprimer
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -254,6 +378,46 @@ function formatDuration(min) {
               </div>
             </div>
 
+            <!-- Images upload -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Photos <span class="text-gray-400 font-normal">({{ totalImages }}/{{ MAX_IMAGES }})</span>
+              </label>
+
+              <div class="grid grid-cols-5 gap-2">
+                <!-- Existing + New previews -->
+                <div v-for="(preview, idx) in imagePreviews" :key="idx" class="relative aspect-square rounded-xl overflow-hidden group bg-gray-100">
+                  <img :src="preview.url" class="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    @click="removeImage(idx)"
+                    class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                  >
+                    <XMarkIcon class="w-5 h-5 text-white" />
+                  </button>
+                </div>
+
+                <!-- Add button -->
+                <label v-if="canAddMore"
+                  class="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-primary-400 hover:bg-primary-50/50 flex flex-col items-center justify-center cursor-pointer transition-colors">
+                  <PhotoIcon class="w-5 h-5 text-gray-300" />
+                  <span class="text-[10px] text-gray-400 mt-1">Ajouter</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    class="hidden"
+                    @change="onFilesSelected"
+                  />
+                </label>
+              </div>
+
+              <p v-if="errors.images || errors['images.0']" class="text-red-500 text-xs mt-1">
+                {{ (errors.images || errors['images.0'])?.[0] }}
+              </p>
+              <p class="text-[11px] text-gray-400 mt-1.5">JPG, PNG ou WebP. Max 2 Mo par image.</p>
+            </div>
+
             <div class="flex gap-3 pt-2">
               <button type="button" @click="modal = false" class="btn-secondary flex-1">Annuler</button>
               <button type="submit" class="btn-primary flex-1" :disabled="saving">
@@ -262,6 +426,52 @@ function formatDuration(min) {
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
+  <!-- Image gallery lightbox -->
+  <Teleport to="body">
+    <Transition name="fade">
+      <div v-if="gallery" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm" @click.self="gallery = null">
+        <button @click="gallery = null" class="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors z-10">
+          <XMarkIcon class="w-7 h-7" />
+        </button>
+
+        <!-- Counter -->
+        <div class="absolute top-4 left-4 text-white/70 text-sm font-medium">
+          {{ gallery.index + 1 }} / {{ gallery.images.length }}
+        </div>
+
+        <!-- Title -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 text-white font-bold text-sm">
+          {{ gallery.name }}
+        </div>
+
+        <!-- Prev -->
+        <button v-if="gallery.images.length > 1" @click="galleryPrev" class="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">
+          <ChevronLeftIcon class="w-6 h-6" />
+        </button>
+
+        <!-- Image -->
+        <img :src="imageUrl(gallery.images[gallery.index])" :alt="gallery.name" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl" />
+
+        <!-- Next -->
+        <button v-if="gallery.images.length > 1" @click="galleryNext" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">
+          <ChevronRightIcon class="w-6 h-6" />
+        </button>
+
+        <!-- Thumbnails -->
+        <div v-if="gallery.images.length > 1" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          <button
+            v-for="(img, i) in gallery.images"
+            :key="i"
+            @click="gallery.index = i"
+            :class="['w-14 h-14 rounded-lg overflow-hidden border-2 transition-all', gallery.index === i ? 'border-white scale-110' : 'border-transparent opacity-60 hover:opacity-100']"
+          >
+            <img :src="imageUrl(img)" class="w-full h-full object-cover" />
+          </button>
         </div>
       </div>
     </Transition>

@@ -40,6 +40,7 @@ class PublicBookingController extends Controller
                 'formatted_duration' => $s->formatted_duration,
                 'color'              => $s->color,
                 'category'           => $s->category,
+                'images'             => $s->images,
             ]),
         ]);
     }

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Mail\BookingConfirmedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
 
 class BookingController extends Controller
 {
@@ -59,18 +61,38 @@ class BookingController extends Controller
         ]);
 
         $booking->update(['status' => $validated['status']]);
+        $booking->load('business', 'service');
 
-        // Send notification when confirmed
+        $response = $booking->fresh()->load('service')->toArray();
+
+        // Send notifications when confirmed
         if ($validated['status'] === 'confirmed') {
-            try {
-                $booking->load('business', 'service');
-                \Notification::send(null, new \App\Notifications\BookingStatusNotification($booking, 'confirmed'));
-            } catch (\Exception $e) {
-                \Log::error('Notification failed: ' . $e->getMessage());
+            // Email the customer if they provided an email
+            if ($booking->customer_email) {
+                try {
+                    Mail::to($booking->customer_email)
+                        ->queue(new BookingConfirmedNotification($booking, $booking->business));
+                } catch (\Exception $e) {
+                    \Log::error('Confirmation email failed: ' . $e->getMessage());
+                }
             }
+
+            // Build WhatsApp link for the merchant to notify the customer
+            $phone = preg_replace('/[^0-9]/', '', $booking->customer_phone);
+            $date = $booking->date->locale('fr')->isoFormat('dddd D MMMM YYYY');
+            $msg = "Bonjour {$booking->customer_name},\n\n"
+                 . "✅ Votre réservation chez *{$booking->business->name}* est confirmée !\n\n"
+                 . "📋 *Détails :*\n"
+                 . "• Service : {$booking->service?->name}\n"
+                 . "• Date : {$date}\n"
+                 . "• Heure : {$booking->time_slot}\n"
+                 . "• Réf : {$booking->reference}\n\n"
+                 . "À bientôt ! 🙏";
+
+            $response['whatsapp_link'] = "https://wa.me/{$phone}?text=" . urlencode($msg);
         }
 
-        return response()->json($booking->fresh()->load('service'));
+        return response()->json($response);
     }
 
     public function destroy(Request $request, Booking $booking): JsonResponse

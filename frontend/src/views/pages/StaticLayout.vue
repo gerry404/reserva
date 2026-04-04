@@ -20,10 +20,8 @@ function goBack() {
           </button>
           <div class="w-px h-5 bg-gray-200" />
           <RouterLink to="/" class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-600 to-violet-600 flex items-center justify-center">
-              <span class="text-white font-extrabold text-xs">R</span>
-            </div>
-            <span class="font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
+            <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
+            <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
           </RouterLink>
         </div>
         <div class="flex items-center gap-2">
@@ -45,10 +43,8 @@ function goBack() {
           <!-- Brand column -->
           <div class="col-span-2 md:col-span-1">
             <div class="flex items-center gap-2 mb-4">
-              <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center">
-                <span class="text-white font-bold text-sm">R</span>
-              </div>
-              <span class="font-extrabold text-white text-lg">Réserva</span>
+              <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
+              <span class="font-display font-extrabold text-white text-lg">Réserva</span>
             </div>
             <p class="text-sm leading-relaxed mb-6">La plateforme de réservation en ligne pensée pour les commerçants ambitieux.</p>
             <div class="flex items-center gap-3">

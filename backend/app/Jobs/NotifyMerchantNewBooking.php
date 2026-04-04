@@ -11,6 +11,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewBookingNotification;
 
 class NotifyMerchantNewBooking implements ShouldQueue
 {
@@ -34,6 +36,11 @@ class NotifyMerchantNewBooking implements ShouldQueue
         // SMS via Africa's Talking
         if ($business->notifications_sms && $business->phone) {
             $this->sendSms($business->phone, strip_tags($message));
+        }
+
+        // Email
+        if ($business->notifications_email && $user->email) {
+            $this->sendEmail($user->email, $this->booking, $business);
         }
     }
 
@@ -86,6 +93,15 @@ class NotifyMerchantNewBooking implements ShouldQueue
                 ]);
         } catch (\Exception $e) {
             Log::error('Meta WhatsApp error: ' . $e->getMessage());
+        }
+    }
+
+    private function sendEmail(string $email, Booking $booking, $business): void
+    {
+        try {
+            Mail::to($email)->send(new NewBookingNotification($booking, $business));
+        } catch (\Exception $e) {
+            Log::error('Booking email notification error: ' . $e->getMessage());
         }
     }
 

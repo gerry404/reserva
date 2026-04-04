@@ -40,6 +40,11 @@ class User extends Authenticatable
         return $this->hasOne(Business::class);
     }
 
+    public function payments()
+    {
+        return $this->hasMany(\App\Models\Payment::class);
+    }
+
     public function isProOrHigher(): bool
     {
         return in_array($this->plan, ['pro', 'business']);

@@ -7,6 +7,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PublicBookingController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,9 @@ Route::prefix('b/{slug}')->group(function () {
     Route::get('/slots',  [PublicBookingController::class, 'availableSlots']);
     Route::post('/book',  [PublicBookingController::class, 'book']);
 });
+
+// Flutterwave webhook (no auth)
+Route::post('/webhooks/flutterwave', [PaymentController::class, 'webhook']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -51,7 +55,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookings/export/csv',             [BookingController::class, 'exportCsv']);
 
     // Dashboard
-    Route::get('/dashboard/stats',    [DashboardController::class, 'stats']);
-    Route::get('/dashboard/upcoming', [DashboardController::class, 'upcoming']);
-    Route::get('/dashboard/chart',    [DashboardController::class, 'chart']);
+    // Payments
+    Route::get('/payments/plans',        [PaymentController::class, 'plans']);
+    Route::post('/payments/initiate',    [PaymentController::class, 'initiate']);
+    Route::post('/payments/verify',      [PaymentController::class, 'verify']);
+    Route::get('/payments/history',      [PaymentController::class, 'history']);
+    Route::get('/payments/subscription', [PaymentController::class, 'subscription']);
+
+    Route::get('/dashboard/stats',     [DashboardController::class, 'stats']);
+    Route::get('/dashboard/upcoming',  [DashboardController::class, 'upcoming']);
+    Route::get('/dashboard/chart',     [DashboardController::class, 'chart']);
+    Route::get('/dashboard/analytics', [DashboardController::class, 'analytics']);
 });

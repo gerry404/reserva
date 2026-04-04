@@ -47,8 +47,8 @@ export const businessApi = {
 // ─── Services ────────────────────────────────────────────────────────────────
 export const servicesApi = {
   list:   ()         => api.get('/services'),
-  create: (data)     => api.post('/services', data),
-  update: (id, data) => api.put(`/services/${id}`, data),
+  create: (data)     => api.post('/services', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update: (id, data) => api.post(`/services/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   toggle: (id)       => api.patch(`/services/${id}/toggle`),
   delete: (id)       => api.delete(`/services/${id}`),
 }
@@ -64,9 +64,19 @@ export const bookingsApi = {
 
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 export const dashboardApi = {
-  stats:    () => api.get('/dashboard/stats'),
-  upcoming: () => api.get('/dashboard/upcoming'),
-  chart:    () => api.get('/dashboard/chart'),
+  stats:     () => api.get('/dashboard/stats'),
+  upcoming:  () => api.get('/dashboard/upcoming'),
+  chart:     () => api.get('/dashboard/chart'),
+  analytics: () => api.get('/dashboard/analytics'),
+}
+
+// ─── Payments ────────────────────────────────────────────────────
+export const paymentsApi = {
+  plans:        ()     => api.get('/payments/plans'),
+  initiate:     (data) => api.post('/payments/initiate', data),
+  verify:       (txRef) => api.post('/payments/verify', { tx_ref: txRef }),
+  history:      ()     => api.get('/payments/history'),
+  subscription: ()     => api.get('/payments/subscription'),
 }
 
 // ─── Public ──────────────────────────────────────────────────────────────────

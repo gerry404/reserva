@@ -17,6 +17,7 @@ class Service extends Model
         'price',
         'category',
         'color',
+        'images',
         'is_active',
     ];
 
@@ -24,6 +25,7 @@ class Service extends Model
         'duration'  => 'integer',
         'price'     => 'decimal:0',
         'is_active' => 'boolean',
+        'images'    => 'array',
     ];
 
     public function business()

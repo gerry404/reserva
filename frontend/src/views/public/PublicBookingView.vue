@@ -121,6 +121,32 @@ function selectTime(time) {
 }
 
 const stepLabels = ['', 'Service', 'Date', 'Heure', 'Coordonnées', 'Confirmé']
+
+const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || ''
+function svcImageUrl(path) {
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  return `${backendUrl}/storage/${path}`
+}
+
+const whatsappLink = computed(() => {
+  if (!booking.value?.business_phone) return '#'
+  const phone = booking.value.business_phone.replace(/[^0-9]/g, '')
+  const svc = selectedService.value?.name || booking.value.service
+  const msg = encodeURIComponent(
+    `Bonjour,\n\n` +
+    `Je viens de réserver chez *${business.value.name}*.\n\n` +
+    `📋 *Détails :*\n` +
+    `• Service : ${svc}\n` +
+    `• Date : ${booking.value.date}\n` +
+    `• Heure : ${booking.value.time}\n` +
+    `• Réf : ${booking.value.reference}\n` +
+    `• Nom : ${form.customer_name}\n` +
+    `• Tél : ${form.customer_phone}\n\n` +
+    `Merci de confirmer ma réservation ! 🙏`
+  )
+  return `https://wa.me/${phone}?text=${msg}`
+})
 </script>
 
 <template>
@@ -191,7 +217,10 @@ const stepLabels = ['', 'Service', 'Date', 'Heure', 'Coordonnées', 'Confirmé']
             @click="selectService(svc)"
             class="w-full card p-4 flex items-center gap-4 hover:shadow-md transition-all duration-200 text-left group"
           >
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shrink-0 group-hover:scale-105 transition-transform"
+            <div v-if="svc.images && svc.images.length" class="w-12 h-12 rounded-xl overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
+              <img :src="svcImageUrl(svc.images[0])" :alt="svc.name" class="w-full h-full object-cover" />
+            </div>
+            <div v-else class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shrink-0 group-hover:scale-105 transition-transform"
               :style="{ backgroundColor: svc.color ?? '#6366f1' }">
               ✦
             </div>
@@ -222,7 +251,10 @@ const stepLabels = ['', 'Service', 'Date', 'Heure', 'Coordonnées', 'Confirmé']
 
           <!-- Service summary -->
           <div class="flex items-center gap-3 p-4 rounded-xl" :style="{ backgroundColor: (selected.service?.color ?? '#6366f1') + '15' }">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
+            <div v-if="selected.service?.images?.length" class="w-10 h-10 rounded-xl overflow-hidden shrink-0">
+              <img :src="svcImageUrl(selected.service.images[0])" :alt="selected.service.name" class="w-full h-full object-cover" />
+            </div>
+            <div v-else class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
               :style="{ backgroundColor: selected.service?.color ?? '#6366f1' }">✦</div>
             <div>
               <p class="font-semibold text-gray-900 text-sm">{{ selected.service?.name }}</p>
@@ -426,16 +458,17 @@ const stepLabels = ['', 'Service', 'Date', 'Heure', 'Coordonnées', 'Confirmé']
             </div>
           </div>
 
-          <div v-if="booking.business_phone" class="flex flex-col gap-2">
-            <p class="text-sm text-gray-500">Questions ? Contactez directement :</p>
+          <div v-if="booking.business_phone" class="flex flex-col gap-3">
+            <p class="text-sm text-gray-500">Envoyez votre réservation au commerçant via WhatsApp :</p>
             <a
-              :href="'https://wa.me/' + booking.business_phone.replace(/[^0-9]/g, '')"
+              :href="whatsappLink"
               target="_blank"
-              class="flex items-center justify-center gap-2 py-3 px-6 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-colors mx-auto"
+              class="flex items-center justify-center gap-2 py-3.5 px-6 bg-[#25D366] hover:bg-[#1fb855] text-white font-bold rounded-xl transition-colors mx-auto shadow-lg shadow-green-500/20"
             >
-              <PhoneIcon class="w-4 h-4" />
-              Contacter sur WhatsApp
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+              Envoyer sur WhatsApp
             </a>
+            <p class="text-[11px] text-gray-400">Un message pré-rempli s'ouvrira dans WhatsApp</p>
           </div>
 
           <button @click="step = 1; Object.assign(form, { customer_name: '', customer_phone: '', customer_email: '', notes: '' }); booking = null" class="btn-secondary mx-auto">

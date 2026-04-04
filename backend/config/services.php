@@ -35,4 +35,10 @@ return [
     'whatsapp' => [
         'provider' => env('WHATSAPP_PROVIDER', 'twilio'),
     ],
+
+    'flutterwave' => [
+        'public_key'   => env('FLW_PUBLIC_KEY'),
+        'secret_key'   => env('FLW_SECRET_KEY'),
+        'webhook_hash' => env('FLW_WEBHOOK_HASH'),
+    ],
 ];

@@ -94,9 +94,7 @@ onUnmounted(() => {
           <div class="p-5">
             <div class="flex items-start gap-4">
               <!-- App icon -->
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center shrink-0 shadow-md">
-                <span class="text-white font-black text-2xl">R</span>
-              </div>
+              <img src="/logo.png" alt="Réserva" class="w-14 h-14 shrink-0" />
 
               <div class="flex-1 min-w-0">
                 <p class="font-bold text-gray-900 text-base leading-tight">Installer Réserva</p>

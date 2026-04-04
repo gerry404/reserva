@@ -37,6 +37,7 @@ class BusinessController extends Controller
             'booking_notice'         => 'sometimes|integer|min:0',
             'notifications_whatsapp' => 'sometimes|boolean',
             'notifications_sms'      => 'sometimes|boolean',
+            'notifications_email'    => 'sometimes|boolean',
             'is_active'              => 'sometimes|boolean',
             'accent_color'           => 'sometimes|string|max:7',
         ]);

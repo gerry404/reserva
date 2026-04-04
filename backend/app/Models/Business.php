@@ -28,6 +28,7 @@ class Business extends Model
         'booking_notice',
         'notifications_whatsapp',
         'notifications_sms',
+        'notifications_email',
         'is_active',
         'accent_color',
     ];
@@ -36,6 +37,7 @@ class Business extends Model
         'working_hours'          => 'array',
         'notifications_whatsapp' => 'boolean',
         'notifications_sms'      => 'boolean',
+        'notifications_email'    => 'boolean',
         'is_active'              => 'boolean',
         'slot_duration'          => 'integer',
         'booking_notice'         => 'integer',

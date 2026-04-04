@@ -87,9 +87,16 @@ export const useAuthStore = defineStore('auth', () => {
     business.value = { ...business.value, ...updated }
   }
 
+  async function fetchUser() {
+    if (!token.value) return
+    const { data } = await authApi.me()
+    user.value     = data.user
+    business.value = data.business
+  }
+
   return {
     user, business, token, loading,
     isAuth, merchantPlan, isPro,
-    init, register, login, loginWithGoogle, logout, updateBusiness,
+    init, register, login, loginWithGoogle, logout, updateBusiness, fetchUser,
   }
 })

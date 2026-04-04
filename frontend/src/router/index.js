@@ -51,6 +51,11 @@ const router = createRouter({
           name: 'settings',
           component: () => import('@/views/dashboard/SettingsView.vue'),
         },
+        {
+          path: 'billing',
+          name: 'billing',
+          component: () => import('@/views/dashboard/BillingView.vue'),
+        },
       ],
     },
 

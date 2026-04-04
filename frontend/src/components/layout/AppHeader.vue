@@ -1,8 +1,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { Bars3Icon, BellIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline'
+import {
+  Bars3Icon,
+  BellIcon,
+  ArrowRightOnRectangleIcon,
+  Cog6ToothIcon,
+  UserCircleIcon,
+  SparklesIcon,
+} from '@heroicons/vue/24/outline'
 
 const emit = defineEmits(['toggle-sidebar'])
 const route = useRoute()
@@ -38,25 +45,41 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
 </script>
 
 <template>
-  <header class="bg-white border-b border-gray-100 px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4 shrink-0">
+  <header class="bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4 shrink-0 sticky top-0 z-30">
     <!-- Mobile menu toggle -->
     <button
       @click="emit('toggle-sidebar')"
-      class="p-2 -ml-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors lg:hidden"
+      class="p-2 -ml-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors lg:hidden"
       aria-label="Menu"
     >
       <Bars3Icon class="w-5 h-5" />
     </button>
 
-    <!-- Page title -->
-    <h1 class="font-bold text-gray-900 text-lg flex-1">
-      {{ getTitle() }}
-    </h1>
+    <!-- Logo (visible on mobile when sidebar hidden) -->
+    <div class="flex items-center gap-2 lg:hidden">
+      <img src="/logo.png" alt="Réserva" class="w-7 h-7" />
+      <span class="font-display font-extrabold text-gray-900 text-base tracking-tight">Réserva</span>
+    </div>
+
+    <!-- Page title + business name -->
+    <div class="flex-1 hidden lg:flex items-center gap-3">
+      <h1 class="font-display font-bold text-gray-900 text-lg">{{ getTitle() }}</h1>
+      <span v-if="auth.business?.name" class="text-gray-300">·</span>
+      <span v-if="auth.business?.name" class="text-sm text-gray-400 truncate max-w-[200px]">{{ auth.business.name }}</span>
+    </div>
+    <div class="flex-1 lg:hidden" />
 
     <!-- Actions -->
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1.5">
+      <!-- Plan badge -->
+      <RouterLink v-if="auth.user?.plan === 'free'" to="/dashboard/settings"
+        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-full transition-colors">
+        <SparklesIcon class="w-3.5 h-3.5" />
+        Passer Pro
+      </RouterLink>
+
       <!-- Notification bell -->
-      <button class="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors relative">
+      <button class="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors relative">
         <BellIcon class="w-5 h-5" />
         <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
       </button>
@@ -65,21 +88,49 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
       <div ref="menuRef" class="relative">
         <button
           @click.stop="showMenu = !showMenu"
-          class="w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center text-white font-semibold text-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:ring-offset-2"
+          class="w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:ring-offset-2"
         >
-          {{ auth.user?.name?.charAt(0) }}
+          {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
         </button>
 
         <Transition name="menu">
           <div
             v-if="showMenu"
-            class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-black/10 border border-gray-100 overflow-hidden z-50"
+            class="absolute right-0 mt-2.5 w-64 bg-white rounded-2xl shadow-2xl shadow-black/12 border border-gray-100 overflow-hidden z-50"
           >
-            <div class="px-4 py-3 border-b border-gray-50">
-              <p class="font-semibold text-gray-900 text-sm truncate">{{ auth.user?.name }}</p>
-              <p class="text-xs text-gray-500 truncate">{{ auth.user?.email }}</p>
+            <!-- User info -->
+            <div class="px-4 py-4 border-b border-gray-50 bg-gray-50/50">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
+                </div>
+                <div class="min-w-0">
+                  <p class="font-bold text-gray-900 text-sm truncate">{{ auth.user?.name }}</p>
+                  <p class="text-xs text-gray-500 truncate">{{ auth.user?.email }}</p>
+                </div>
+              </div>
+              <div v-if="auth.business?.name" class="mt-2.5 px-2.5 py-1.5 bg-white rounded-lg border border-gray-100">
+                <p class="text-[11px] text-gray-400 font-medium">Commerce</p>
+                <p class="text-xs font-semibold text-gray-700 truncate">{{ auth.business.name }}</p>
+              </div>
             </div>
-            <div class="py-1">
+
+            <!-- Menu links -->
+            <div class="py-1.5">
+              <RouterLink @click="showMenu = false" to="/dashboard/settings"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <Cog6ToothIcon class="w-4 h-4 text-gray-400" />
+                Paramètres
+              </RouterLink>
+              <RouterLink @click="showMenu = false" to="/"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <UserCircleIcon class="w-4 h-4 text-gray-400" />
+                Voir le site
+              </RouterLink>
+            </div>
+
+            <!-- Logout -->
+            <div class="border-t border-gray-50 py-1.5">
               <button
                 @click="handleLogout"
                 class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"

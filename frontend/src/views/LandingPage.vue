@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import {
   DevicePhoneMobileIcon,
   BoltIcon,
@@ -10,7 +11,10 @@ import {
   StarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ArrowRightIcon,
 } from '@heroicons/vue/24/outline'
+
+const auth = useAuthStore()
 
 const features = [
   {
@@ -170,6 +174,13 @@ function resetAutoplay() {
 
 // ── Navbar scroll ──
 const scrolled = ref(false)
+const navHidden = ref(false)
+const lastScrollY = ref(0)
+const mobileMenuOpen = ref(false)
+
+// ── Scroll-reveal ──
+const heroVisible = ref(false)
+const heroTextEl = ref(null)
 
 // ── Animated browser mockup ──
 const mockupStep = ref(1)
@@ -268,7 +279,12 @@ function startAnimation() {
 // Cursor blink
 let cursorTimer = null
 
-function onScroll() { scrolled.value = window.scrollY > 20 }
+function onScroll() {
+  const y = window.scrollY
+  scrolled.value = y > 20
+  navHidden.value = y > 300 && y > lastScrollY.value
+  lastScrollY.value = y
+}
 function measureCarousel() {
   if (trackEl.value) containerWidth.value = trackEl.value.offsetWidth
 }
@@ -282,6 +298,7 @@ onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('resize', measureCarousel, { passive: true })
   setTimeout(measureCarousel, 100)
+  nextTick(() => { setTimeout(() => { heroVisible.value = true }, 100) })
 })
 
 onUnmounted(() => {
@@ -296,132 +313,155 @@ onUnmounted(() => {
 
 <template>
   <div class="min-h-screen bg-white">
-    <!-- Navbar — Sticky Glassmorphism -->
-    <nav :class="[
-      'fixed top-0 inset-x-0 z-50 transition-all duration-500',
-      scrolled
-        ? 'py-0 bg-white/60 backdrop-blur-xl backdrop-saturate-150 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_0_0_1px_rgba(0,0,0,0.03)]'
-        : 'py-1 bg-white/30 backdrop-blur-md'
-    ]">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-[56px] flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-600 to-violet-600 flex items-center justify-center">
-            <span class="text-white font-extrabold text-xs">R</span>
-          </div>
-          <span class="font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
-        </div>
+    <!-- ══════ FLOATING NAVBAR ══════ -->
+    <div :class="[
+      'fixed top-0 inset-x-0 z-50 transition-all duration-500 flex justify-center',
+      navHidden ? '-translate-y-full' : 'translate-y-0'
+    ]" :style="{ paddingTop: scrolled ? '8px' : '16px' }">
+      <nav :class="[
+        'transition-all duration-500 flex items-center justify-between',
+        scrolled
+          ? 'max-w-3xl w-full mx-4 px-4 py-2 bg-white/70 backdrop-blur-2xl backdrop-saturate-[1.8] shadow-[0_8px_32px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] rounded-2xl'
+          : 'max-w-6xl w-full mx-4 sm:mx-6 px-6 py-3 bg-transparent rounded-2xl'
+      ]">
+        <!-- Logo -->
+        <RouterLink to="/" class="flex items-center gap-2 shrink-0">
+          <img src="/logo.png" alt="Réserva" :class="['transition-all duration-300', scrolled ? 'w-7 h-7' : 'w-8 h-8']" />
+          <span :class="[
+            'font-display font-black tracking-tight transition-all duration-300',
+            scrolled ? 'text-base text-gray-900' : 'text-lg text-gray-900'
+          ]">Réserva</span>
+        </RouterLink>
+
+        <!-- Center nav links -->
+        <!-- Logo text uses display font via global h* rule or explicit class -->
         <div class="hidden md:flex items-center">
-          <div class="flex items-center gap-0.5 bg-white/50 backdrop-blur-sm rounded-full px-1.5 py-1 border border-white/60">
-            <a href="#features" class="px-3.5 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-full hover:bg-white/80 transition-all duration-200">Fonctionnalités</a>
-            <a href="#pricing" class="px-3.5 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-full hover:bg-white/80 transition-all duration-200">Tarifs</a>
-            <RouterLink to="/blog" class="px-3.5 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-full hover:bg-white/80 transition-all duration-200">Blog</RouterLink>
-            <RouterLink to="/contact" class="px-3.5 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-full hover:bg-white/80 transition-all duration-200">Contact</RouterLink>
+          <div :class="[
+            'flex items-center gap-0.5 rounded-full px-1 py-0.5 transition-all duration-300',
+            scrolled ? '' : 'bg-white/50 backdrop-blur-sm border border-white/60'
+          ]">
+            <a href="#features" class="nav-pill">Fonctionnalités</a>
+            <a href="#pricing" class="nav-pill">Tarifs</a>
+            <RouterLink to="/blog" class="nav-pill">Blog</RouterLink>
+            <RouterLink to="/contact" class="nav-pill">Contact</RouterLink>
           </div>
         </div>
-        <div class="hidden sm:flex items-center gap-2">
-          <RouterLink to="/login" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 rounded-full hover:bg-white/70 transition-all duration-200">Se connecter</RouterLink>
-          <RouterLink to="/register" class="px-5 py-2 text-sm font-semibold text-white bg-gray-900 hover:bg-gray-800 rounded-full transition-all duration-200 shadow-sm shadow-gray-900/10">Démarrer</RouterLink>
-        </div>
-        <RouterLink to="/register" class="px-4 py-2 text-sm font-semibold text-white bg-gray-900 rounded-full sm:hidden">Démarrer</RouterLink>
-      </div>
-    </nav>
 
-    <!-- Hero -->
-    <section class="pt-28 pb-20 px-4 sm:px-6 relative overflow-hidden">
-      <!-- Mesh gradient background -->
+        <!-- Right actions -->
+        <div class="hidden sm:flex items-center gap-1.5">
+          <template v-if="auth.isAuth">
+            <RouterLink to="/dashboard" class="inline-flex items-center gap-2 px-5 py-1.5 text-sm font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all duration-200 shadow-md shadow-gray-900/15 hover:shadow-lg hover:shadow-gray-900/20 hover:-translate-y-px">
+              Mon tableau de bord
+              <ArrowRightIcon class="w-3.5 h-3.5" />
+            </RouterLink>
+          </template>
+          <template v-else>
+            <RouterLink to="/login" :class="[
+              'px-4 py-1.5 text-sm font-semibold rounded-xl transition-all duration-200',
+              scrolled ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' : 'text-gray-700 hover:text-gray-900 hover:bg-white/60'
+            ]">Se connecter</RouterLink>
+            <RouterLink to="/register" class="px-5 py-1.5 text-sm font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all duration-200 shadow-md shadow-gray-900/15 hover:shadow-lg hover:shadow-gray-900/20 hover:-translate-y-px">Démarrer</RouterLink>
+          </template>
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="sm:hidden flex flex-col gap-1 p-2">
+          <span :class="['block w-5 h-0.5 bg-gray-900 rounded-full transition-all duration-300', mobileMenuOpen ? 'rotate-45 translate-y-[6px]' : '']" />
+          <span :class="['block w-5 h-0.5 bg-gray-900 rounded-full transition-all duration-300', mobileMenuOpen ? 'opacity-0' : '']" />
+          <span :class="['block w-5 h-0.5 bg-gray-900 rounded-full transition-all duration-300', mobileMenuOpen ? '-rotate-45 -translate-y-[6px]' : '']" />
+        </button>
+      </nav>
+    </div>
+
+    <!-- Mobile menu -->
+    <Transition name="mobile-menu">
+      <div v-if="mobileMenuOpen" class="fixed inset-0 z-40 bg-white/95 backdrop-blur-2xl flex flex-col items-center justify-center gap-6 sm:hidden">
+        <a @click="mobileMenuOpen = false" href="#features" class="text-2xl font-bold text-gray-900">Fonctionnalités</a>
+        <a @click="mobileMenuOpen = false" href="#pricing" class="text-2xl font-bold text-gray-900">Tarifs</a>
+        <RouterLink @click="mobileMenuOpen = false" to="/blog" class="text-2xl font-bold text-gray-900">Blog</RouterLink>
+        <RouterLink @click="mobileMenuOpen = false" to="/contact" class="text-2xl font-bold text-gray-900">Contact</RouterLink>
+        <div class="flex flex-col gap-3 mt-4 w-56">
+          <template v-if="auth.isAuth">
+            <RouterLink @click="mobileMenuOpen = false" to="/dashboard" class="py-3 text-center text-base font-bold text-white bg-gray-900 rounded-xl">Mon tableau de bord</RouterLink>
+          </template>
+          <template v-else>
+            <RouterLink @click="mobileMenuOpen = false" to="/login" class="py-3 text-center text-base font-semibold text-gray-700 border-2 border-gray-200 rounded-xl">Se connecter</RouterLink>
+            <RouterLink @click="mobileMenuOpen = false" to="/register" class="py-3 text-center text-base font-bold text-white bg-gray-900 rounded-xl">Démarrer</RouterLink>
+          </template>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- ══════ HERO ══════ -->
+    <section class="relative min-h-[100vh] flex flex-col justify-center px-4 sm:px-6 overflow-hidden">
+      <!-- Background -->
       <div class="absolute inset-0 -z-10">
-        <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary-200/40 rounded-full blur-[120px]" />
-        <div class="absolute top-20 right-1/4 w-[400px] h-[400px] bg-violet-200/30 rounded-full blur-[100px]" />
-        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-amber-100/20 rounded-full blur-[100px]" />
-        <!-- Dot grid pattern -->
-        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, #6366f1 0.5px, transparent 0); background-size: 32px 32px;" />
+        <div class="absolute top-[-20%] left-[10%] w-[600px] h-[600px] bg-primary-100/50 rounded-full blur-[150px] animate-float-slow" />
+        <div class="absolute top-[10%] right-[5%] w-[500px] h-[500px] bg-violet-100/40 rounded-full blur-[130px] animate-float-slow" style="animation-delay: -3s" />
+        <div class="absolute bottom-[-10%] left-[40%] w-[500px] h-[400px] bg-amber-50/40 rounded-full blur-[120px]" />
+        <div class="absolute inset-0 opacity-[0.025]" style="background-image: radial-gradient(circle at 1px 1px, #6366f1 0.5px, transparent 0); background-size: 40px 40px;" />
       </div>
 
-      <div class="max-w-6xl mx-auto">
-        <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          <!-- Left: Text content -->
-          <div class="max-w-xl animate-slide-up">
-            <h1 class="text-5xl sm:text-6xl lg:text-[3.5rem] xl:text-6xl font-extrabold text-gray-900 leading-[1.08] tracking-tight mb-6">
-              Vos réservations,
-              <span class="relative inline-block">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 via-violet-600 to-primary-600 bg-[length:200%_auto] animate-gradient-x">en pilote automatique</span>
-              </span>
-            </h1>
+      <div class="max-w-4xl mx-auto text-center pt-28 pb-12">
+        <!-- Title -->
+        <h1 :class="[
+          'text-5xl sm:text-6xl lg:text-7xl font-black text-gray-900 leading-[1.05] tracking-tight mb-7 transition-all duration-700 delay-150',
+          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        ]">
+          Vos réservations,<br />
+          <span class="hero-gradient-text">en pilote automatique</span>
+        </h1>
 
-            <p class="text-lg sm:text-xl text-gray-500 leading-relaxed mb-8">
-              Créez votre page de réservation en 5 minutes. Vos clients réservent en ligne, vous recevez une notification WhatsApp. <strong class="text-gray-700">Zéro appel manqué.</strong>
-            </p>
+        <!-- Subtitle -->
+        <p :class="[
+          'text-lg sm:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto mb-10 transition-all duration-700 delay-300',
+          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        ]">
+          Créez votre page de réservation en 5 minutes. Vos clients réservent en ligne,
+          vous recevez une notification WhatsApp. <strong class="text-gray-700 font-semibold">Zéro appel manqué.</strong>
+        </p>
 
-            <div class="flex flex-col sm:flex-row gap-3 mb-6">
-              <RouterLink to="/register" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all duration-200 shadow-lg shadow-gray-900/20">
-                Créer mon compte gratuit
-              </RouterLink>
-              <a href="#features" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-gray-700 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-xl transition-all duration-200">
-                Voir les fonctionnalités
-              </a>
+        <!-- CTA buttons -->
+        <div :class="[
+          'flex flex-col sm:flex-row gap-3 justify-center mb-12 transition-all duration-700 delay-[450ms]',
+          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        ]">
+          <RouterLink to="/register"
+            class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-2xl transition-all duration-300 shadow-xl shadow-gray-900/20 hover:shadow-2xl hover:shadow-gray-900/30 hover:-translate-y-0.5">
+            Créer mon compte gratuit
+            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </RouterLink>
+          <a href="#features"
+            class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-gray-700 bg-white/80 backdrop-blur-sm border border-gray-200 hover:border-gray-300 hover:bg-white rounded-2xl transition-all duration-300 hover:-translate-y-0.5">
+            Voir les fonctionnalités
+          </a>
+        </div>
+
+        <!-- Social proof -->
+        <div :class="[
+          'flex items-center justify-center gap-4 transition-all duration-700 delay-[600ms]',
+          heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        ]">
+          <div class="flex -space-x-2">
+            <div v-for="(c, i) in ['from-pink-500 to-rose-500', 'from-blue-500 to-cyan-500', 'from-violet-500 to-purple-500', 'from-emerald-500 to-teal-500']" :key="i"
+              :class="['w-8 h-8 rounded-full bg-gradient-to-br border-2 border-white flex items-center justify-center text-white text-[10px] font-bold shadow-sm', c]">
+              {{ ['MN', 'JM', 'AD', 'SE'][i] }}
             </div>
           </div>
-
-          <!-- Right: Floating UI cards (compact, lightweight) -->
-          <div class="relative hidden lg:block h-[420px]">
-            <!-- Notification card -->
-            <div class="absolute top-4 left-6 right-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-900/[0.06] border border-gray-100/80 p-4 animate-slide-up" style="animation-delay: 0.15s">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-gray-900">Nouvelle réservation</p>
-                  <p class="text-xs text-gray-400">Amina B. -- Tresses, Mer. 28 a 09:30</p>
-                </div>
-                <span class="text-[10px] bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">Confirmée</span>
-              </div>
+          <div class="flex items-center gap-1">
+            <div class="flex">
+              <svg v-for="i in 5" :key="i" class="w-4 h-4 text-amber-400 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
             </div>
-
-            <!-- Stats + mini chart -->
-            <div class="absolute top-[110px] left-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-900/[0.06] border border-gray-100/80 p-4 w-44 animate-slide-up" style="animation-delay: 0.3s">
-              <p class="text-[11px] text-gray-400 font-medium">Ce mois</p>
-              <p class="text-xl font-extrabold text-gray-900 leading-tight">147</p>
-              <p class="text-[11px] text-emerald-600 font-semibold mb-2">+23%</p>
-              <div class="flex items-end gap-0.5 h-6">
-                <div class="flex-1 bg-primary-100 rounded-sm" style="height: 40%" />
-                <div class="flex-1 bg-primary-200 rounded-sm" style="height: 55%" />
-                <div class="flex-1 bg-primary-200 rounded-sm" style="height: 45%" />
-                <div class="flex-1 bg-primary-300 rounded-sm" style="height: 70%" />
-                <div class="flex-1 bg-primary-400 rounded-sm" style="height: 60%" />
-                <div class="flex-1 bg-primary-500 rounded-sm" style="height: 85%" />
-                <div class="flex-1 bg-primary-600 rounded-sm" style="height: 100%" />
-              </div>
-            </div>
-
-            <!-- Calendar mini -->
-            <div class="absolute top-[110px] right-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-900/[0.06] border border-gray-100/80 p-3.5 w-48 animate-slide-up" style="animation-delay: 0.45s">
-              <p class="text-[11px] font-bold text-gray-900 mb-2">Mars 2026</p>
-              <div class="grid grid-cols-7 gap-px text-center">
-                <span v-for="d in ['L','M','M','J','V','S','D']" :key="d" class="text-[8px] font-semibold text-gray-300 pb-1">{{ d }}</span>
-                <span v-for="n in [24,25,26,27,28,29,30]" :key="n" :class="['text-[10px] w-5 h-5 flex items-center justify-center rounded', n === 28 ? 'bg-primary-600 text-white font-bold' : n === 29 ? 'bg-primary-50 text-primary-600' : 'text-gray-400']">{{ n }}</span>
-              </div>
-            </div>
-
-            <!-- WhatsApp toast -->
-            <div class="absolute bottom-10 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-900/[0.06] border border-gray-100/80 p-3.5 animate-slide-up" style="animation-delay: 0.6s">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-semibold text-gray-900">WhatsApp</p>
-                  <p class="text-[11px] text-gray-400 truncate">Amina B. a réservé pour le 28/03</p>
-                </div>
-                <span class="text-[10px] text-gray-300">9:32</span>
-              </div>
-            </div>
+            <span class="text-sm font-semibold text-gray-600 ml-1">4.9/5</span>
           </div>
         </div>
       </div>
 
       <!-- ══════ ANIMATED BROWSER MOCKUP ══════ -->
-      <div class="max-w-5xl mx-auto mt-16 px-4">
+      <div :class="[
+        'w-full max-w-[min(90vw,1280px)] mx-auto mt-4 px-0 pb-20 transition-all duration-1000 delay-700',
+        heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+      ]">
         <div class="relative rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5">
           <!-- Browser chrome -->
           <div class="bg-gray-800 px-4 py-3 flex items-center gap-2">
@@ -437,7 +477,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Browser content -->
-          <div class="bg-gray-50 min-h-[440px] overflow-hidden">
+          <div class="bg-gray-50 min-h-[440px] lg:min-h-[540px] xl:min-h-[620px] overflow-hidden">
             <!-- Mini business header -->
             <div class="bg-gradient-to-r from-violet-600 to-primary-500 px-6 py-4 text-white text-center">
               <div class="w-11 h-11 rounded-full bg-white/20 border-2 border-white/30 mx-auto mb-1.5 flex items-center justify-center">
@@ -937,10 +977,8 @@ onUnmounted(() => {
           <!-- Brand column -->
           <div class="col-span-2 md:col-span-1">
             <div class="flex items-center gap-2 mb-4">
-              <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center">
-                <span class="text-white font-bold text-sm">R</span>
-              </div>
-              <span class="font-extrabold text-white text-lg">Réserva</span>
+              <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
+              <span class="font-display font-extrabold text-white text-lg">Réserva</span>
             </div>
             <p class="text-sm leading-relaxed mb-6">La plateforme de réservation en ligne pensée pour les commerçants ambitieux.</p>
             <!-- Social links -->
@@ -1020,4 +1058,39 @@ onUnmounted(() => {
   0%   { transform: scale(0); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* Nav pill links */
+.nav-pill {
+  @apply px-3.5 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-full hover:bg-white/80 transition-all duration-200;
+}
+
+/* Hero gradient text */
+.hero-gradient-text {
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 25%, #a855f7 50%, #7e22ce 75%, #9333ea 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* Float animation for bg blobs */
+.animate-float-slow {
+  animation: floatSlow 8s ease-in-out infinite;
+}
+@keyframes floatSlow {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -20px); }
+}
+
+/* Mobile menu transitions */
+.mobile-menu-enter-active { transition: all 0.3s ease-out; }
+.mobile-menu-leave-active { transition: all 0.2s ease-in; }
+.mobile-menu-enter-from { opacity: 0; }
+.mobile-menu-leave-to { opacity: 0; }
 </style>

@@ -7,6 +7,7 @@ import {
   CalendarDaysIcon,
   Squares2X2Icon,
   Cog6ToothIcon,
+  CreditCardIcon,
   ArrowTopRightOnSquareIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
@@ -22,6 +23,7 @@ const navItems = [
   { name: 'Réservations',    to: '/dashboard/bookings', icon: CalendarDaysIcon },
   { name: 'Services',        to: '/dashboard/services', icon: Squares2X2Icon },
   { name: 'Paramètres',      to: '/dashboard/settings', icon: Cog6ToothIcon },
+  { name: 'Abonnement',     to: '/dashboard/billing',  icon: CreditCardIcon },
 ]
 
 const publicUrl = computed(() => {
@@ -51,10 +53,8 @@ function onNav() {
     <div class="flex flex-col flex-1 overflow-hidden">
       <!-- Logo -->
       <div class="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-600 to-violet-600 flex items-center justify-center shrink-0 shadow-md shadow-primary-500/20">
-          <span class="text-white font-extrabold text-sm">R</span>
-        </div>
-        <span class="font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
+        <img src="/logo.png" alt="Réserva" class="w-9 h-9 shrink-0" />
+        <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
       </div>
 
       <!-- Nav -->
@@ -113,10 +113,8 @@ function onNav() {
       <!-- Mobile header -->
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-600 to-violet-600 flex items-center justify-center">
-            <span class="text-white font-bold text-sm">R</span>
-          </div>
-          <span class="font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
+          <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
+          <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
         </div>
         <button @click="emit('close')" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
           <XMarkIcon class="w-5 h-5" />
