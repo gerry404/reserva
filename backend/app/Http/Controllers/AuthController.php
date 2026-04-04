@@ -8,8 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use App\Mail\WelcomeNotification;
 
 class AuthController extends Controller
 {
@@ -26,11 +28,12 @@ class AuthController extends Controller
         ]);
 
         $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'phone'    => $validated['phone'],
-            'plan'     => 'free',
+            'name'            => $validated['name'],
+            'email'           => $validated['email'],
+            'password'        => Hash::make($validated['password']),
+            'phone'           => $validated['phone'],
+            'plan'            => 'pro',
+            'plan_expires_at' => now()->addDays(14),
         ]);
 
         $business = Business::create([
@@ -51,6 +54,13 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('auth-token')->plainTextToken;
+
+        // Send welcome email
+        try {
+            Mail::to($user->email)->queue(new WelcomeNotification($user));
+        } catch (\Exception $e) {
+            \Log::error('Welcome email failed: ' . $e->getMessage());
+        }
 
         return response()->json([
             'token'    => $token,
@@ -126,14 +136,21 @@ class AuthController extends Controller
                 'avatar'    => $googleUser->getAvatar(),
             ]);
         } else {
-            // Create new user
+            // Create new user with 14-day Pro trial
             $user = User::create([
-                'name'      => $googleUser->getName(),
-                'email'     => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'avatar'    => $googleUser->getAvatar(),
-                'plan'      => 'free',
+                'name'            => $googleUser->getName(),
+                'email'           => $googleUser->getEmail(),
+                'google_id'       => $googleUser->getId(),
+                'avatar'          => $googleUser->getAvatar(),
+                'plan'            => 'pro',
+                'plan_expires_at' => now()->addDays(14),
             ]);
+
+            try {
+                Mail::to($user->email)->queue(new WelcomeNotification($user));
+            } catch (\Exception $e) {
+                \Log::error('Welcome email failed: ' . $e->getMessage());
+            }
         }
 
         $user->tokens()->delete();

@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         ]);
+        $middleware->appendToGroup('api', [
+            \App\Http\Middleware\CheckPlanExpiry::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, $request) {

@@ -209,6 +209,16 @@ const statusSegments = computed(() => {
   })
 })
 
+// Trial info
+const trialDaysLeft = computed(() => {
+  const expires = auth.user?.plan_expires_at
+  if (!expires || auth.user?.plan === 'free') return -1
+  const diff = Math.ceil((new Date(expires) - new Date()) / (1000 * 60 * 60 * 24))
+  return diff
+})
+
+const isOnTrial = computed(() => trialDaysLeft.value > 0 && trialDaysLeft.value <= 14)
+
 // Greeting
 const greeting = computed(() => {
   const h = new Date().getHours()
@@ -419,6 +429,25 @@ const greeting = computed(() => {
           </div>
         </div>
 
+        <!-- Trial banner -->
+        <div v-if="isOnTrial" class="card overflow-hidden">
+          <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div class="flex items-center gap-3 flex-1">
+              <span class="text-2xl">🎁</span>
+              <div>
+                <h3 class="font-bold text-white text-sm">Essai Pro gratuit</h3>
+                <p class="text-white/80 text-xs">
+                  <template v-if="trialDaysLeft <= 3">Plus que <strong>{{ trialDaysLeft }} jour{{ trialDaysLeft > 1 ? 's' : '' }}</strong> ! Passez au Pro pour ne rien perdre.</template>
+                  <template v-else>Il vous reste <strong>{{ trialDaysLeft }} jours</strong> d'essai. Profitez de toutes les fonctionnalités Pro !</template>
+                </p>
+              </div>
+            </div>
+            <RouterLink to="/dashboard/billing" class="bg-white text-amber-700 font-bold text-xs px-4 py-2 rounded-xl hover:bg-amber-50 transition-colors shrink-0">
+              Voir les plans
+            </RouterLink>
+          </div>
+        </div>
+
         <!-- Plan usage -->
         <div v-if="stats.plan === 'free'" class="card p-5">
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -440,7 +469,7 @@ const greeting = computed(() => {
                 ⚠ Presque à la limite — passez au Pro pour des réservations illimitées.
               </p>
             </div>
-            <RouterLink to="/dashboard/settings" class="btn-primary text-xs px-4 py-2 whitespace-nowrap shrink-0">
+            <RouterLink to="/dashboard/billing" class="btn-primary text-xs px-4 py-2 whitespace-nowrap shrink-0">
               <SparklesIcon class="w-3.5 h-3.5" /> Passer Pro
             </RouterLink>
           </div>

@@ -32,6 +32,10 @@ Route::prefix('b/{slug}')->group(function () {
 // Flutterwave webhook (no auth)
 Route::post('/webhooks/flutterwave', [PaymentController::class, 'webhook']);
 
+// Public booking tracking (no auth)
+Route::post('/track-booking',  [PublicBookingController::class, 'track']);
+Route::post('/cancel-booking', [PublicBookingController::class, 'cancelByCustomer']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth

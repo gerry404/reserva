@@ -471,9 +471,17 @@ const whatsappLink = computed(() => {
             <p class="text-[11px] text-gray-400">Un message pré-rempli s'ouvrira dans WhatsApp</p>
           </div>
 
-          <button @click="step = 1; Object.assign(form, { customer_name: '', customer_phone: '', customer_email: '', notes: '' }); booking = null" class="btn-secondary mx-auto">
-            Faire une autre réservation
-          </button>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <RouterLink
+              :to="{ path: '/track', query: { ref: booking.reference } }"
+              class="btn-secondary text-sm"
+            >
+              📋 Suivre ma réservation
+            </RouterLink>
+            <button @click="step = 1; Object.assign(form, { customer_name: '', customer_phone: '', customer_email: '', notes: '' }); booking = null" class="btn-secondary text-sm">
+              Faire une autre réservation
+            </button>
+          </div>
         </div>
       </Transition>
     </div>

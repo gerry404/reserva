@@ -56,27 +56,27 @@ const plans = computed(() => [
     priceMonthly: '0',
     priceAnnual: '0',
     period: 'F CFA',
-    desc: 'Pour tester la plateforme',
+    desc: 'Pour démarrer sans risque',
     color: '',
     cta: 'Commencer gratuitement',
     ctaClass: 'block w-full py-3 rounded-xl text-sm font-bold text-center border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all',
     features: [
-      'Jusqu\'à 15 réservations/mois',
-      '3 services maximum',
+      'Jusqu\'à 30 réservations/mois',
       'Page de réservation publique',
-      'Notifications de base',
+      'Notifications WhatsApp (wa.me)',
+      'Tableau de bord basique',
+      'Export CSV',
     ],
     limitations: [
-      'Branding Réserva visible',
       'Pas de rappels automatiques',
       'Statistiques limitées',
     ],
   },
   {
     name: 'Pro',
-    priceMonthly: '4 490',
-    priceAnnual: '2 990',
-    savingsAnnual: '17 880',
+    priceMonthly: '2 900',
+    priceAnnual: '2 075',
+    savingsAnnual: '9 900',
     period: 'F CFA/mois',
     desc: 'Choisi par 82% de nos clients',
     color: 'border-primary-500 ring-2 ring-primary-500/20',
@@ -85,19 +85,18 @@ const plans = computed(() => [
     ctaClass: 'btn-primary block w-full py-3 text-sm text-center',
     features: [
       'Réservations illimitées',
-      'Services illimités',
-      'Suppression du branding',
-      'Rappels WhatsApp automatiques',
-      'Statistiques complètes & revenus',
-      'Export CSV des données',
+      'Rappels email automatiques',
+      'URL personnalisée',
+      'Statistiques avancées & revenus',
+      'Export CSV illimité',
       'Support prioritaire',
     ],
   },
   {
     name: 'Business',
-    priceMonthly: '14 900',
-    priceAnnual: '9 900',
-    savingsAnnual: '59 400',
+    priceMonthly: '7 900',
+    priceAnnual: '5 825',
+    savingsAnnual: '24 900',
     period: 'F CFA/mois',
     desc: 'Pour les équipes & multi-sites',
     color: 'border-gray-200',
@@ -105,8 +104,8 @@ const plans = computed(() => [
     ctaClass: 'block w-full py-3 rounded-xl text-sm font-bold text-center border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-all',
     features: [
       'Tout le plan Pro',
-      'Multi-employés & planning',
-      'Plusieurs lieux / adresses',
+      'Multi-employés (bientôt)',
+      'SMS automatiques',
       'Tableau de bord multi-sites',
       'Intégration API personnalisée',
       'Gestionnaire de compte dédié',
@@ -1005,6 +1004,7 @@ onUnmounted(() => {
               <li><RouterLink to="/register" class="text-sm hover:text-white transition-colors">Créer un compte</RouterLink></li>
               <li><a href="#features" class="text-sm hover:text-white transition-colors">Fonctionnalités</a></li>
               <li><a href="#pricing" class="text-sm hover:text-white transition-colors">Tarifs</a></li>
+              <li><RouterLink to="/track" class="text-sm hover:text-white transition-colors">Suivre une réservation</RouterLink></li>
               <li><RouterLink to="/api-docs" class="text-sm hover:text-white transition-colors">API</RouterLink></li>
             </ul>
           </div>

@@ -66,6 +66,13 @@ const router = createRouter({
       component: () => import('@/views/public/PublicBookingView.vue'),
     },
 
+    // Booking tracking page (client)
+    {
+      path: '/track',
+      name: 'track-booking',
+      component: () => import('@/views/public/TrackBookingView.vue'),
+    },
+
     // Static pages (with shared layout)
     {
       path: '/',

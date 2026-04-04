@@ -40,6 +40,7 @@ class BusinessController extends Controller
             'notifications_email'    => 'sometimes|boolean',
             'is_active'              => 'sometimes|boolean',
             'accent_color'           => 'sometimes|string|max:7',
+            'slug'                   => ['sometimes', 'string', 'max:60', 'regex:/^[a-z0-9][a-z0-9-]*[a-z0-9]$/', 'unique:businesses,slug,' . $business->id],
         ]);
 
         // Handle logo upload

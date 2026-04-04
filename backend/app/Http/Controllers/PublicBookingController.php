@@ -149,6 +149,64 @@ class PublicBookingController extends Controller
         ], 201);
     }
 
+    /**
+     * Track a booking by reference and phone.
+     */
+    public function track(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'reference' => 'required|string',
+            'phone'     => 'required|string',
+        ]);
+
+        $booking = Booking::with('service', 'business')
+            ->where('reference', $validated['reference'])
+            ->where('customer_phone', $validated['phone'])
+            ->first();
+
+        if (!$booking) {
+            return response()->json(['message' => 'Aucune réservation trouvée avec ces informations.'], 404);
+        }
+
+        return response()->json([
+            'reference'      => $booking->reference,
+            'customer_name'  => $booking->customer_name,
+            'service'        => $booking->service?->name,
+            'business_name'  => $booking->business->name,
+            'business_phone' => $booking->business->whatsapp ?? $booking->business->phone,
+            'date'           => $booking->date->locale('fr')->isoFormat('dddd D MMMM YYYY'),
+            'time'           => $booking->time_slot,
+            'status'         => $booking->status,
+            'status_label'   => $booking->status_label,
+            'can_cancel'     => in_array($booking->status, ['pending', 'confirmed']) && $booking->date->isFuture(),
+        ]);
+    }
+
+    /**
+     * Cancel a booking by the customer.
+     */
+    public function cancelByCustomer(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'reference' => 'required|string',
+            'phone'     => 'required|string',
+        ]);
+
+        $booking = Booking::where('reference', $validated['reference'])
+            ->where('customer_phone', $validated['phone'])
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('date', '>=', now()->toDateString())
+            ->first();
+
+        if (!$booking) {
+            return response()->json(['message' => 'Impossible d\'annuler cette réservation.'], 404);
+        }
+
+        $booking->update(['status' => 'cancelled']);
+
+        return response()->json(['message' => 'Votre réservation a été annulée.']);
+    }
+
     private function generateSlots(string $open, string $close, int $duration): array
     {
         $slots   = [];

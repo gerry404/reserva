@@ -42,6 +42,7 @@ function onCoverChange(e) {
 
 const form = reactive({
   name:                '',
+  slug:                '',
   description:         '',
   category:            '',
   city:                '',
@@ -88,6 +89,7 @@ onMounted(() => {
   if (!b) return
   Object.assign(form, {
     name:                b.name ?? '',
+    slug:                b.slug ?? '',
     description:         b.description ?? '',
     category:            b.category ?? '',
     city:                b.city ?? '',
@@ -238,6 +240,16 @@ async function copyLink() {
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nom du commerce *</label>
             <input v-model="form.name" type="text" class="input-field" required />
             <p v-if="errors.name" class="text-red-500 text-xs mt-1">{{ errors.name[0] }}</p>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">URL personnalisée (slug)</label>
+            <div class="flex items-center gap-0">
+              <span class="px-3 py-2.5 bg-gray-100 border border-r-0 border-gray-200 rounded-l-xl text-sm text-gray-500 whitespace-nowrap">{{ window.location.origin }}/b/</span>
+              <input v-model="form.slug" type="text" class="input-field rounded-l-none flex-1" placeholder="mon-salon" pattern="[a-z0-9][a-z0-9-]*[a-z0-9]" />
+            </div>
+            <p v-if="errors.slug" class="text-red-500 text-xs mt-1">{{ errors.slug[0] }}</p>
+            <p class="text-[11px] text-gray-400 mt-1">Lettres minuscules, chiffres et tirets uniquement</p>
           </div>
 
           <div class="sm:col-span-2">
