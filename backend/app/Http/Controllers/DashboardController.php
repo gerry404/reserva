@@ -196,26 +196,26 @@ class DashboardController extends Controller
 
         // Peak hours (distribution of bookings by hour)
         $peakHours = Booking::forBusiness($bid)
-            ->select(DB::raw("SUBSTRING(time_slot, 1, 2) as hour"), DB::raw('COUNT(*) as count'))
+            ->select(DB::raw("LEFT(time_slot, 2) as hour"), DB::raw('COUNT(*) as count'))
             ->groupBy('hour')
             ->orderBy('hour')
             ->pluck('count', 'hour')
             ->toArray();
 
-        // Peak days (distribution by weekday)
+        // Peak days (distribution by weekday) — EXTRACT(DOW) is PostgreSQL-compatible (0=Sun, 1=Mon…6=Sat)
         $peakDays = Booking::forBusiness($bid)
-            ->select(DB::raw('DAYOFWEEK(date) as dow'), DB::raw('COUNT(*) as count'))
+            ->select(DB::raw('EXTRACT(DOW FROM date)::int as dow'), DB::raw('COUNT(*) as count'))
             ->groupBy('dow')
             ->orderBy('dow')
             ->pluck('count', 'dow')
             ->toArray();
 
-        $dayNames = [1 => 'Dim', 2 => 'Lun', 3 => 'Mar', 4 => 'Mer', 5 => 'Jeu', 6 => 'Ven', 7 => 'Sam'];
+        $dayNames = [0 => 'Dim', 1 => 'Lun', 2 => 'Mar', 3 => 'Mer', 4 => 'Jeu', 5 => 'Ven', 6 => 'Sam'];
         $peakDaysFormatted = [];
-        for ($i = 2; $i <= 7; $i++) { // Mon to Sat first
+        for ($i = 1; $i <= 6; $i++) { // Mon to Sat first
             $peakDaysFormatted[] = ['day' => $dayNames[$i], 'count' => $peakDays[$i] ?? 0];
         }
-        $peakDaysFormatted[] = ['day' => $dayNames[1], 'count' => $peakDays[1] ?? 0]; // Sunday last
+        $peakDaysFormatted[] = ['day' => $dayNames[0], 'count' => $peakDays[0] ?? 0]; // Sunday last
 
         // Recent activity (last 10 status changes)
         $recentActivity = Booking::forBusiness($bid)
