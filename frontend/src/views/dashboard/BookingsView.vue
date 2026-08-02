@@ -175,7 +175,7 @@ const stats = computed(() => {
 
     <!-- Mini stat pills -->
     <div class="flex flex-wrap gap-2">
-      <div class="flex items-center gap-2 px-3.5 py-2 bg-white border border-gray-100 rounded-xl text-sm">
+      <div class="flex items-center gap-2 px-3.5 py-2 bg-clay-50 border border-gray-100 rounded-xl text-sm">
         <span class="font-bold text-gray-900">{{ stats.total }}</span>
         <span class="text-gray-400">total</span>
       </div>
@@ -297,7 +297,7 @@ const stats = computed(() => {
             <Transition name="menu">
               <div
                 v-if="actionMenu === b.id"
-                class="fixed w-48 bg-white rounded-xl shadow-2xl shadow-black/15 border border-gray-100 overflow-hidden z-[9999]"
+                class="fixed w-48 bg-clay-50 rounded-xl shadow-2xl shadow-black/15 border border-gray-100 overflow-hidden z-[9999]"
                 :style="menuStyle"
               >
                 <template v-if="b.status === 'pending'">
@@ -392,7 +392,7 @@ const stats = computed(() => {
   <Teleport to="body">
     <Transition name="fade">
       <div v-if="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm animate-slide-up">
+        <div class="bg-clay-50 rounded-2xl shadow-xl p-6 w-full max-w-sm animate-slide-up">
           <h3 class="font-bold text-gray-900 text-lg mb-2">
             {{ confirmModal.action === 'cancel' ? 'Annuler la réservation ?' : confirmModal.action === 'confirm' ? 'Confirmer la réservation ?' : 'Marquer comme terminée ?' }}
           </h3>

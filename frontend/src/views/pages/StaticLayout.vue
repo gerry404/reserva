@@ -9,7 +9,7 @@ function goBack() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-white flex flex-col">
+  <div class="min-h-screen bg-clay-50 flex flex-col">
     <!-- Navbar -->
     <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-gray-900/5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 h-[60px] flex items-center justify-between">

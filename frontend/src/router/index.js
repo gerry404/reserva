@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -79,7 +78,21 @@ const router = createRouter({
  * session rather than on the mere presence of a token in storage.
  */
 router.beforeEach(async (to) => {
-  const auth = useAuthStore()
+  /*
+   * Le store est importé ici, pas en tête de fichier.
+   *
+   * stores/auth importe ce routeur pour naviguer après connexion, et ce
+   * fichier importait le store : un cycle. Selon l'ordre d'évaluation retenu
+   * par le bundler, le garde s'exécutait avant que Pinia ne soit installé et
+   * l'application ne montait pas du tout — « getActivePinia() was called but
+   * there was no active Pinia ». L'import différé rompt le cycle et garantit
+   * que Pinia est prêt, puisque le garde ne s'exécute qu'à la navigation.
+   */
+  const [{ useAuthStore }, { pinia }] = await Promise.all([
+    import('@/stores/auth'),
+    import('@/main'),
+  ])
+  const auth = useAuthStore(pinia)
   await auth.init()
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {

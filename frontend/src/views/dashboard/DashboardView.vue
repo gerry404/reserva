@@ -309,7 +309,7 @@ const greeting = computed(() => {
             <div class="ml-auto hidden sm:flex items-center gap-2">
               <span class="text-white/70 text-sm font-medium">{{ onboardingDone }}/{{ onboarding.length }}</span>
               <div class="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
-                <div class="h-full bg-white rounded-full transition-all duration-500" :style="{ width: (onboardingDone / onboarding.length * 100) + '%' }" />
+                <div class="h-full bg-clay-50 rounded-full transition-all duration-500" :style="{ width: (onboardingDone / onboarding.length * 100) + '%' }" />
               </div>
             </div>
           </div>
@@ -471,7 +471,7 @@ const greeting = computed(() => {
                 </p>
               </div>
             </div>
-            <RouterLink to="/dashboard/billing" class="bg-white text-amber-700 font-bold text-xs px-4 py-2 rounded-xl hover:bg-amber-50 transition-colors shrink-0">
+            <RouterLink to="/dashboard/billing" class="bg-clay-50 text-amber-700 font-bold text-xs px-4 py-2 rounded-xl hover:bg-amber-50 transition-colors shrink-0">
               Voir les plans
             </RouterLink>
           </div>
@@ -512,10 +512,10 @@ const greeting = computed(() => {
             <div class="flex items-center justify-between mb-6">
               <h3 class="font-bold text-gray-900">Réservations</h3>
               <div class="flex items-center bg-gray-100 rounded-lg p-0.5">
-                <button @click="chartTab = 'daily'" :class="['text-xs font-semibold px-3 py-1.5 rounded-md transition-all', chartTab === 'daily' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
+                <button @click="chartTab = 'daily'" :class="['text-xs font-semibold px-3 py-1.5 rounded-md transition-all', chartTab === 'daily' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
                   7 jours
                 </button>
-                <button @click="chartTab = 'monthly'" :class="['text-xs font-semibold px-3 py-1.5 rounded-md transition-all', chartTab === 'monthly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
+                <button @click="chartTab = 'monthly'" :class="['text-xs font-semibold px-3 py-1.5 rounded-md transition-all', chartTab === 'monthly' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
                   6 mois
                 </button>
               </div>
@@ -696,7 +696,7 @@ const greeting = computed(() => {
         <!-- Advanced analytics are a Pro feature. When the API declines, say so
              plainly instead of leaving three empty cards on the page. -->
         <div v-if="!analytics" class="card p-8 text-center border-2 border-dashed border-primary-100 bg-primary-50/30">
-          <div class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <div class="w-14 h-14 rounded-2xl bg-clay-50 flex items-center justify-center mx-auto mb-4 shadow-sm">
             <ChartBarIcon class="w-7 h-7 text-primary-500" />
           </div>
           <h3 class="font-bold text-gray-900 mb-1.5">Statistiques avancées</h3>

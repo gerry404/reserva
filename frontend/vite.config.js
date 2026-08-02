@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
         name: 'Nuvo — Réservations en ligne',
         short_name: 'Nuvo',
         description: 'Gérez vos réservations sans stress. Notifications WhatsApp, calendrier et tableau de bord pour commerçants et entreprises.',
-        theme_color: '#635BFF',
+        theme_color: '#14603C',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',

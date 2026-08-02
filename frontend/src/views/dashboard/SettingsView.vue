@@ -229,7 +229,7 @@ async function copyLink() {
               <span class="text-sm">Ajouter une bannière</span>
             </div>
           </div>
-          <label class="absolute bottom-3 right-3 bg-white/90 backdrop-blur rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 cursor-pointer hover:bg-white transition shadow-sm flex items-center gap-1.5">
+          <label class="absolute bottom-3 right-3 bg-white/90 backdrop-blur rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 cursor-pointer hover:bg-clay-50 transition shadow-sm flex items-center gap-1.5">
             <CameraIcon class="w-4 h-4" />
             Changer la bannière
             <input type="file" accept="image/*" class="hidden" @change="onCoverChange" />
@@ -398,7 +398,7 @@ async function copyLink() {
               @click="form.working_hours[day].is_open = !form.working_hours[day].is_open"
               :class="['relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors', form.working_hours[day]?.is_open ? 'bg-primary-600' : 'bg-gray-200']"
             >
-              <span :class="['absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform', form.working_hours[day]?.is_open ? 'translate-x-4' : 'translate-x-0']" />
+              <span :class="['absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-clay-50 shadow transition-transform', form.working_hours[day]?.is_open ? 'translate-x-4' : 'translate-x-0']" />
             </button>
 
             <span class="w-20 text-sm font-medium text-gray-700 capitalize">{{ day }}</span>
@@ -433,7 +433,7 @@ async function copyLink() {
             @click="form.notifications_whatsapp = !form.notifications_whatsapp"
             :class="['relative inline-flex h-6 w-11 rounded-full transition-colors cursor-pointer', form.notifications_whatsapp ? 'bg-primary-600' : 'bg-gray-200']"
           >
-            <span :class="['absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform', form.notifications_whatsapp ? 'translate-x-5' : 'translate-x-0']" />
+            <span :class="['absolute top-1 left-1 w-4 h-4 rounded-full bg-clay-50 shadow transition-transform', form.notifications_whatsapp ? 'translate-x-5' : 'translate-x-0']" />
           </div>
         </label>
 
@@ -446,7 +446,7 @@ async function copyLink() {
             @click="form.notifications_email = !form.notifications_email"
             :class="['relative inline-flex h-6 w-11 rounded-full transition-colors cursor-pointer', form.notifications_email ? 'bg-primary-600' : 'bg-gray-200']"
           >
-            <span :class="['absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform', form.notifications_email ? 'translate-x-5' : 'translate-x-0']" />
+            <span :class="['absolute top-1 left-1 w-4 h-4 rounded-full bg-clay-50 shadow transition-transform', form.notifications_email ? 'translate-x-5' : 'translate-x-0']" />
           </div>
         </label>
 
@@ -459,7 +459,7 @@ async function copyLink() {
             @click="form.notifications_sms = !form.notifications_sms"
             :class="['relative inline-flex h-6 w-11 rounded-full transition-colors cursor-pointer', form.notifications_sms ? 'bg-primary-600' : 'bg-gray-200']"
           >
-            <span :class="['absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform', form.notifications_sms ? 'translate-x-5' : 'translate-x-0']" />
+            <span :class="['absolute top-1 left-1 w-4 h-4 rounded-full bg-clay-50 shadow transition-transform', form.notifications_sms ? 'translate-x-5' : 'translate-x-0']" />
           </div>
         </label>
       </div>

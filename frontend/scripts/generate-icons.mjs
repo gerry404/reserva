@@ -65,9 +65,9 @@ function drawIcon(size, maskable = false) {
   // carré et le motif reste dans la zone sûre centrale.
   const r = maskable ? 0 : Math.round(size * 0.22)
 
-  // Dégradé de marque : #635BFF → #3D1FD6.
-  const fromR = 0x63, fromG = 0x5b, fromB = 0xff
-  const toR   = 0x3d, toG   = 0x1f, toB   = 0xd6
+  // Dégradé de marque : #1F7D57 → #0E3E28, le vert forêt de la palette.
+  const fromR = 0x1f, fromG = 0x7d, fromB = 0x57
+  const toR   = 0x0e, toG   = 0x3e, toB   = 0x28
 
   // Fractions du côté — l'échelle se réduit sur une maskable pour rester dans
   // la zone sûre.
