@@ -157,7 +157,9 @@ onMounted(() => {
   <div class="min-h-screen flex">
     <!-- Left panel -->
     <div class="hidden lg:flex flex-col w-[520px] shrink-0 relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-gray-950 via-primary-950 to-gray-950" />
+      <!-- Vert profond plutôt que noir : la couleur du produit tient le
+           panneau, elle ne fait pas que l'éclairer. -->
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-800 via-primary-950 to-primary-900" />
 
       <svg class="absolute inset-0 w-full h-full opacity-[0.05]" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -198,10 +200,10 @@ onMounted(() => {
               <div v-for="(a, i) in [
                 { initials: 'MN', color: 'from-pink-500 to-rose-500' },
                 { initials: 'JM', color: 'from-blue-500 to-cyan-500' },
-                { initials: 'AD', color: 'from-violet-500 to-purple-500' },
+                { initials: 'AD', color: 'from-primary-500 to-primary-700' },
                 { initials: 'SE', color: 'from-emerald-500 to-teal-500' },
               ]" :key="i"
-                :class="['w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center text-white text-[10px] font-bold border-2 border-gray-950', a.color]">
+                :class="['w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center text-white text-[10px] font-bold border-2 border-primary-950', a.color]">
                 {{ a.initials }}
               </div>
             </div>

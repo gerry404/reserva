@@ -149,6 +149,21 @@ export const colors = {
   forest,
   clay,
   gray: clay,
+
+  /*
+   * violet, purple et indigo pointent aussi sur l'échelle forêt.
+   *
+   * L'ancienne identité les employait dans près de quatre-vingts dégradés —
+   * from-primary-600 to-violet-600 et ses variantes. Les réécrire un par un
+   * aurait laissé passer des oublis ; les rediriger garantit qu'aucun violet
+   * ne peut subsister, y compris dans une classe ajoutée par distraction.
+   *
+   * Un dégradé du vert vers le vert reste un dégradé : les nuances 500 et 600
+   * diffèrent assez pour que le relief se voie.
+   */
+  violet: forest,
+  purple: forest,
+  indigo: forest,
 }
 
 /**

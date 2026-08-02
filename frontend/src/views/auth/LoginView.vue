@@ -76,7 +76,9 @@ onMounted(() => {
   <div class="min-h-screen flex">
     <!-- Left panel -->
     <div class="hidden lg:flex flex-col w-[520px] shrink-0 relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-gray-950 via-primary-950 to-gray-950" />
+      <!-- Vert profond plutôt que noir : la couleur du produit tient le
+           panneau, elle ne fait pas que l'éclairer. -->
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-800 via-primary-950 to-primary-900" />
 
       <!-- Polygon pattern -->
       <svg class="absolute inset-0 w-full h-full opacity-[0.05]" xmlns="http://www.w3.org/2000/svg">

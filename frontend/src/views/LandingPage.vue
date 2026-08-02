@@ -100,7 +100,7 @@ const plans = computed(() => [
     desc: 'Pour les équipes & multi-sites',
     color: 'border-gray-200',
     cta: 'Essai gratuit de 14 jours',
-    ctaClass: 'block w-full py-3 rounded-xl text-sm font-bold text-center border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-all',
+    ctaClass: 'block w-full py-3 rounded-xl text-sm font-bold text-center border-2 border-primary-600 text-primary-700 hover:bg-primary-600 hover:text-white transition-all',
     features: [
       'Tout le plan Pro',
       'Multi-employés (bientôt)',
@@ -348,7 +348,7 @@ onUnmounted(() => {
         <!-- Right actions -->
         <div class="hidden sm:flex items-center gap-1.5">
           <template v-if="auth.isAuthenticated">
-            <RouterLink to="/dashboard" class="inline-flex items-center gap-2 px-5 py-1.5 text-sm font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all duration-200 shadow-md shadow-gray-900/15 hover:shadow-lg hover:shadow-gray-900/20 hover:-translate-y-px">
+            <RouterLink to="/dashboard" class="inline-flex items-center gap-2 px-5 py-1.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-200 shadow-md shadow-primary-900/20 hover:shadow-lg hover:shadow-primary-900/25 hover:-translate-y-px">
               Mon tableau de bord
               <ArrowRightIcon class="w-3.5 h-3.5" />
             </RouterLink>
@@ -358,7 +358,7 @@ onUnmounted(() => {
               'px-4 py-1.5 text-sm font-semibold rounded-xl transition-all duration-200',
               scrolled ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' : 'text-gray-700 hover:text-gray-900 hover:bg-white/60'
             ]">Se connecter</RouterLink>
-            <RouterLink to="/register" class="px-5 py-1.5 text-sm font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all duration-200 shadow-md shadow-gray-900/15 hover:shadow-lg hover:shadow-gray-900/20 hover:-translate-y-px">Démarrer</RouterLink>
+            <RouterLink to="/register" class="px-5 py-1.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-200 shadow-md shadow-primary-900/20 hover:shadow-lg hover:shadow-primary-900/25 hover:-translate-y-px">Démarrer</RouterLink>
           </template>
         </div>
 
@@ -380,11 +380,11 @@ onUnmounted(() => {
         <RouterLink @click="mobileMenuOpen = false" to="/contact" class="text-2xl font-bold text-gray-900">Contact</RouterLink>
         <div class="flex flex-col gap-3 mt-4 w-56">
           <template v-if="auth.isAuthenticated">
-            <RouterLink @click="mobileMenuOpen = false" to="/dashboard" class="py-3 text-center text-base font-bold text-white bg-gray-900 rounded-xl">Mon tableau de bord</RouterLink>
+            <RouterLink @click="mobileMenuOpen = false" to="/dashboard" class="py-3 text-center text-base font-bold text-white bg-primary-600 rounded-xl">Mon tableau de bord</RouterLink>
           </template>
           <template v-else>
             <RouterLink @click="mobileMenuOpen = false" to="/login" class="py-3 text-center text-base font-semibold text-gray-700 border-2 border-gray-200 rounded-xl">Se connecter</RouterLink>
-            <RouterLink @click="mobileMenuOpen = false" to="/register" class="py-3 text-center text-base font-bold text-white bg-gray-900 rounded-xl">Démarrer</RouterLink>
+            <RouterLink @click="mobileMenuOpen = false" to="/register" class="py-3 text-center text-base font-bold text-white bg-primary-600 rounded-xl">Démarrer</RouterLink>
           </template>
         </div>
       </div>
@@ -425,7 +425,7 @@ onUnmounted(() => {
           heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
         ]">
           <RouterLink to="/register"
-            class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-2xl transition-all duration-300 shadow-xl shadow-gray-900/20 hover:shadow-2xl hover:shadow-gray-900/30 hover:-translate-y-0.5">
+            class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl transition-all duration-300 shadow-xl shadow-primary-900/25 hover:shadow-2xl hover:shadow-primary-900/30 hover:-translate-y-0.5">
             Créer mon compte gratuit
             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
           </RouterLink>
@@ -701,7 +701,7 @@ onUnmounted(() => {
         <path d="M0,100 C360,0 720,80 1080,20 C1260,-10 1380,30 1440,10 L1440,100 Z" />
       </svg>
 
-      <section class="px-4 sm:px-6 bg-gray-950 text-white relative overflow-hidden py-20 sm:py-28">
+      <section class="px-4 sm:px-6 bg-primary-950 text-white relative overflow-hidden py-20 sm:py-28">
         <!-- Polygon grid background -->
         <svg class="absolute inset-0 w-full h-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -957,7 +957,7 @@ onUnmounted(() => {
     </section>
 
     <!-- ══════ REAL FOOTER ══════ -->
-    <footer class="bg-gray-900 text-gray-400">
+    <footer class="bg-primary-950 text-primary-200">
       <!-- Main footer -->
       <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-10">
@@ -1054,7 +1054,16 @@ onUnmounted(() => {
 
 /* Hero gradient text */
 .hero-gradient-text {
-  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 25%, #a855f7 50%, #7e22ce 75%, #9333ea 100%);
+  /* Les jetons, pas des hex : ce dégradé était le dernier violet de
+     l'application, invisible au remappage parce qu'écrit en CSS brut. */
+  background: linear-gradient(
+    135deg,
+    var(--forest-600) 0%,
+    var(--forest-800) 25%,
+    var(--forest-500) 50%,
+    var(--forest-800) 75%,
+    var(--forest-600) 100%
+  );
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

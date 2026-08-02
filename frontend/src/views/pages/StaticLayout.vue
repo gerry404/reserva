@@ -26,7 +26,7 @@ function goBack() {
         </div>
         <div class="flex items-center gap-2">
           <RouterLink to="/login" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100/70 transition-all duration-200 hidden sm:block">Se connecter</RouterLink>
-          <RouterLink to="/register" class="px-4 py-2 text-sm font-semibold text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-all duration-200 shadow-sm">Démarrer gratuitement</RouterLink>
+          <RouterLink to="/register" class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-all duration-200 shadow-sm">Démarrer gratuitement</RouterLink>
         </div>
       </div>
     </nav>
@@ -37,7 +37,7 @@ function goBack() {
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-400">
+    <footer class="bg-primary-950 text-primary-200">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-10">
           <!-- Brand column -->

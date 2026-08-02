@@ -221,10 +221,10 @@ async function verifyPayment(txRef) {
 
       <!-- Billing cycle toggle -->
       <div class="flex items-center justify-center gap-3">
-        <button @click="cycle = 'monthly'" :class="['text-sm font-semibold px-4 py-2 rounded-xl transition-all', cycle === 'monthly' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700']">
+        <button @click="cycle = 'monthly'" :class="['text-sm font-semibold px-4 py-2 rounded-xl transition-all', cycle === 'monthly' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-700']">
           Mensuel
         </button>
-        <button @click="cycle = 'yearly'" :class="['text-sm font-semibold px-4 py-2 rounded-xl transition-all', cycle === 'yearly' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700']">
+        <button @click="cycle = 'yearly'" :class="['text-sm font-semibold px-4 py-2 rounded-xl transition-all', cycle === 'yearly' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-700']">
           Annuel
           <span class="ml-1 text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Économisez</span>
         </button>
