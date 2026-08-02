@@ -2,26 +2,36 @@
  * Réserva — typographie
  * ─────────────────────────────────────────────────────────────────────────
  *
- *   Dekatron SemiBold   titres, marque, interface
- *   Yuzo                texte courant et chiffres
+ *   Dekatron SemiBold   titres et marque
+ *   Roboto              texte courant, sous-titres, formulaires
+ *   Yuzo                chiffres en vedette — heures, prix, compteurs
  *
- * Auto-hébergées : aucune requête vers un CDN tiers avant le premier texte
- * affiché, et l'application reste lisible hors ligne.
+ * Dekatron donne le caractère là où il se voit, Roboto porte tout ce qui se
+ * lit par phrases, Yuzo signe les chiffres. Toutes auto-hébergées : aucune
+ * requête vers un CDN tiers avant le premier texte affiché, et l'application
+ * reste lisible hors ligne.
  *
- * Note licence : Dekatron est fournie avec l'EULA Desktop de Typodermic, qui
- * ne couvre pas le web. Une licence Webfont est à prendre auprès de la
- * fonderie avant la mise en production.
- *
- * Note technique : Yuzo ne contient pas é, è, ç, œ ni €. Les mots français qui
- * en contiennent sont complétés par la police de repli déclarée après elle
- * dans tailwind.config.js — c'est pourquoi Dekatron y figure juste derrière,
- * étant la seule des deux à couvrir l'intégralité du français.
+ * Licence : Dekatron est fournie sous l'EULA Desktop de Typodermic. Une
+ * licence Webfont est à prendre auprès de la fonderie avant mise en
+ * production.
  */
 
+/* Roboto — variable 300→700, romain et italique, latin + latin-ext. */
+@import './_roboto.css';
+
+/*
+ * Plage 400→900 déclarée alors que le fichier est un SemiBold unique.
+ *
+ * Sans cela, les titres en font-black (900) sortaient de la plage et le
+ * navigateur appliquait un gras synthétique qui épaissit les contours au point
+ * d'effacer les formes carrées de Dekatron — elle en devenait indiscernable de
+ * Roboto. En couvrant toute la plage, ce sont toujours les vrais tracés qui
+ * sont rendus.
+ */
 @font-face {
   font-family: 'Dekatron';
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 400 900;
   font-display: swap;
   src: url('./dekatron-semibold.woff2') format('woff2');
 }
@@ -29,18 +39,27 @@
 @font-face {
   font-family: 'Dekatron';
   font-style: italic;
-  font-weight: 400 700;
+  font-weight: 400 900;
   font-display: swap;
   src: url('./dekatron-semibold-italic.woff2') format('woff2');
 }
 
+/*
+ * Yuzo n'intervient que sur les chiffres (classe .numeric). Elle ne dessine ni
+ * é, ni è, ni ç, ni œ, ni € — sur du texte, les mots casseraient en plein
+ * milieu. Sa pile de repli commence donc par Roboto.
+ */
 @font-face {
   font-family: 'Yuzo';
   font-style: normal;
-  font-weight: 400 700;
+  /* Poids 400 seul, à l'inverse de Dekatron : Yuzo est une graisse légère, et
+     les prix affichés en semi-gras sortaient trop maigres pour être lus d'un
+     coup d'œil. En déclarant le seul poids réel, le navigateur renforce
+     lui-même les demandes plus grasses. */
+  font-weight: 400;
   font-display: swap;
   src: url('./yuzo.woff2') format('woff2');
-  /* Chiffres à 0,610 de l'em contre 0,674 pour Dekatron : sans cet
-     alignement, un prix rétrécit au milieu d'une ligne. */
-  size-adjust: 110.5%;
+  /* Chiffres à 0,610 de l'em contre 0,721 pour Roboto : sans cet alignement,
+     un prix rétrécit au milieu d'une ligne. */
+  size-adjust: 118.1%;
 }
