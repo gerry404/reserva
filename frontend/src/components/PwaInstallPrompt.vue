@@ -87,7 +87,7 @@ onUnmounted(() => {
         v-if="visible && !isInStandalone"
         class="fixed bottom-0 inset-x-0 z-[100] p-4 sm:p-6 sm:max-w-sm sm:left-auto sm:right-4 sm:bottom-4"
       >
-        <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+        <div class="bg-clay-50 rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
           <!-- Top gradient bar -->
           <div class="h-1 bg-gradient-to-r from-primary-500 to-violet-500" />
 

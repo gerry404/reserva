@@ -259,7 +259,7 @@ onMounted(() => {
         <!-- Google Sign-In (step 1 only) -->
         <div v-if="step === 1" class="mb-6">
           <button @click="registerWithGoogle" :disabled="googleLoading || auth.loading"
-            class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-60 shadow-sm">
+            class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-clay-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-60 shadow-sm">
             <span v-if="googleLoading" class="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
             <template v-else>
               <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -302,7 +302,7 @@ onMounted(() => {
                   <!-- Country selector -->
                   <div ref="phoneDropdownRef" class="relative">
                     <button type="button" @click.stop="dropdownOpen = !dropdownOpen"
-                      class="flex items-center gap-1.5 h-full px-3 bg-white border border-gray-200 border-r-0 rounded-l-xl hover:bg-gray-50 transition-colors text-sm min-w-[100px]">
+                      class="flex items-center gap-1.5 h-full px-3 bg-clay-50 border border-gray-200 border-r-0 rounded-l-xl hover:bg-gray-50 transition-colors text-sm min-w-[100px]">
                       <span class="text-lg leading-none">{{ selectedCountry.flag }}</span>
                       <span class="text-gray-700 font-medium">{{ selectedCountry.dial }}</span>
                       <svg class="w-3.5 h-3.5 text-gray-400 shrink-0 ml-auto" :class="{ 'rotate-180': dropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
@@ -310,7 +310,7 @@ onMounted(() => {
 
                     <!-- Dropdown -->
                     <Transition name="dropdown">
-                      <div v-if="dropdownOpen" class="absolute top-full left-0 mt-1 w-72 bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/10 z-50 overflow-hidden">
+                      <div v-if="dropdownOpen" class="absolute top-full left-0 mt-1 w-72 bg-clay-50 border border-gray-200 rounded-xl shadow-xl shadow-black/10 z-50 overflow-hidden">
                         <!-- Search -->
                         <div class="p-2 border-b border-gray-100">
                           <input v-model="searchQuery" type="text" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-100 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-300" placeholder="Rechercher un pays..." />

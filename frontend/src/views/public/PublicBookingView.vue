@@ -3,6 +3,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { publicApi } from '@/api'
 import { useAccent } from '@/composables/useAccent'
+import { useRhythm } from '@/composables/useRhythm'
 import { DAY_END, DAY_START } from '@/composables/useDuration'
 import DurationBar from '@/components/time/DurationBar.vue'
 import TimeRibbon from '@/components/time/TimeRibbon.vue'
@@ -44,6 +45,9 @@ const submitError = ref('')
 const booking     = ref(null)
 
 const { style: accentStyle } = useAccent(() => business.value?.accent_color)
+
+/** La signature de l'établissement, tirée de ses horaires. */
+const rhythm = useRhythm(business)
 
 // ─── Calendar ──────────────────────────────────────────────────────────────
 const currentMonth = ref(new Date())
@@ -306,9 +310,24 @@ loadBusiness()
   </div>
 
   <div v-else class="min-h-screen bg-gray-50" :style="accentStyle">
-    <!-- Business header -->
-    <header class="py-10 px-4 accent-gradient">
-      <div class="max-w-2xl mx-auto text-center">
+    <!--
+      En-tête signé.
+
+      Le motif de fond est calculé depuis les horaires réels du commerce : une
+      bande par jour ouvert, dont la hauteur est l'amplitude d'ouverture. Deux
+      établissements n'ont donc jamais le même en-tête, et le dessin dit quelque
+      chose de vrai — un salon ouvert 6 jours de 8h à 19h ne ressemble pas à un
+      cabinet ouvert 4 jours de 9h à 17h.
+
+      Confiné à l'en-tête : le corps de page reste neutre pour que le ruban et
+      les barres de durée gardent toute leur lisibilité.
+    -->
+    <header
+      class="py-10 px-4 accent-gradient signature"
+      :style="{ '--rhythm': rhythm.patternUrl.value ?? 'none' }"
+      :title="rhythm.description.value"
+    >
+      <div class="max-w-2xl mx-auto text-center relative">
         <div class="w-20 h-20 rounded-full border-4 border-white/30 overflow-hidden mx-auto mb-4 bg-white/20 flex items-center justify-center">
           <img v-if="business.logo" :src="business.logo" :alt="business.name" class="w-full h-full object-cover" />
           <span v-else class="text-3xl font-black">{{ business.name?.charAt(0) }}</span>
@@ -717,6 +736,40 @@ loadBusiness()
 .accent-gradient {
   background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));
   color: var(--accent-fg);
+}
+
+/*
+ * Le motif se superpose au dégradé sans toucher au contenu : il vit dans un
+ * pseudo-élément, donc le texte conserve exactement le contraste calculé par
+ * useAccent. Opacité basse et masque en fondu — une signature se remarque, elle
+ * ne se lit pas.
+ */
+.signature {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.signature::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--rhythm);
+  background-repeat: repeat-x;
+  background-position: center;
+  background-size: auto 100%;
+  opacity: 0.95;
+  /*
+   * Masque radial plutôt que fondu vertical.
+   *
+   * Un fondu de haut en bas effaçait le bas des bandes — précisément là où
+   * l'amplitude d'ouverture se lit : toutes commencent en haut, seule leur
+   * longueur varie. En dégageant le centre, on protège le logo et le nom tout
+   * en laissant les bandes entières visibles sur les côtés.
+   */
+  mask-image: radial-gradient(ellipse 46% 78% at 50% 50%, transparent 40%, #000 100%);
+  -webkit-mask-image: radial-gradient(ellipse 46% 78% at 50% 50%, transparent 40%, #000 100%);
 }
 
 .accent-bg {

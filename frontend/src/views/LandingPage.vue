@@ -310,7 +310,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="min-h-screen bg-clay-50">
     <!-- ══════ FLOATING NAVBAR ══════ -->
     <div :class="[
       'fixed top-0 inset-x-0 z-50 transition-all duration-500 flex justify-center',
@@ -430,7 +430,7 @@ onUnmounted(() => {
             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
           </RouterLink>
           <a href="#features"
-            class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-gray-700 bg-white/80 backdrop-blur-sm border border-gray-200 hover:border-gray-300 hover:bg-white rounded-2xl transition-all duration-300 hover:-translate-y-0.5">
+            class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-gray-700 bg-white/80 backdrop-blur-sm border border-gray-200 hover:border-gray-300 hover:bg-clay-50 rounded-2xl transition-all duration-300 hover:-translate-y-0.5">
             Voir les fonctionnalités
           </a>
         </div>
@@ -503,7 +503,7 @@ onUnmounted(() => {
                 <div class="space-y-2">
                   <div v-for="svc in services" :key="svc.name"
                     :class="[
-                      'bg-white rounded-xl p-2.5 flex items-center gap-2.5 border transition-all duration-300 cursor-pointer',
+                      'bg-clay-50 rounded-xl p-2.5 flex items-center gap-2.5 border transition-all duration-300 cursor-pointer',
                       mockupSelectedService?.name === svc.name ? 'border-primary-400 shadow-md ring-2 ring-primary-100 scale-[1.02]' : 'border-gray-100 shadow-sm'
                     ]">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs shrink-0"
@@ -534,7 +534,7 @@ onUnmounted(() => {
                   </div>
                 </div>
                 <!-- Mini calendar -->
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+                <div class="bg-clay-50 rounded-xl p-3 shadow-sm border border-gray-100">
                   <div class="flex items-center justify-between mb-2">
                     <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     <span class="text-[11px] font-bold text-gray-800">Mars 2026</span>
@@ -579,7 +579,7 @@ onUnmounted(() => {
               <div v-else-if="mockupStep === 4" key="ms4" class="px-5 pb-5">
                 <p class="text-[11px] font-extrabold text-gray-800 mb-2">Vos coordonnées</p>
                 <!-- Mini summary -->
-                <div class="bg-white rounded-lg p-2.5 shadow-sm border border-gray-100 mb-3 space-y-1">
+                <div class="bg-clay-50 rounded-lg p-2.5 shadow-sm border border-gray-100 mb-3 space-y-1">
                   <div class="flex justify-between text-[9px]">
                     <span class="text-gray-400">Service</span>
                     <span class="font-semibold text-gray-700">Tresses africaines</span>
@@ -601,7 +601,7 @@ onUnmounted(() => {
                 <div class="space-y-2">
                   <div>
                     <label class="text-[9px] font-semibold text-gray-600 mb-0.5 block">Nom complet *</label>
-                    <div class="bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-[10px] text-gray-800 flex items-center"
+                    <div class="bg-clay-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-[10px] text-gray-800 flex items-center"
                       :class="{ 'border-primary-400 ring-1 ring-primary-100': mockupTypedName.length > 0 && !mockupTypedPhone }">
                       {{ mockupTypedName || '' }}<span v-if="mockupTypedName.length > 0 && !mockupTypedPhone && mockupShowCursor" class="inline-block w-[1px] h-3 bg-primary-500 ml-px animate-none" />
                       <span v-if="!mockupTypedName" class="text-gray-300">Votre nom</span>
@@ -609,7 +609,7 @@ onUnmounted(() => {
                   </div>
                   <div>
                     <label class="text-[9px] font-semibold text-gray-600 mb-0.5 block">Téléphone *</label>
-                    <div class="bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-[10px] text-gray-800 flex items-center"
+                    <div class="bg-clay-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-[10px] text-gray-800 flex items-center"
                       :class="{ 'border-primary-400 ring-1 ring-primary-100': mockupTypedPhone.length > 0 }">
                       {{ mockupTypedPhone || '' }}<span v-if="mockupTypedPhone.length > 0 && mockupTypedPhone.length < 16 && mockupShowCursor" class="inline-block w-[1px] h-3 bg-primary-500 ml-px" />
                       <span v-if="!mockupTypedPhone" class="text-gray-300">+237 6XX XXX XXX</span>
@@ -629,7 +629,7 @@ onUnmounted(() => {
                 </div>
                 <h4 class="text-sm font-extrabold text-gray-900 mb-1">Réservation confirmée !</h4>
                 <p class="text-[10px] text-gray-400 mb-3">Salon Élégance Douala vous confirme sous peu.</p>
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100 text-left space-y-1.5 mb-3">
+                <div class="bg-clay-50 rounded-xl p-3 shadow-sm border border-gray-100 text-left space-y-1.5 mb-3">
                   <div class="flex justify-between text-[9px]">
                     <span class="text-gray-400">Référence</span>
                     <span class="font-mono font-bold text-gray-900">RSV-2026-4F8A</span>
@@ -676,7 +676,7 @@ onUnmounted(() => {
           <div
             v-for="(feature, idx) in features"
             :key="feature.title"
-            class="group relative bg-white rounded-2xl p-7 border border-gray-100 hover:border-gray-200 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5"
+            class="group relative bg-clay-50 rounded-2xl p-7 border border-gray-100 hover:border-gray-200 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5"
           >
             <!-- Gradient glow on hover -->
             <div :class="['absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl', feature.bg]" />
@@ -765,11 +765,11 @@ onUnmounted(() => {
           <div class="inline-flex items-center bg-gray-100 rounded-full p-1 gap-0.5">
             <button
               @click="isAnnual = false"
-              :class="['px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200', !isAnnual ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+              :class="['px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200', !isAnnual ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
             >Mensuel</button>
             <button
               @click="isAnnual = true"
-              :class="['px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2', isAnnual ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+              :class="['px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2', isAnnual ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
             >
               Annuel
               <span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">-33%</span>
@@ -784,7 +784,7 @@ onUnmounted(() => {
             :class="[
               'rounded-2xl p-8 relative flex flex-col border-2 transition-all duration-300',
               plan.popular ? 'border-primary-500 ring-4 ring-primary-500/10 shadow-xl shadow-primary-500/10 md:-mt-4 md:mb-4' : plan.color || 'border-gray-100',
-              plan.popular ? 'bg-white' : 'bg-white'
+              plan.popular ? 'bg-clay-50' : 'bg-clay-50'
             ]"
           >
             <!-- Popular badge -->
@@ -869,7 +869,7 @@ onUnmounted(() => {
             :style="{ transform: `translateX(-${carouselIndex * cardWidth}px)` }">
             <div v-for="c in useCases" :key="c.trade"
               class="flex-shrink-0 w-full md:w-1/3 px-3">
-              <div class="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-black/5 transition-all duration-300 h-full flex flex-col">
+              <div class="bg-clay-50 rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-black/5 transition-all duration-300 h-full flex flex-col">
                 <div :class="['w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-2xl shadow-lg mb-5', c.color]">
                   {{ c.icon }}
                 </div>
@@ -935,7 +935,7 @@ onUnmounted(() => {
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <RouterLink to="/register"
-            class="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-900 font-bold text-base rounded-xl hover:shadow-2xl hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300">
+            class="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-clay-50 text-gray-900 font-bold text-base rounded-xl hover:shadow-2xl hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300">
             Créer mon compte gratuit
             <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
           </RouterLink>

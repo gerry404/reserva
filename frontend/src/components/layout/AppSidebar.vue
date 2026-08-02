@@ -49,7 +49,7 @@ function onNav() {
 
 <template>
   <!-- Desktop sidebar -->
-  <aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-100 h-full shrink-0">
+  <aside class="hidden lg:flex flex-col w-64 bg-clay-50 border-r border-gray-100 h-full shrink-0">
     <div class="flex flex-col flex-1 overflow-hidden">
       <!-- Logo -->
       <div class="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100">
@@ -108,7 +108,7 @@ function onNav() {
   <Transition name="slide-in">
     <aside
       v-if="open"
-      class="fixed inset-y-0 left-0 z-30 w-72 bg-white shadow-2xl flex flex-col lg:hidden"
+      class="fixed inset-y-0 left-0 z-30 w-72 bg-clay-50 shadow-2xl flex flex-col lg:hidden"
     >
       <!-- Mobile header -->
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">

@@ -32,7 +32,13 @@ function luminance(hex) {
  */
 export function useAccent(source) {
   const accent = computed(() => {
-    const value = unref(source)
+    // unref ne déballe pas une fonction, seulement une ref. Appelé avec
+    // « () => business.value?.accent_color » — la forme idiomatique pour
+    // rester réactif sur une valeur asynchrone — il renvoyait la fonction
+    // elle-même, qui échouait au test et retombait sur la couleur par défaut.
+    // La teinte choisie par le commerçant n'était donc jamais appliquée.
+    const value = typeof source === 'function' ? source() : unref(source)
+
     return /^#[0-9a-f]{6}$/i.test(String(value ?? '')) ? value : FALLBACK
   })
 
