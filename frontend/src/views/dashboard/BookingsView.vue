@@ -16,6 +16,14 @@ import {
 } from '@heroicons/vue/24/outline'
 import { format, parseISO } from 'date-fns'
 import DurationBar from '@/components/time/DurationBar.vue'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
+import { defaultAccent } from '@/design/tokens'
+import UserAvatar from '@/components/ui/UserAvatar.vue'
+import BaseSpinner from '@/components/ui/BaseSpinner.vue'
+import { STATUS_FILTER_OPTIONS, describeStatus } from '@/constants/bookingStatus'
+
+/** Les libellés et couleurs viennent de constants/bookingStatus. */
+const statusOptions = STATUS_FILTER_OPTIONS
 import { fr } from 'date-fns/locale'
 
 const store       = useBookingsStore()
@@ -33,22 +41,6 @@ watch(() => store.filters.search, () => {
 })
 watch(() => [store.filters.status, store.filters.date], () => store.fetchBookings())
 
-const statusOptions = [
-  { value: '',           label: 'Tous les statuts' },
-  { value: 'pending',    label: 'En attente' },
-  { value: 'confirmed',  label: 'Confirmé' },
-  { value: 'completed',  label: 'Terminé' },
-  { value: 'cancelled',  label: 'Annulé' },
-  { value: 'no_show',    label: 'Non présenté' },
-]
-
-const statusConfig = {
-  pending:   { label: 'En attente', class: 'badge-pending',   dot: 'bg-amber-400' },
-  confirmed: { label: 'Confirmé',   class: 'badge-confirmed', dot: 'bg-emerald-400' },
-  cancelled: { label: 'Annulé',     class: 'badge-cancelled', dot: 'bg-red-400' },
-  completed: { label: 'Terminé',    class: 'badge-completed', dot: 'bg-blue-400' },
-  no_show:   { label: 'Non présenté', class: 'badge-cancelled', dot: 'bg-gray-400' },
-}
 
 function formatDate(d) {
   try { return format(parseISO(d), 'EEE d MMM', { locale: fr }) }
@@ -165,7 +157,7 @@ const stats = computed(() => {
         <a
           :href="toast.whatsappLink"
           target="_blank"
-          class="shrink-0 flex items-center gap-2 px-4 py-2 bg-[#25D366] hover:bg-[#1fb855] text-white text-sm font-bold rounded-lg transition-colors shadow-sm"
+          class="btn-whatsapp shrink-0 px-4 py-2 text-sm shadow-sm"
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
           Envoyer sur WhatsApp
@@ -246,11 +238,7 @@ const stats = computed(() => {
         @click="viewDetail = viewDetail?.id === b.id ? null : b"
       >
         <div class="flex items-center gap-4 p-4">
-          <!-- Avatar -->
-          <div class="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm"
-            :style="{ backgroundColor: b.service?.color ?? '#a855f7' }">
-            {{ b.customer_name?.charAt(0)?.toUpperCase() }}
-          </div>
+          <UserAvatar :name="b.customer_name" :color="b.service?.color" size="lg" />
 
           <!-- Main info -->
           <div class="flex-1 min-w-0">
@@ -260,7 +248,7 @@ const stats = computed(() => {
             </div>
             <div class="flex items-center gap-3 mt-0.5 text-xs text-gray-400">
               <span v-if="b.service" class="flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full shrink-0" :style="{ backgroundColor: b.service.color ?? '#a855f7' }" />
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" :style="{ backgroundColor: b.service.color ?? defaultAccent }" />
                 {{ b.service.name }}
               </span>
               <span class="flex items-center gap-1">
@@ -281,9 +269,7 @@ const stats = computed(() => {
           </div>
 
           <!-- Status badge -->
-          <span :class="['badge shrink-0', statusConfig[b.status]?.class ?? 'badge-pending']">
-            {{ statusConfig[b.status]?.label ?? b.status }}
-          </span>
+          <StatusBadge :status="b.status" class="shrink-0" />
 
           <!-- Action button -->
           <div data-menu-trigger>

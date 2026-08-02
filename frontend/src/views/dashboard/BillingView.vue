@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { paymentsApi } from '@/api'
+import { describePayment } from '@/constants/paymentStatus'
 import {
   CheckIcon,
   SparklesIcon,
@@ -155,12 +156,6 @@ async function verifyPayment(txRef) {
   }
 }
 
-const statusConfig = {
-  successful: { label: 'Payé',     class: 'bg-emerald-50 text-emerald-700', icon: CheckCircleIcon },
-  pending:    { label: 'En cours', class: 'bg-amber-50 text-amber-700',     icon: ClockIcon },
-  failed:     { label: 'Échoué',   class: 'bg-red-50 text-red-700',         icon: XCircleIcon },
-  cancelled:  { label: 'Annulé',   class: 'bg-gray-100 text-gray-500',      icon: XCircleIcon },
-}
 </script>
 
 <template>
@@ -353,15 +348,24 @@ const statusConfig = {
         </div>
         <div class="divide-y divide-gray-50">
           <div v-for="p in history" :key="p.id" class="flex items-center gap-4 px-6 py-4">
-            <component :is="statusConfig[p.status]?.icon ?? ClockIcon"
-              :class="['w-5 h-5 shrink-0', p.status === 'successful' ? 'text-emerald-500' : p.status === 'failed' ? 'text-red-500' : 'text-amber-500']" />
+            <span
+              class="w-2.5 h-2.5 rounded-full shrink-0"
+              :style="{ backgroundColor: describePayment(p.status).tone.solid }"
+              aria-hidden="true"
+            />
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-gray-900">{{ p.plan }} — {{ p.billing_cycle }}</p>
               <p class="text-xs text-gray-400">{{ formatDate(p.created_at) }}{{ p.payment_method ? ' · ' + p.payment_method : '' }}</p>
             </div>
             <span class="text-sm font-bold text-gray-900 numeric">{{ p.formatted_amount }}</span>
-            <span :class="['text-[11px] font-semibold px-2 py-0.5 rounded-full', statusConfig[p.status]?.class ?? 'bg-gray-100 text-gray-500']">
-              {{ statusConfig[p.status]?.label ?? p.status }}
+            <span
+              class="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+              :style="{
+                backgroundColor: describePayment(p.status).tone.bg,
+                color: describePayment(p.status).tone.text,
+              }"
+            >
+              {{ describePayment(p.status).label }}
             </span>
           </div>
         </div>
