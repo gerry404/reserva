@@ -15,6 +15,7 @@ import {
   ChatBubbleLeftIcon,
 } from '@heroicons/vue/24/outline'
 import { format, parseISO } from 'date-fns'
+import DurationBar from '@/components/time/DurationBar.vue'
 import { fr } from 'date-fns/locale'
 
 const store       = useBookingsStore()
@@ -38,6 +39,7 @@ const statusOptions = [
   { value: 'confirmed',  label: 'Confirmé' },
   { value: 'completed',  label: 'Terminé' },
   { value: 'cancelled',  label: 'Annulé' },
+  { value: 'no_show',    label: 'Non présenté' },
 ]
 
 const statusConfig = {
@@ -45,6 +47,7 @@ const statusConfig = {
   confirmed: { label: 'Confirmé',   class: 'badge-confirmed', dot: 'bg-emerald-400' },
   cancelled: { label: 'Annulé',     class: 'badge-cancelled', dot: 'bg-red-400' },
   completed: { label: 'Terminé',    class: 'badge-completed', dot: 'bg-blue-400' },
+  no_show:   { label: 'Non présenté', class: 'badge-cancelled', dot: 'bg-gray-400' },
 }
 
 function formatDate(d) {
@@ -262,9 +265,19 @@ const stats = computed(() => {
               </span>
               <span class="flex items-center gap-1">
                 <CalendarDaysIcon class="w-3 h-3" />
-                {{ formatDate(b.date) }} · <span class="numeric">{{ b.time_slot }}</span>
+                {{ formatDate(b.date) }} ·
+                <span class="numeric">{{ b.time_slot }}–{{ b.ends_at_time }}</span>
               </span>
             </div>
+
+            <!-- Même barre que sur la page publique et le tableau de bord :
+                 une seule échelle de temps dans tout le produit. -->
+            <DurationBar
+              :minutes="b.duration"
+              :color="b.service?.color"
+              size="sm"
+              class="mt-2 max-w-[160px]"
+            />
           </div>
 
           <!-- Status badge -->

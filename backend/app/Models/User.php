@@ -102,11 +102,28 @@ class User extends Authenticatable
         return $this->hasPlan(self::PLAN_PRO);
     }
 
-    /** On the free Pro trial: entitled to Pro, but has never paid for it. */
+    /**
+     * On the free Pro trial: entitled to Pro, never paid, and still inside the
+     * trial window.
+     *
+     * The window check matters. Without it, any unpaid Pro account counted as a
+     * trial — including one granted a year by hand for a demo or a partnership,
+     * which then displayed "Essai Pro — 365 j" in the header. A trial cannot
+     * outlast TRIAL_DAYS by definition.
+     */
     public function onTrial(): bool
     {
-        return $this->isPro()
-            && $this->payments()->where('status', Payment::STATUS_SUCCESSFUL)->doesntExist();
+        if (! $this->isPro() || ! $this->plan_expires_at) {
+            return false;
+        }
+
+        // now() en premier : diffInDays est signé en Carbon 3, et l'ordre
+        // inverse donnait une valeur négative, donc toujours sous le seuil.
+        if (now()->diffInDays($this->plan_expires_at) > self::TRIAL_DAYS) {
+            return false;
+        }
+
+        return $this->payments()->where('status', Payment::STATUS_SUCCESSFUL)->doesntExist();
     }
 
     /**
