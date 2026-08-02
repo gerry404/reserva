@@ -1,78 +1,46 @@
 /*
- * Réserva — la fonderie du produit
+ * Réserva — typographie
  * ─────────────────────────────────────────────────────────────────────────
  *
- * Trois rôles, trois voix. Chaque police est employée là où elle est bonne,
- * et nulle part ailleurs.
+ *   Dekatron SemiBold   titres, marque, interface
+ *   Yuzo                texte courant et chiffres
  *
- *   Bricolage Grotesque   titres, marque      — variable 400→800, SIL OFL
- *   Plus Jakarta Sans     texte courant       — variable 300→800, SIL OFL
- *   Yuzo                  chiffres en vedette — 1001Fonts FFC
+ * Auto-hébergées : aucune requête vers un CDN tiers avant le premier texte
+ * affiché, et l'application reste lisible hors ligne.
  *
- * Les trois sont auto-hébergées. Elles arrivaient auparavant du CDN Google :
- * une requête bloquante vers un tiers, sur un produit dont les utilisateurs
- * sont en Afrique de l'Ouest et centrale, souvent en 3G. En local, elles
- * partent avec le reste du bundle, s'affichent hors ligne, et le domaine
- * fonts.gstatic.com disparaît de la CSP.
+ * Note licence : Dekatron est fournie avec l'EULA Desktop de Typodermic, qui
+ * ne couvre pas le web. Une licence Webfont est à prendre auprès de la
+ * fonderie avant la mise en production.
  *
- * Sous-ensembles latin + latin-ext uniquement : le français y tient
- * entièrement (les accents en latin, œ/Œ en latin-ext), et le navigateur ne
- * télécharge latin-ext que s'il rencontre un caractère qui l'exige.
+ * Note technique : Yuzo ne contient pas é, è, ç, œ ni €. Les mots français qui
+ * en contiennent sont complétés par la police de repli déclarée après elle
+ * dans tailwind.config.js — c'est pourquoi Dekatron y figure juste derrière,
+ * étant la seule des deux à couvrir l'intégralité du français.
  */
 
-/* Bricolage Grotesque + Plus Jakarta Sans, variables et sous-ensemblées. */
-@import './_google-faces.css';
+@font-face {
+  font-family: 'Dekatron';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./dekatron-semibold.woff2') format('woff2');
+}
 
-/*
- * Yuzo — réservée aux chiffres.
- *
- * Il lui manque é, è, ç, € et une trentaine d'autres glyphes français : sur du
- * texte, le navigateur substituerait au milieu des mots et « Réserva » se
- * casserait en deux. Le fichier est donc sous-ensemblé aux chiffres et à leurs
- * séparateurs — 84 Ko d'OTF devenus 7,9 Ko. La restriction n'est pas une
- * convention qu'il faut penser à respecter : elle est dans le fichier.
- */
+@font-face {
+  font-family: 'Dekatron';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./dekatron-semibold-italic.woff2') format('woff2');
+}
+
 @font-face {
   font-family: 'Yuzo';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 700;
   font-display: swap;
-  src: url('./yuzo-numerals.woff2') format('woff2');
-
-  /*
-   * Les chiffres de Yuzo occupent 0,610 de l'em, ceux de Bricolage 0,674.
-   * À taille CSS identique, Yuzo paraît donc 10 % plus petite et les prix
-   * rétrécissaient au milieu d'une ligne. size-adjust corrige au niveau de la
-   * police plutôt qu'en rectifiant les tailles à chaque endroit — et garde du
-   * même coup la hauteur de ligne inchangée quand la police de repli prend le
-   * relais pendant le chargement.
-   */
+  src: url('./yuzo.woff2') format('woff2');
+  /* Chiffres à 0,610 de l'em contre 0,674 pour Dekatron : sans cet
+     alignement, un prix rétrécit au milieu d'une ligne. */
   size-adjust: 110.5%;
-  /* Chiffres, séparateurs, symboles monétaires, unités de durée. */
-  unicode-range: U+0020, U+0024, U+002B, U+002C-002F, U+0030-0039, U+003A,
-                 U+0025, U+0041, U+0043, U+0046, U+0068, U+006A, U+006D,
-                 U+0069, U+006E, U+00A0, U+00A3, U+20AC, U+2013-2014, U+202F;
 }
-
-/*
- * Dekatron SemiBold — non incluse, volontairement.
- *
- * Typographiquement, c'est la meilleure des trois : 463 glyphes, français
- * intégral, chiffres, italique. Mais elle est distribuée sous l'EULA Desktop
- * de Typodermic, qui couvre l'installation sur poste et l'incorporation dans
- * des documents pour impression, ne mentionne jamais le web, et réserve
- * explicitement « tous les droits non expressément accordés ». La servir en
- * @font-face demande une licence Webfont distincte.
- *
- * Une fois cette licence acquise : déposer Dekatron-SemiBold.woff2 ici,
- * décommenter le bloc, et ajouter 'Dekatron' en tête de --font-display dans
- * tailwind.config.js. Rien d'autre à toucher.
- *
- * @font-face {
- *   font-family: 'Dekatron';
- *   font-style: normal;
- *   font-weight: 600;
- *   font-display: swap;
- *   src: url('./dekatron-semibold.woff2') format('woff2');
- * }
- */
