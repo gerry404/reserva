@@ -242,7 +242,7 @@ const statusConfig = {
           <div class="mb-6">
             <p class="text-sm font-bold text-gray-400 mb-1">GRATUIT</p>
             <div class="flex items-baseline gap-1">
-              <span class="text-4xl font-black text-gray-900">0</span>
+              <span class="text-4xl font-black text-gray-900 numeric">0</span>
               <span class="text-sm text-gray-400">F CFA</span>
             </div>
             <p class="text-xs text-gray-400 mt-1">Pour toujours</p>
@@ -271,7 +271,7 @@ const statusConfig = {
           <div class="mb-6">
             <p class="text-sm font-bold text-primary-600 mb-1">{{ plan.name.toUpperCase() }}</p>
             <div class="flex items-baseline gap-1">
-              <span class="text-4xl font-black text-gray-900">{{ formatPrice(cycle === 'monthly' ? plan.monthly : plan.yearly) }}</span>
+              <span class="text-4xl font-black text-gray-900 numeric">{{ formatPrice(cycle === 'monthly' ? plan.monthly : plan.yearly) }}</span>
               <span class="text-sm text-gray-400">F CFA</span>
             </div>
             <p class="text-xs text-gray-400 mt-1">
@@ -359,7 +359,7 @@ const statusConfig = {
               <p class="text-sm font-semibold text-gray-900">{{ p.plan }} — {{ p.billing_cycle }}</p>
               <p class="text-xs text-gray-400">{{ formatDate(p.created_at) }}{{ p.payment_method ? ' · ' + p.payment_method : '' }}</p>
             </div>
-            <span class="text-sm font-bold text-gray-900">{{ p.formatted_amount }}</span>
+            <span class="text-sm font-bold text-gray-900 numeric">{{ p.formatted_amount }}</span>
             <span :class="['text-[11px] font-semibold px-2 py-0.5 rounded-full', statusConfig[p.status]?.class ?? 'bg-gray-100 text-gray-500']">
               {{ statusConfig[p.status]?.label ?? p.status }}
             </span>

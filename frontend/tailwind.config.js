@@ -4,8 +4,15 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"Bricolage Grotesque"', '"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Texte courant. Dekatron suit Yuzo dans la pile : elle complète les
+        // accents que Yuzo ne dessine pas (é, è, ç, œ, €).
+        sans: ['"Yuzo"', '"Dekatron"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+
+        // Titres, marque, interface.
+        display: ['"Dekatron"', '"Yuzo"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+
+        // Chiffres en vedette — heures, prix, compteurs.
+        numeric: ['"Yuzo"', '"Dekatron"', 'ui-monospace', 'monospace'],
       },
       colors: {
         primary: {
