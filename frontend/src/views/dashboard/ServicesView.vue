@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, reactive, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { servicesApi } from '@/api'
+import { defaultAccent, swatches } from '@/design/tokens'
 import {
   PlusIcon,
   PencilIcon,
@@ -49,7 +50,7 @@ function onGalleryKey(e) {
 }
 
 const form = reactive({
-  name: '', description: '', duration: 30, price: 0, category: '', color: '#6366f1',
+  name: '', description: '', duration: 30, price: 0, category: '', color: defaultAccent,
 })
 
 // Images state
@@ -61,10 +62,7 @@ const MAX_IMAGES = 5
 const totalImages = computed(() => existingImages.value.length + newImages.value.length)
 const canAddMore = computed(() => totalImages.value < MAX_IMAGES)
 
-const colors = [
-  '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b',
-  '#10b981', '#06b6d4', '#ef4444', '#f97316',
-]
+const colors = swatches
 
 const durations = [
   { v: 15, l: '15 min' }, { v: 30, l: '30 min' }, { v: 45, l: '45 min' },
@@ -103,7 +101,7 @@ function resetImageState() {
 
 function openCreate() {
   editing.value = null
-  Object.assign(form, { name: '', description: '', duration: 30, price: 0, category: '', color: '#6366f1' })
+  Object.assign(form, { name: '', description: '', duration: 30, price: 0, category: '', color: defaultAccent })
   errors.value = {}
   resetImageState()
   modal.value  = true
@@ -113,7 +111,7 @@ function openEdit(svc) {
   editing.value = svc.id
   Object.assign(form, {
     name: svc.name, description: svc.description ?? '', duration: svc.duration,
-    price: svc.price, category: svc.category ?? '', color: svc.color ?? '#6366f1',
+    price: svc.price, category: svc.category ?? '', color: svc.color ?? defaultAccent,
   })
   errors.value = {}
   resetImageState()
@@ -279,7 +277,7 @@ function formatDuration(min) {
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shrink-0"
-                :style="{ backgroundColor: svc.color ?? '#6366f1' }">
+                :style="{ backgroundColor: svc.color ?? defaultAccent }">
                 ✦
               </div>
               <div>

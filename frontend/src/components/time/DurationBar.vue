@@ -26,7 +26,7 @@ const height = computed(() => heights[props.size] ?? heights.md)
 </script>
 
 <template>
-  <div class="duration" :style="{ '--bar-height': height, '--bar-color': color || 'var(--accent, #635BFF)' }">
+  <div class="duration" :style="{ '--bar-height': height, '--bar-color': color || 'var(--accent, var(--forest-600))' }">
     <div class="duration__track">
       <div class="duration__fill" :style="{ width: `${width}%` }" />
     </div>

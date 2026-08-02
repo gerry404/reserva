@@ -2,6 +2,8 @@
 import { onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { publicApi } from '@/api'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
+import { describeStatus } from '@/constants/bookingStatus'
 import {
   MagnifyingGlassIcon,
   CheckCircleIcon,
@@ -23,13 +25,6 @@ const form = reactive({
   phone: '',
 })
 
-const statusConfig = {
-  pending:   { label: 'En attente de confirmation', icon: ClockIcon, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
-  confirmed: { label: 'Confirmée',                  icon: CheckCircleIcon, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
-  completed: { label: 'Terminée',                   icon: CheckCircleIcon, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
-  cancelled: { label: 'Annulée',                    icon: XCircleIcon, color: 'text-red-600', bg: 'bg-red-50 border-red-200' },
-  no_show:   { label: 'Non présenté',               icon: ExclamationTriangleIcon, color: 'text-gray-600', bg: 'bg-gray-50 border-gray-200' },
-}
 
 async function search() {
   error.value = ''
@@ -127,15 +122,23 @@ async function cancelBooking() {
 
       <!-- Booking result -->
       <div v-if="booking" class="mt-6 card overflow-hidden animate-slide-up">
-        <!-- Status banner -->
-        <div :class="['p-4 border-b flex items-center gap-3', statusConfig[booking.status]?.bg ?? 'bg-gray-50 border-gray-200']">
-          <component :is="statusConfig[booking.status]?.icon ?? ClockIcon"
-            :class="['w-6 h-6', statusConfig[booking.status]?.color ?? 'text-gray-500']" />
+        <!--
+          La bannière tire ses couleurs des mêmes jetons que le badge : une
+          seule définition du sens de chaque statut, deux rendus.
+        -->
+        <div
+          class="p-4 border-b flex items-center gap-3"
+          :style="{
+            backgroundColor: describeStatus(booking.status).tone.bg,
+            borderColor: describeStatus(booking.status).tone.border,
+          }"
+        >
+          <span class="text-xl" aria-hidden="true">{{ describeStatus(booking.status).icon }}</span>
           <div>
-            <p :class="['font-bold text-sm', statusConfig[booking.status]?.color ?? 'text-gray-700']">
-              {{ statusConfig[booking.status]?.label ?? booking.status_label }}
+            <p class="font-bold text-sm" :style="{ color: describeStatus(booking.status).tone.text }">
+              {{ describeStatus(booking.status).customer }}
             </p>
-            <p class="text-xs text-gray-500">Réf. <span class="numeric">{{ booking.reference }}</span></p>
+            <p class="text-xs text-gray-600">Réf. <span class="numeric">{{ booking.reference }}</span></p>
           </div>
         </div>
 
@@ -165,7 +168,7 @@ async function cancelBooking() {
             <a
               :href="`https://wa.me/${booking.business_phone.replace(/[^0-9]/g, '')}`"
               target="_blank"
-              class="flex items-center justify-center gap-2 py-2.5 bg-[#25D366] hover:bg-[#1fb855] text-white text-sm font-bold rounded-xl transition-colors"
+              class="btn-whatsapp w-full py-2.5 text-sm"
             >
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
               Contacter le commerce
