@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\Money;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +30,11 @@ class Service extends Model
         'images'    => 'array',
     ];
 
+    /** Bounds mirrored by the request rules; a service must fit inside a day. */
+    public const MIN_DURATION = 5;
+    public const MAX_DURATION = 480;
+    public const MAX_IMAGES   = 5;
+
     public function business()
     {
         return $this->belongsTo(Business::class);
@@ -38,17 +45,30 @@ class Service extends Model
         return $this->hasMany(Booking::class);
     }
 
-    public function getFormattedPriceAttribute(): string
+    protected function formattedPrice(): Attribute
     {
-        if ($this->price == 0) return 'Gratuit';
-        return number_format($this->price, 0, ',', ' ') . ' F CFA';
+        return Attribute::get(function () {
+            if ((float) $this->price === 0.0) {
+                return 'Gratuit';
+            }
+
+            return Money::format($this->price, $this->business?->currency);
+        });
     }
 
-    public function getFormattedDurationAttribute(): string
+    protected function formattedDuration(): Attribute
     {
-        if ($this->duration < 60) return $this->duration . ' min';
-        $hours   = intdiv($this->duration, 60);
-        $minutes = $this->duration % 60;
-        return $minutes > 0 ? "{$hours}h{$minutes}" : "{$hours}h";
+        return Attribute::get(function () {
+            $minutes = (int) $this->duration;
+
+            if ($minutes < 60) {
+                return $minutes . ' min';
+            }
+
+            $hours     = intdiv($minutes, 60);
+            $remainder = $minutes % 60;
+
+            return $remainder > 0 ? "{$hours}h{$remainder}" : "{$hours}h";
+        });
     }
 }

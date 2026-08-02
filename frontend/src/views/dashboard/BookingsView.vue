@@ -60,15 +60,16 @@ function formatDateLong(d) {
 async function changeStatus(id, status) {
   confirmModal.value = null
   actionMenu.value   = null
-  const data = await store.updateStatus(id, status)
+  const response = await store.updateStatus(id, status)
+  const booking  = response.booking.data ?? response.booking
 
-  if (status === 'confirmed' && data.whatsapp_link) {
-    const name = data.customer_name || 'le client'
+  if (status === 'confirmed' && response.whatsapp_link) {
+    const name = booking.customer_name || 'le client'
     toast.value = {
-      message: data.customer_email
+      message: booking.customer_email
         ? `✅ Confirmé ! Un email a été envoyé à ${name}.`
         : `✅ Confirmé ! Prévenez ${name} via WhatsApp :`,
-      whatsappLink: data.whatsapp_link,
+      whatsappLink: response.whatsapp_link,
     }
     setTimeout(() => { toast.value = null }, 15000)
   }
@@ -354,20 +355,20 @@ const stats = computed(() => {
     </div>
 
     <!-- Pagination -->
-    <div v-if="store.pagination && store.pagination.last_page > 1" class="flex items-center justify-between text-sm">
+    <div v-if="store.pagination && store.pagination.lastPage > 1" class="flex items-center justify-between text-sm">
       <p class="text-gray-400">
-        Page {{ store.pagination.current_page }} sur {{ store.pagination.last_page }}
+        Page {{ store.pagination.currentPage }} sur {{ store.pagination.lastPage }}
         <span class="text-gray-300 ml-1">({{ store.pagination.total }} résultats)</span>
       </p>
       <div class="flex gap-2">
         <button
-          :disabled="store.pagination.current_page <= 1"
-          @click="goToPage(store.pagination.current_page - 1)"
+          :disabled="store.pagination.currentPage <= 1"
+          @click="goToPage(store.pagination.currentPage - 1)"
           class="btn-secondary text-xs px-3 py-1.5 disabled:opacity-40"
         >← Précédent</button>
         <button
-          :disabled="store.pagination.current_page >= store.pagination.last_page"
-          @click="goToPage(store.pagination.current_page + 1)"
+          :disabled="store.pagination.currentPage >= store.pagination.lastPage"
+          @click="goToPage(store.pagination.currentPage + 1)"
           class="btn-secondary text-xs px-3 py-1.5 disabled:opacity-40"
         >Suivant →</button>
       </div>

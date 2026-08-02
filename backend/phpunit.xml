@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache">
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:c2VjcmV0LWtleS1mb3ItdGVzdGluZy1vbmx5LTMyYnQ="/>
+        <env name="APP_DEBUG" value="true"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+
+        <!-- In-memory SQLite: fast, isolated, and forces us to keep the SQL
+             portable, which is the bug that broke the dashboard on Postgres. -->
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+
+        <!-- Rate-limit counters live in the cache: an on-disk store would leak
+             them from one test into the next. -->
+        <env name="CACHE_STORE" value="array"/>
+        <env name="CACHE_DRIVER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="MAIL_MAILER" value="array"/>
+
+        <env name="FRONTEND_URL" value="http://localhost:5173"/>
+
+        <!-- Present so the payment tests exercise the signature path; every
+             outbound call is faked. -->
+        <env name="FLW_SECRET_KEY" value="test-secret-key"/>
+        <env name="FLW_WEBHOOK_HASH" value="test-webhook-hash"/>
+
+        <env name="WHATSAPP_PROVIDER" value="none"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+    </php>
+</phpunit>

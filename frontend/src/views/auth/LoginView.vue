@@ -19,9 +19,7 @@ async function submit() {
   try {
     await auth.login(form)
   } catch (e) {
-    error.value = e.response?.data?.errors?.email?.[0]
-      || e.response?.data?.message
-      || 'Une erreur est survenue.'
+    error.value = e.message
   }
 }
 
@@ -44,7 +42,7 @@ async function handleGoogleResponse(response) {
   try {
     await auth.loginWithGoogle(response.access_token)
   } catch (e) {
-    error.value = e.response?.data?.message || 'Erreur lors de la connexion avec Google.'
+    error.value = e.message || 'Erreur lors de la connexion avec Google.'
   } finally {
     googleLoading.value = false
   }

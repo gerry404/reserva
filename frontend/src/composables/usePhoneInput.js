@@ -68,6 +68,12 @@ const countries = [
   { code: 'HT', name: 'Haïti', dial: '+509', flag: '🇭🇹' },
 ]
 
+/**
+ * The same country list, for screens that need to pick a country without a
+ * phone input attached (onboarding, business settings).
+ */
+export const COUNTRIES = countries
+
 export function usePhoneInput() {
   const selectedCountry = ref(countries[0]) // Default: Cameroun
   const phoneNumber = ref('')

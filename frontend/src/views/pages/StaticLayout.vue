@@ -70,7 +70,7 @@ function goBack() {
               <li><RouterLink to="/register" class="text-sm hover:text-white transition-colors">Créer un compte</RouterLink></li>
               <li><RouterLink to="/" class="text-sm hover:text-white transition-colors">Fonctionnalités</RouterLink></li>
               <li><RouterLink to="/" class="text-sm hover:text-white transition-colors">Tarifs</RouterLink></li>
-              <li><RouterLink to="/api-docs" class="text-sm hover:text-white transition-colors">API</RouterLink></li>
+              
             </ul>
           </div>
 
@@ -80,7 +80,7 @@ function goBack() {
             <ul class="space-y-2.5">
               <li><RouterLink to="/help" class="text-sm hover:text-white transition-colors">Centre d'aide</RouterLink></li>
               <li><RouterLink to="/guide" class="text-sm hover:text-white transition-colors">Guide de démarrage</RouterLink></li>
-              <li><RouterLink to="/blog" class="text-sm hover:text-white transition-colors">Blog</RouterLink></li>
+              
             </ul>
           </div>
 
@@ -89,7 +89,7 @@ function goBack() {
             <h4 class="font-bold text-white text-sm mb-4">Entreprise</h4>
             <ul class="space-y-2.5">
               <li><RouterLink to="/about" class="text-sm hover:text-white transition-colors">À propos</RouterLink></li>
-              <li><RouterLink to="/careers" class="text-sm hover:text-white transition-colors">Carrières</RouterLink></li>
+              
               <li><RouterLink to="/contact" class="text-sm hover:text-white transition-colors">Contact</RouterLink></li>
             </ul>
           </div>

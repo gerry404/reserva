@@ -2,128 +2,79 @@
 
 namespace App\Jobs;
 
+use App\Mail\NewBookingNotification;
 use App\Models\Booking;
-use App\Notifications\BookingStatusNotification;
+use App\Services\MessagingService;
+use App\Support\BookingMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\NewBookingNotification;
 
+/**
+ * Tell the merchant a booking just came in, over whichever channels they enabled.
+ *
+ * One channel failing must not stop the others: a merchant with WhatsApp *and*
+ * email switched on should still get the email while Twilio is down. Retries are
+ * spaced out because the failure mode is almost always a provider outage — the
+ * booking itself is safely stored either way.
+ */
 class NotifyMerchantNewBooking implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public readonly Booking $booking) {}
+    public int $tries = 3;
 
-    public function handle(): void
+    /** @var list<int> */
+    public array $backoff = [30, 300];
+
+    public function __construct(
+        public readonly Booking $booking,
+    ) {}
+
+    public function handle(MessagingService $messaging): void
     {
-        $business = $this->booking->business;
-        $user     = $business->user;
+        $booking  = $this->booking->loadMissing('service', 'business.user');
+        $business = $booking->business;
 
-        $notification = new BookingStatusNotification($this->booking, 'new');
-        $message      = $notification->buildMessage();
+        if (! $business) {
+            return;
+        }
 
-        // WhatsApp via Twilio
         if ($business->notifications_whatsapp && $business->whatsapp) {
-            $this->sendWhatsApp($business->whatsapp, $message);
+            $messaging->sendWhatsApp($business->whatsapp, BookingMessage::forMerchant($booking));
         }
 
-        // SMS via Africa's Talking
         if ($business->notifications_sms && $business->phone) {
-            $this->sendSms($business->phone, strip_tags($message));
+            $messaging->sendSms($business->phone, BookingMessage::forMerchantSms($booking));
         }
 
-        // Email
-        if ($business->notifications_email && $user->email) {
-            $this->sendEmail($user->email, $this->booking, $business);
+        if ($business->notifications_email && $business->user?->email) {
+            $this->sendEmail($booking);
         }
     }
 
-    private function sendWhatsApp(string $phone, string $message): void
+    public function failed(\Throwable $e): void
     {
-        $provider = config('services.whatsapp.provider', 'twilio');
-
-        if ($provider === 'twilio') {
-            $this->sendViaTwilio($phone, $message);
-        } elseif ($provider === 'meta') {
-            $this->sendViaMeta($phone, $message);
-        }
+        Log::error('Merchant notification permanently failed', [
+            'booking' => $this->booking->reference,
+            'error'   => $e->getMessage(),
+        ]);
     }
 
-    private function sendViaTwilio(string $phone, string $message): void
+    private function sendEmail(Booking $booking): void
     {
         try {
-            $sid   = config('services.twilio.sid');
-            $token = config('services.twilio.token');
-            $from  = config('services.twilio.whatsapp_from');
-
-            if (!$sid || !$token) return;
-
-            Http::withBasicAuth($sid, $token)
-                ->post("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json", [
-                    'From' => $from,
-                    'To'   => 'whatsapp:+' . ltrim($phone, '+'),
-                    'Body' => $message,
-                ]);
-        } catch (\Exception $e) {
-            Log::error('Twilio WhatsApp error: ' . $e->getMessage());
-        }
-    }
-
-    private function sendViaMeta(string $phone, string $message): void
-    {
-        try {
-            $token   = config('services.meta_wa.token');
-            $phoneId = config('services.meta_wa.phone_id');
-            $version = config('services.meta_wa.version', 'v18.0');
-
-            if (!$token || !$phoneId) return;
-
-            Http::withToken($token)
-                ->post("https://graph.facebook.com/{$version}/{$phoneId}/messages", [
-                    'messaging_product' => 'whatsapp',
-                    'to'                => ltrim($phone, '+'),
-                    'type'              => 'text',
-                    'text'              => ['body' => $message],
-                ]);
-        } catch (\Exception $e) {
-            Log::error('Meta WhatsApp error: ' . $e->getMessage());
-        }
-    }
-
-    private function sendEmail(string $email, Booking $booking, $business): void
-    {
-        try {
-            Mail::to($email)->send(new NewBookingNotification($booking, $business));
-        } catch (\Exception $e) {
-            Log::error('Booking email notification error: ' . $e->getMessage());
-        }
-    }
-
-    private function sendSms(string $phone, string $message): void
-    {
-        try {
-            $username = config('services.africastalking.username');
-            $apiKey   = config('services.africastalking.api_key');
-            $sender   = config('services.africastalking.sender_id');
-
-            if (!$username || !$apiKey) return;
-
-            Http::withHeaders(['apiKey' => $apiKey, 'Accept' => 'application/json'])
-                ->asForm()
-                ->post('https://api.africastalking.com/version1/messaging', [
-                    'username' => $username,
-                    'to'       => $phone,
-                    'message'  => $message,
-                    'from'     => $sender,
-                ]);
-        } catch (\Exception $e) {
-            Log::error('Africa\'s Talking SMS error: ' . $e->getMessage());
+            Mail::to($booking->business->user->email)
+                ->send(new NewBookingNotification($booking, $booking->business));
+        } catch (\Throwable $e) {
+            Log::error('New-booking email failed', [
+                'booking' => $booking->reference,
+                'error'   => $e->getMessage(),
+            ]);
         }
     }
 }

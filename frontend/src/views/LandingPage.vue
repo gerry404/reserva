@@ -8,7 +8,6 @@ import {
   ChartBarIcon,
   GlobeAltIcon,
   CheckCircleIcon,
-  StarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowRightIcon,
@@ -78,7 +77,7 @@ const plans = computed(() => [
     priceAnnual: '2 075',
     savingsAnnual: '9 900',
     period: 'F CFA/mois',
-    desc: 'Choisi par 82% de nos clients',
+    desc: 'Pour les commerces qui tournent tous les jours',
     color: 'border-primary-500 ring-2 ring-primary-500/20',
     popular: true,
     cta: 'Essai gratuit de 14 jours',
@@ -113,48 +112,48 @@ const plans = computed(() => [
   },
 ])
 
-const testimonials = [
+/*
+ * Illustrative use cases, not testimonials.
+ *
+ * This array used to hold four named people with photos, five-star ratings and
+ * hard numbers ("+60% de réservations", "-80% de no-shows"). None of them
+ * existed and none of those figures were measured. Invented social proof is
+ * both a legal exposure and the fastest way to lose a merchant's trust the day
+ * they look closely — so the section now describes what the product does for a
+ * kind of business, and claims nothing on anybody's behalf.
+ */
+const useCases = [
   {
-    name: 'Marie Nguema',
-    role: 'Coiffeuse, Douala',
-    text: 'Avant Réserva, je passais ma journée à répondre aux appels. Maintenant mes clientes réservent seules et je reçois juste une notification WhatsApp. Ma vie a changé !',
-    avatar: 'MN',
+    trade: 'Salon de coiffure',
+    city: 'Douala',
+    text: "Publiez vos prestations avec leur durée réelle. Une pose de tresses de trois heures bloque trois heures — impossible de vous retrouver avec deux clientes sur le même fauteuil.",
+    icon: '💇',
     color: 'from-pink-500 to-rose-500',
-    rating: 5,
   },
   {
-    name: 'Jean-Paul Mbarga',
-    role: 'Médecin généraliste, Yaoundé',
-    text: "Mon cabinet a réduit les double-réservations à zéro. La page de réservation est simple, mes patients l'utilisent même sans smartphone performant.",
-    avatar: 'JM',
+    trade: 'Barbier',
+    city: 'Yaoundé',
+    text: "Votre lien se partage sur WhatsApp et Instagram. Vos clients réservent la nuit, le dimanche, pendant que vous coupez — vous recevez la demande sur votre téléphone.",
+    icon: '💈',
     color: 'from-blue-500 to-cyan-500',
-    rating: 5,
   },
   {
-    name: 'Aicha Diallo',
-    role: 'Esthéticienne, Abidjan',
-    text: "J'ai commencé avec le plan gratuit. En deux semaines j'étais passée au plan Pro tellement ça marchait. Mes réservations ont augmenté de 60%.",
-    avatar: 'AD',
+    trade: 'Institut de beauté',
+    city: 'Abidjan',
+    text: "Chaque réservation confirmée déclenche un email au client et un rappel la veille, pour réduire les rendez-vous manqués sans passer un seul appel.",
+    icon: '💅',
     color: 'from-violet-500 to-purple-500',
-    rating: 5,
   },
   {
-    name: 'Samuel Ekotto',
-    role: 'Barbier, Douala',
-    text: "Mes clients me trouvent directement sur Google grâce à mon lien Réserva. Le dimanche je dors tranquille, les réservations du lundi sont déjà calées.",
-    avatar: 'SE',
-    color: 'from-emerald-500 to-teal-500',
-    rating: 5,
-  },
-  {
-    name: 'Fatou Sow',
-    role: 'Spa & Massage, Dakar',
-    text: "L'interface est tellement simple que même ma mère peut réserver. Et les rappels WhatsApp ont réduit mes no-shows de 80%. Je recommande à tous.",
-    avatar: 'FS',
+    trade: 'Spa & massage',
+    city: 'Dakar',
+    text: "Vos horaires d'ouverture, vos délais de réservation et vos jours de fermeture sont respectés automatiquement. Personne ne peut réserver quand vous êtes fermé.",
+    icon: '💆',
     color: 'from-amber-500 to-orange-500',
-    rating: 5,
   },
 ]
+
+
 
 // ── Testimonials carousel ──
 const carouselIndex = ref(0)
@@ -162,7 +161,7 @@ const carouselAutoplay = ref(null)
 const trackEl = ref(null)
 const containerWidth = ref(0)
 const visibleCount = computed(() => typeof window !== 'undefined' && window.innerWidth >= 768 ? 3 : 1)
-const maxIndex = computed(() => Math.max(0, testimonials.length - visibleCount.value))
+const maxIndex = computed(() => Math.max(0, useCases.length - visibleCount.value))
 const cardWidth = computed(() => containerWidth.value / visibleCount.value)
 function nextTestimonial() { carouselIndex.value = carouselIndex.value >= maxIndex.value ? 0 : carouselIndex.value + 1 }
 function prevTestimonial() { carouselIndex.value = carouselIndex.value <= 0 ? maxIndex.value : carouselIndex.value - 1 }
@@ -341,14 +340,14 @@ onUnmounted(() => {
           ]">
             <a href="#features" class="nav-pill">Fonctionnalités</a>
             <a href="#pricing" class="nav-pill">Tarifs</a>
-            <RouterLink to="/blog" class="nav-pill">Blog</RouterLink>
+            <RouterLink to="/guide" class="nav-pill">Guide</RouterLink>
             <RouterLink to="/contact" class="nav-pill">Contact</RouterLink>
           </div>
         </div>
 
         <!-- Right actions -->
         <div class="hidden sm:flex items-center gap-1.5">
-          <template v-if="auth.isAuth">
+          <template v-if="auth.isAuthenticated">
             <RouterLink to="/dashboard" class="inline-flex items-center gap-2 px-5 py-1.5 text-sm font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all duration-200 shadow-md shadow-gray-900/15 hover:shadow-lg hover:shadow-gray-900/20 hover:-translate-y-px">
               Mon tableau de bord
               <ArrowRightIcon class="w-3.5 h-3.5" />
@@ -377,10 +376,10 @@ onUnmounted(() => {
       <div v-if="mobileMenuOpen" class="fixed inset-0 z-40 bg-white/95 backdrop-blur-2xl flex flex-col items-center justify-center gap-6 sm:hidden">
         <a @click="mobileMenuOpen = false" href="#features" class="text-2xl font-bold text-gray-900">Fonctionnalités</a>
         <a @click="mobileMenuOpen = false" href="#pricing" class="text-2xl font-bold text-gray-900">Tarifs</a>
-        <RouterLink @click="mobileMenuOpen = false" to="/blog" class="text-2xl font-bold text-gray-900">Blog</RouterLink>
+        <RouterLink @click="mobileMenuOpen = false" to="/guide" class="text-2xl font-bold text-gray-900">Guide</RouterLink>
         <RouterLink @click="mobileMenuOpen = false" to="/contact" class="text-2xl font-bold text-gray-900">Contact</RouterLink>
         <div class="flex flex-col gap-3 mt-4 w-56">
-          <template v-if="auth.isAuth">
+          <template v-if="auth.isAuthenticated">
             <RouterLink @click="mobileMenuOpen = false" to="/dashboard" class="py-3 text-center text-base font-bold text-white bg-gray-900 rounded-xl">Mon tableau de bord</RouterLink>
           </template>
           <template v-else>
@@ -441,18 +440,15 @@ onUnmounted(() => {
           'flex items-center justify-center gap-4 transition-all duration-700 delay-[600ms]',
           heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         ]">
-          <div class="flex -space-x-2">
-            <div v-for="(c, i) in ['from-pink-500 to-rose-500', 'from-blue-500 to-cyan-500', 'from-violet-500 to-purple-500', 'from-emerald-500 to-teal-500']" :key="i"
-              :class="['w-8 h-8 rounded-full bg-gradient-to-br border-2 border-white flex items-center justify-center text-white text-[10px] font-bold shadow-sm', c]">
-              {{ ['MN', 'JM', 'AD', 'SE'][i] }}
-            </div>
-          </div>
-          <div class="flex items-center gap-1">
-            <div class="flex">
-              <svg v-for="i in 5" :key="i" class="w-4 h-4 text-amber-400 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-            </div>
-            <span class="text-sm font-semibold text-gray-600 ml-1">4.9/5</span>
-          </div>
+          <!--
+            A "4.9/5" rating and a row of invented customer avatars used to sit
+            here. Both were fabricated. Replaced with something we can actually
+            stand behind: what the product does, and what it costs to try.
+          -->
+          <p class="text-sm text-gray-500">
+            <span class="font-semibold text-gray-700">14 jours d'essai Pro</span>
+            — sans carte bancaire, sans engagement.
+          </p>
         </div>
       </div>
 
@@ -842,7 +838,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Testimonials Carousel -->
+    <!-- Use cases carousel -->
     <section class="py-28 px-4 sm:px-6 bg-gray-50 relative overflow-hidden">
       <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100/30 rounded-full blur-3xl -z-0" />
       <div class="absolute bottom-0 left-0 w-80 h-80 bg-violet-100/30 rounded-full blur-3xl -z-0" />
@@ -851,7 +847,7 @@ onUnmounted(() => {
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14 gap-6">
           <div>
             <h2 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-              Ils nous font<br />confiance
+              Pensé pour<br />votre métier
             </h2>
           </div>
           <!-- Carousel controls -->
@@ -871,24 +867,16 @@ onUnmounted(() => {
         <div ref="trackEl" class="overflow-hidden -mx-3">
           <div class="flex transition-transform duration-500 ease-out px-3"
             :style="{ transform: `translateX(-${carouselIndex * cardWidth}px)` }">
-            <div v-for="t in testimonials" :key="t.name"
+            <div v-for="c in useCases" :key="c.trade"
               class="flex-shrink-0 w-full md:w-1/3 px-3">
               <div class="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-black/5 transition-all duration-300 h-full flex flex-col">
-                <!-- Stars -->
-                <div class="flex items-center gap-0.5 mb-5">
-                  <StarIcon v-for="s in t.rating" :key="s" class="w-5 h-5 fill-amber-400 text-amber-400" />
+                <div :class="['w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-2xl shadow-lg mb-5', c.color]">
+                  {{ c.icon }}
                 </div>
-                <!-- Quote -->
-                <p class="text-gray-600 leading-relaxed flex-1 mb-7">"{{ t.text }}"</p>
-                <!-- Author -->
-                <div class="flex items-center gap-3 pt-5 border-t border-gray-100">
-                  <div :class="['w-11 h-11 rounded-full bg-gradient-to-br flex items-center justify-center text-white font-bold text-sm shadow-lg', t.color]">
-                    {{ t.avatar }}
-                  </div>
-                  <div>
-                    <p class="font-bold text-gray-900 text-sm">{{ t.name }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">{{ t.role }}</p>
-                  </div>
+                <p class="text-gray-600 leading-relaxed flex-1 mb-7">{{ c.text }}</p>
+                <div class="pt-5 border-t border-gray-100">
+                  <p class="font-bold text-gray-900 text-sm">{{ c.trade }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">Exemple d'usage · {{ c.city }}</p>
                 </div>
               </div>
             </div>
@@ -942,7 +930,7 @@ onUnmounted(() => {
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-violet-400 to-primary-400">niveau supérieur</span> ?
         </h2>
         <p class="text-gray-400 text-lg sm:text-xl mb-12 max-w-xl mx-auto leading-relaxed">
-          Rejoignez des centaines de commerçants qui ont déjà automatisé leurs réservations et augmenté leur chiffre d'affaires.
+          Créez votre page de réservation en quelques minutes et laissez vos clients réserver, même quand vous êtes occupé.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1005,7 +993,7 @@ onUnmounted(() => {
               <li><a href="#features" class="text-sm hover:text-white transition-colors">Fonctionnalités</a></li>
               <li><a href="#pricing" class="text-sm hover:text-white transition-colors">Tarifs</a></li>
               <li><RouterLink to="/track" class="text-sm hover:text-white transition-colors">Suivre une réservation</RouterLink></li>
-              <li><RouterLink to="/api-docs" class="text-sm hover:text-white transition-colors">API</RouterLink></li>
+              
             </ul>
           </div>
 
@@ -1015,7 +1003,7 @@ onUnmounted(() => {
             <ul class="space-y-2.5">
               <li><RouterLink to="/help" class="text-sm hover:text-white transition-colors">Centre d'aide</RouterLink></li>
               <li><RouterLink to="/guide" class="text-sm hover:text-white transition-colors">Guide de démarrage</RouterLink></li>
-              <li><RouterLink to="/blog" class="text-sm hover:text-white transition-colors">Blog</RouterLink></li>
+              
             </ul>
           </div>
 
@@ -1024,7 +1012,7 @@ onUnmounted(() => {
             <h4 class="font-bold text-white text-sm mb-4">Entreprise</h4>
             <ul class="space-y-2.5">
               <li><RouterLink to="/about" class="text-sm hover:text-white transition-colors">À propos</RouterLink></li>
-              <li><RouterLink to="/careers" class="text-sm hover:text-white transition-colors">Carrières</RouterLink></li>
+              
               <li><RouterLink to="/contact" class="text-sm hover:text-white transition-colors">Contact</RouterLink></li>
             </ul>
           </div>

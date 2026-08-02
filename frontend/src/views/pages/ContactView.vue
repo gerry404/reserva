@@ -1,12 +1,32 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { computed, reactive } from 'vue'
 
-const sent = ref(false)
+const CONTACT_EMAIL = 'contact@reserva.cm'
+
 const form = reactive({ name: '', email: '', subject: '', message: '' })
 
+/**
+ * Opens the visitor's mail client with the message pre-written.
+ *
+ * This form used to flip a flag and say "message envoyé" while sending
+ * absolutely nothing — every prospect who wrote in was silently dropped. A
+ * mailto: hand-off is unglamorous, but it actually delivers, and it needs no
+ * inbox infrastructure to stand behind it.
+ */
+const mailtoLink = computed(() => {
+  const subject = `[Réserva] ${form.subject || 'Contact'}`
+  const body = [
+    `Nom : ${form.name}`,
+    `Email : ${form.email}`,
+    '',
+    form.message,
+  ].join('\n')
+
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+})
+
 function submit() {
-  // In production, this would call an API
-  sent.value = true
+  window.location.href = mailtoLink.value
 }
 </script>
 
@@ -43,15 +63,7 @@ function submit() {
 
         <!-- Form -->
         <div class="md:col-span-3">
-          <div v-if="sent" class="bg-emerald-50 border border-emerald-100 rounded-2xl p-8 text-center">
-            <div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-              <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <h3 class="font-bold text-gray-900 text-lg mb-2">Message envoyé</h3>
-            <p class="text-gray-500 text-sm">Nous vous répondrons dans les plus brefs délais.</p>
-          </div>
-
-          <form v-else @submit.prevent="submit" class="space-y-5">
+          <form @submit.prevent="submit" class="space-y-5">
             <div class="grid sm:grid-cols-2 gap-5">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Nom</label>
@@ -78,6 +90,14 @@ function submit() {
               <textarea v-model="form.message" class="input-field resize-none" rows="5" placeholder="Comment pouvons-nous vous aider ?" required />
             </div>
             <button type="submit" class="btn-primary w-full py-3">Envoyer le message</button>
+
+            <p class="text-xs text-gray-400 text-center">
+              Le message s'ouvrira dans votre application de messagerie. Vous pouvez
+              aussi nous écrire directement à
+              <a :href="`mailto:${CONTACT_EMAIL}`" class="text-primary-600 font-medium hover:underline">
+                {{ CONTACT_EMAIL }}
+              </a>.
+            </p>
           </form>
         </div>
       </div>

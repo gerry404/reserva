@@ -91,7 +91,7 @@ async function submit() {
   try {
     await auth.register({ ...form, phone: fullPhone.value })
   } catch (e) {
-    const errs = e.response?.data?.errors ?? {}
+    const errs = e.fieldErrors
     errors.value = errs
     const step1Fields = ['name', 'email', 'phone', 'password']
     if (step1Fields.some(f => errs[f])) step.value = 1
@@ -124,7 +124,7 @@ async function handleGoogleResponse(response) {
   try {
     await auth.loginWithGoogle(response.access_token)
   } catch (e) {
-    googleError.value = e.response?.data?.message || 'Erreur lors de la connexion avec Google.'
+    googleError.value = e.message || 'Erreur lors de la connexion avec Google.'
   } finally {
     googleLoading.value = false
   }

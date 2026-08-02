@@ -1,0 +1,143 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Réserva — production stack for a self-hosted VPS
+#
+#   caddy      TLS (Let's Encrypt), serves the Vue build, proxies /api
+#   app        Laravel on FrankenPHP
+#   worker     queue:work — notifications must never run inside a customer's
+#              booking request
+#   scheduler  schedule:run every minute — without it no reminder ever fires
+#   postgres   the database, on a named volume
+#
+# Everything sits behind one domain, so the browser sees a single origin and
+# CORS never enters the picture.
+#
+#   cp .env.example .env   # fill it in
+#   docker compose up -d --build
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: reserva
+
+services:
+  caddy:
+    build:
+      context: .
+      dockerfile: docker/caddy/Dockerfile
+      args:
+        # Baked into the bundle at build time: Vite substitutes them into the
+        # JS and into the Open Graph tags, which must be absolute.
+        VITE_SITE_URL: ${APP_URL}
+        VITE_API_URL: /api
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    environment:
+      DOMAIN: ${DOMAIN}
+      TLS_EMAIL: ${TLS_EMAIL}
+    volumes:
+      - caddy_data:/data          # certificates — losing this re-issues them
+      - caddy_config:/config
+      # Uploads are served straight off disk rather than proxied through PHP.
+      - uploads:/srv/uploads:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [reserva]
+
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      RUN_MIGRATIONS: "true"     # only this container migrates
+      CONTAINER_ROLE: app
+    volumes:
+      - uploads:/app/storage/app/public
+      - logs:/app/storage/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/up"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s          # generous: first boot runs the migrations
+    networks: [reserva]
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      RUN_MIGRATIONS: "false"
+      CONTAINER_ROLE: worker
+    # --max-time recycles the process hourly so a slow memory leak in any
+    # provider SDK cannot accumulate; Docker restarts it immediately.
+    command: php artisan queue:work --tries=3 --backoff=30 --max-time=3600 --sleep=3
+    volumes:
+      - uploads:/app/storage/app/public
+      - logs:/app/storage/logs
+    depends_on:
+      app:
+        condition: service_healthy
+    stop_grace_period: 60s       # let an in-flight job finish
+    networks: [reserva]
+
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      RUN_MIGRATIONS: "false"
+      CONTAINER_ROLE: scheduler
+    # schedule:work is the long-running form of "run schedule:run every minute",
+    # so there is no crontab to install inside the container.
+    command: php artisan schedule:work
+    volumes:
+      - uploads:/app/storage/app/public
+      - logs:/app/storage/logs
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [reserva]
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      # Deterministic collation: without it the image inherits the host locale,
+      # and a rebuilt volume can sort text differently than the old one.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Not published to the host: the database is reachable only from this
+    # network. Use `docker compose exec postgres psql` for a shell.
+    networks: [reserva]
+
+volumes:
+  postgres_data:
+  uploads:        # merchant logos, covers, service photos
+  logs:
+  caddy_data:
+  caddy_config:
+
+networks:
+  reserva:
+    driver: bridge

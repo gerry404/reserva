@@ -1,11 +1,31 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 
-export default defineConfig({
+/**
+ * Substitutes __SITE_URL__ in index.html.
+ *
+ * Open Graph images must be absolute — WhatsApp and Facebook do not resolve
+ * relative paths, and a blank preview on WhatsApp is a real cost for a product
+ * whose links are shared there. Falls back to a sane origin so an unset env var
+ * leaves a working URL rather than a literal placeholder in the markup.
+ */
+function siteUrlPlugin(siteUrl) {
+  return {
+    name: 'reserva-site-url',
+    transformIndexHtml: (html) => html.replaceAll('__SITE_URL__', siteUrl),
+  }
+}
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const siteUrl = (env.VITE_SITE_URL || 'https://reserva.cm').replace(/\/$/, '')
+
+  return {
   plugins: [
     vue(),
+    siteUrlPlugin(siteUrl),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
@@ -23,6 +43,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait-primary',
         start_url: '/dashboard',
+        id: '/dashboard',
         scope: '/',
         lang: 'fr',
         categories: ['business', 'productivity'],
@@ -65,15 +86,6 @@ export default defineConfig({
             short_name: 'Réservations',
             url: '/dashboard/bookings',
             icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }],
-          },
-        ],
-        screenshots: [
-          {
-            src: '/screenshots/dashboard.png',
-            sizes: '1280x720',
-            type: 'image/png',
-            form_factor: 'wide',
-            label: 'Tableau de bord Réserva',
           },
         ],
       },
@@ -159,4 +171,11 @@ export default defineConfig({
       '/storage': { target: 'http://localhost:8000', changeOrigin: true },
     },
   },
+
+  build: {
+    // Sourcemaps make a production stack trace readable without shipping the
+    // original sources inline.
+    sourcemap: true,
+  },
+  }
 })

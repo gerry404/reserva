@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { paymentsApi } from '@/api'
@@ -74,27 +74,39 @@ function formatPrice(amount) {
   return Number(amount).toLocaleString('fr-FR')
 }
 
+/** ISO timestamps from the API, rendered the way a French merchant reads them. */
+function formatDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+}
+
 function yearlySaving(plan) {
   return Math.round((1 - plan.yearly / (plan.monthly * 12)) * 100)
 }
 
-const isActive = computed(() => {
-  return subscription.value?.is_active
-})
+async function loadSubscription() {
+  const [sub, payments] = await Promise.all([
+    paymentsApi.subscription(),
+    paymentsApi.history(),
+  ])
+  subscription.value = sub
+  history.value      = payments
+}
 
 onMounted(async () => {
   try {
-    const [subRes, histRes] = await Promise.all([
-      paymentsApi.subscription(),
-      paymentsApi.history(),
-    ])
-    subscription.value = subRes.data
-    history.value      = histRes.data
-  } catch {}
-  loading.value = false
+    await loadSubscription()
+  } catch (e) {
+    toast.value = { type: 'error', message: e.message }
+  } finally {
+    loading.value = false
+  }
 
-  // Handle callback from Flutterwave
-  if (route.query.status === 'callback' && route.query.tx_ref) {
+  // Returning from Flutterwave. Keyed on tx_ref alone: the gateway appends its
+  // own `status` to the redirect URL, so the previous check against
+  // `status === 'callback'` saw an array and never fired — the customer paid
+  // and nothing happened.
+  if (typeof route.query.tx_ref === 'string') {
     verifyPayment(route.query.tx_ref)
   }
 })
@@ -103,16 +115,15 @@ async function initPayment(planId) {
   initiating.value = planId
   toast.value = null
   try {
-    const { data } = await paymentsApi.initiate({
+    const { payment_link: paymentLink } = await paymentsApi.initiate({
       plan: planId,
       billing_cycle: cycle.value,
     })
-    // Redirect to Flutterwave checkout
-    window.location.href = data.payment_link
+    window.location.href = paymentLink
   } catch (e) {
     toast.value = {
       type: 'error',
-      message: e.response?.data?.message || 'Erreur lors de l\'initiation du paiement.',
+      message: e.message || 'Erreur lors de l\'initiation du paiement.',
     }
   } finally {
     initiating.value = null
@@ -123,22 +134,22 @@ async function verifyPayment(txRef) {
   verifying.value = true
   toast.value = null
   try {
-    const { data } = await paymentsApi.verify(txRef)
-    if (data.status === 'successful') {
-      toast.value = { type: 'success', message: data.message }
-      // Refresh user data
-      await auth.fetchUser()
-      const [subRes, histRes] = await Promise.all([
-        paymentsApi.subscription(),
-        paymentsApi.history(),
-      ])
-      subscription.value = subRes.data
-      history.value      = histRes.data
-    } else {
-      toast.value = { type: 'error', message: data.message }
+    const result = await paymentsApi.verify(txRef)
+
+    toast.value = {
+      type: result.status === 'successful' ? 'success' : 'error',
+      message: result.message,
     }
-  } catch {
-    toast.value = { type: 'error', message: 'Vérification en cours… Réessayez dans quelques instants.' }
+
+    if (result.status === 'successful') {
+      // The plan changed: refresh the session so the sidebar badge and every
+      // Pro-gated screen agree with what was just paid for.
+      await auth.refresh()
+    }
+
+    await loadSubscription()
+  } catch (e) {
+    toast.value = { type: 'error', message: e.message }
   } finally {
     verifying.value = false
   }
@@ -200,7 +211,7 @@ const statusConfig = {
                 </h3>
                 <p :class="['text-sm', subscription?.plan === 'free' ? 'text-gray-500' : 'text-white/70']">
                   <template v-if="subscription?.plan === 'free'">30 réservations / mois — Passez à Pro pour déverrouiller tout</template>
-                  <template v-else-if="subscription?.plan_expires_at">Actif jusqu'au {{ subscription.plan_expires_at }}</template>
+                  <template v-else-if="subscription?.plan_expires_at">Actif jusqu'au {{ formatDate(subscription.plan_expires_at) }}</template>
                   <template v-else>Abonnement actif</template>
                 </p>
               </div>
@@ -346,9 +357,9 @@ const statusConfig = {
               :class="['w-5 h-5 shrink-0', p.status === 'successful' ? 'text-emerald-500' : p.status === 'failed' ? 'text-red-500' : 'text-amber-500']" />
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-gray-900">{{ p.plan }} — {{ p.billing_cycle }}</p>
-              <p class="text-xs text-gray-400">{{ p.created_at }}{{ p.payment_method ? ' · ' + p.payment_method : '' }}</p>
+              <p class="text-xs text-gray-400">{{ formatDate(p.created_at) }}{{ p.payment_method ? ' · ' + p.payment_method : '' }}</p>
             </div>
-            <span class="text-sm font-bold text-gray-900">{{ formatPrice(p.amount) }} F</span>
+            <span class="text-sm font-bold text-gray-900">{{ p.formatted_amount }}</span>
             <span :class="['text-[11px] font-semibold px-2 py-0.5 rounded-full', statusConfig[p.status]?.class ?? 'bg-gray-100 text-gray-500']">
               {{ statusConfig[p.status]?.label ?? p.status }}
             </span>

@@ -69,23 +69,43 @@ const onboarding = computed(() => {
 const onboardingDone = computed(() => onboarding.value.filter(s => s.done).length)
 const showOnboarding = computed(() => onboardingDone.value < onboarding.value.length && stats.value?.monthly_bookings === 0)
 
+/**
+ * Quota gauge. Derived from the limit the API reports rather than from a
+ * hardcoded 30, so changing a plan's allowance never leaves the warning
+ * threshold pointing at the old number.
+ */
+const quotaPercent = computed(() => {
+  if (!stats.value?.plan_limit) return 0
+  return Math.min(100, Math.round((stats.value.plan_used / stats.value.plan_limit) * 100))
+})
+
+const quotaIsTight = computed(() => quotaPercent.value >= 80)
+
 // Load all dashboard data
 async function loadDashboard() {
   loading.value = true
   error.value = ''
   try {
-    const [statsRes, upcomingRes, chartRes, analyticsRes] = await Promise.all([
+    // allSettled, not all: analytics is Pro-only and answers 402 on a free
+    // plan. With Promise.all that single rejection blanked the whole dashboard
+    // — the free tier saw an error page instead of their bookings.
+    const [statsResult, upcomingResult, chartResult, analyticsResult] = await Promise.allSettled([
       dashboardApi.stats(),
       dashboardApi.upcoming(),
       dashboardApi.chart(),
       dashboardApi.analytics(),
     ])
-    stats.value     = statsRes.data
-    upcoming.value  = upcomingRes.data
-    chart.value     = chartRes.data
-    analytics.value = analyticsRes.data
+
+    if (statsResult.status === 'rejected') throw statsResult.reason
+
+    stats.value    = statsResult.value
+    upcoming.value = upcomingResult.status === 'fulfilled' ? upcomingResult.value : []
+    chart.value    = chartResult.status === 'fulfilled' ? chartResult.value : null
+
+    // Absent rather than broken: the UI shows the upgrade prompt instead.
+    analytics.value = analyticsResult.status === 'fulfilled' ? analyticsResult.value : null
   } catch (e) {
-    error.value = e.response?.data?.message || 'Impossible de charger le tableau de bord.'
+    error.value = e.message
   } finally {
     loading.value = false
   }
@@ -448,25 +468,26 @@ const greeting = computed(() => {
           </div>
         </div>
 
-        <!-- Plan usage -->
-        <div v-if="stats.plan === 'free'" class="card p-5">
+        <!-- Plan usage. plan_limit is null on paid plans (unmetered), so this
+             whole block only makes sense while a limit exists. -->
+        <div v-if="stats.plan_limit" class="card p-5">
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
             <div class="flex-1">
               <div class="flex items-center justify-between mb-2">
-                <p class="text-sm font-semibold text-gray-700">Utilisation du plan gratuit</p>
-                <span class="text-sm font-bold" :class="stats.plan_used >= 25 ? 'text-amber-600' : 'text-gray-900'">
+                <p class="text-sm font-semibold text-gray-700">Réservations ce mois-ci</p>
+                <span class="text-sm font-bold" :class="quotaIsTight ? 'text-amber-600' : 'text-gray-900'">
                   {{ stats.plan_used }} / {{ stats.plan_limit }}
                 </span>
               </div>
               <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   class="h-full rounded-full transition-all duration-700"
-                  :class="stats.plan_used >= 25 ? 'bg-gradient-to-r from-amber-500 to-red-500' : 'bg-gradient-to-r from-primary-500 to-violet-500'"
-                  :style="{ width: Math.min((stats.plan_used / stats.plan_limit) * 100, 100) + '%' }"
+                  :class="quotaIsTight ? 'bg-gradient-to-r from-amber-500 to-red-500' : 'bg-gradient-to-r from-primary-500 to-violet-500'"
+                  :style="{ width: quotaPercent + '%' }"
                 />
               </div>
-              <p v-if="stats.plan_used >= stats.plan_limit * 0.8" class="text-xs text-amber-600 mt-1.5 font-medium">
-                ⚠ Presque à la limite — passez au Pro pour des réservations illimitées.
+              <p v-if="quotaIsTight" class="text-xs text-amber-600 mt-1.5 font-medium">
+                ⚠ Bientôt à la limite — au-delà, vos clients ne pourront plus réserver ce mois-ci.
               </p>
             </div>
             <RouterLink to="/dashboard/billing" class="btn-primary text-xs px-4 py-2 whitespace-nowrap shrink-0">
@@ -649,6 +670,22 @@ const greeting = computed(() => {
               <p class="text-sm text-gray-400 font-medium">Aucune donnée encore</p>
             </div>
           </div>
+        </div>
+
+        <!-- Advanced analytics are a Pro feature. When the API declines, say so
+             plainly instead of leaving three empty cards on the page. -->
+        <div v-if="!analytics" class="card p-8 text-center border-2 border-dashed border-primary-100 bg-primary-50/30">
+          <div class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <ChartBarIcon class="w-7 h-7 text-primary-500" />
+          </div>
+          <h3 class="font-bold text-gray-900 mb-1.5">Statistiques avancées</h3>
+          <p class="text-sm text-gray-500 max-w-md mx-auto leading-relaxed mb-5">
+            Heures de pointe, jours les plus chargés, revenus par service et suivi
+            de l'activité : disponibles avec le plan Pro.
+          </p>
+          <RouterLink :to="{ name: 'billing' }" class="btn-primary px-6 py-2.5 text-sm inline-flex">
+            Découvrir le plan Pro
+          </RouterLink>
         </div>
 
         <!-- ═══════ PEAK HOURS + PEAK DAYS ═══════ -->
