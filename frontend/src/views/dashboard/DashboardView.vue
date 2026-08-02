@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { dashboardApi, bookingsApi } from '@/api'
+import DurationBar from '@/components/time/DurationBar.vue'
 import { RouterLink } from 'vue-router'
 import {
   CalendarDaysIcon,
@@ -170,13 +171,15 @@ function formatPrice(p) {
 const statusClass = {
   pending: 'badge-pending', confirmed: 'badge-confirmed',
   cancelled: 'badge-cancelled', completed: 'badge-completed',
+  no_show: 'badge-cancelled',
 }
 const statusLabel = {
   pending: 'En attente', confirmed: 'Confirmé',
   cancelled: 'Annulé', completed: 'Terminé',
+  no_show: 'Non présenté',
 }
 const statusIcon = {
-  pending: '⏳', confirmed: '✅', cancelled: '❌', completed: '🏁',
+  pending: '⏳', confirmed: '✅', cancelled: '❌', completed: '🏁', no_show: '🚫',
 }
 
 // Chart helpers
@@ -218,8 +221,14 @@ const statusTotal = computed(() => {
 
 const statusSegments = computed(() => {
   if (!analytics.value?.status_distribution || statusTotal.value === 0) return []
-  const colors = { confirmed: '#10b981', completed: '#3b82f6', pending: '#f59e0b', cancelled: '#ef4444' }
-  const labels = { confirmed: 'Confirmé', completed: 'Terminé', pending: 'En attente', cancelled: 'Annulé' }
+  const colors = {
+    confirmed: '#10b981', completed: '#3b82f6', pending: '#f59e0b',
+    cancelled: '#ef4444', no_show: '#6b7280',
+  }
+  const labels = {
+    confirmed: 'Confirmé', completed: 'Terminé', pending: 'En attente',
+    cancelled: 'Annulé', no_show: 'Non présenté',
+  }
   let offset = 0
   return Object.entries(analytics.value.status_distribution).map(([status, count]) => {
     const pct = (count / statusTotal.value) * 100
@@ -611,8 +620,20 @@ const greeting = computed(() => {
                 <div class="flex-1 min-w-0">
                   <p class="font-semibold text-sm text-gray-900 truncate">{{ b.customer_name }}</p>
                   <p class="text-xs text-gray-400 truncate">
-                    {{ b.service?.name }} · {{ formatDate(b.date) }} à {{ b.time_slot }}
+                    {{ b.service?.name }} ·
+                    <span class="numeric">{{ formatDate(b.date) }} {{ b.time_slot }}–{{ b.ends_at_time }}</span>
                   </p>
+                  <!--
+                    Le commerçant voit d'un coup ce que sa journée engage :
+                    trois barres courtes se lisent autrement que deux longues,
+                    même à nombre de rendez-vous égal.
+                  -->
+                  <DurationBar
+                    :minutes="b.duration"
+                    :color="b.service?.color"
+                    size="sm"
+                    class="mt-1.5 max-w-[150px]"
+                  />
                 </div>
                 <div class="flex items-center gap-2">
                   <span :class="['badge text-[10px]', statusClass[b.status]]">{{ statusLabel[b.status] }}</span>
