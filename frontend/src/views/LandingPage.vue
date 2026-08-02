@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
+import FinalCta from '@/components/marketing/FinalCta.vue'
 import { useAuthStore } from '@/stores/auth'
 import {
   DevicePhoneMobileIcon,
@@ -152,7 +153,6 @@ const useCases = [
     color: 'from-amber-500 to-orange-500',
   },
 ]
-
 
 
 // ── Testimonials carousel ──
@@ -892,69 +892,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- CTA final -->
-    <section class="relative py-32 px-4 sm:px-6 overflow-hidden">
-      <!-- Background gradient -->
-      <div class="absolute inset-0 bg-gradient-to-br from-gray-950 via-primary-950 to-gray-950" />
-
-      <!-- Polygon grid -->
-      <svg class="absolute inset-0 w-full h-full opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="cta-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-            <path d="M30 0L60 15L60 45L30 60L0 45L0 15Z" fill="none" stroke="white" stroke-width="0.5"/>
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#cta-grid)" />
-      </svg>
-
-      <!-- Glow orbs -->
-      <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-primary-600/20 rounded-full blur-[120px]" />
-      <div class="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-violet-600/15 rounded-full blur-[100px]" />
-
-      <!-- Floating polygons -->
-      <svg class="absolute top-10 left-10 w-24 h-24 text-white/[0.04] animate-spin" style="animation-duration: 30s" viewBox="0 0 100 100"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="currentColor"/></svg>
-      <svg class="absolute bottom-10 right-16 w-32 h-32 text-white/[0.03] animate-spin" style="animation-duration: 45s; animation-direction: reverse" viewBox="0 0 100 100"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="currentColor"/></svg>
-      <svg class="absolute top-1/4 right-1/3 w-16 h-16 text-primary-400/[0.08] animate-spin" style="animation-duration: 20s" viewBox="0 0 100 100"><polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-
-      <!-- Content -->
-      <div class="relative max-w-3xl mx-auto text-center">
-        <!-- Top decorative line -->
-        <div class="flex items-center justify-center gap-4 mb-10">
-          <div class="h-px w-16 bg-gradient-to-r from-transparent to-primary-400/50" />
-          <svg class="w-6 h-6 text-primary-400/60" viewBox="0 0 100 100"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="none" stroke="currentColor" stroke-width="4"/></svg>
-          <div class="h-px w-16 bg-gradient-to-l from-transparent to-primary-400/50" />
-        </div>
-
-        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-          Prêt à passer au
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-violet-400 to-primary-400">niveau supérieur</span> ?
-        </h2>
-        <p class="text-gray-400 text-lg sm:text-xl mb-12 max-w-xl mx-auto leading-relaxed">
-          Créez votre page de réservation en quelques minutes et laissez vos clients réserver, même quand vous êtes occupé.
-        </p>
-
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <RouterLink to="/register"
-            class="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-clay-50 text-gray-900 font-bold text-base rounded-xl hover:shadow-2xl hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300">
-            Créer mon compte gratuit
-            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-          </RouterLink>
-          <RouterLink to="/contact"
-            class="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-white/20 text-white font-bold text-base rounded-xl hover:bg-white/10 hover:border-white/30 transition-all duration-300">
-            Nous contacter
-          </RouterLink>
-        </div>
-
-        <p class="text-gray-500 text-sm mt-8">14 jours d'essai gratuit. Sans engagement. Sans carte bancaire.</p>
-
-        <!-- Bottom decorative line -->
-        <div class="flex items-center justify-center gap-4 mt-12">
-          <div class="h-px w-24 bg-gradient-to-r from-transparent to-white/10" />
-          <div class="w-1.5 h-1.5 rounded-full bg-primary-500/50" />
-          <div class="h-px w-24 bg-gradient-to-l from-transparent to-white/10" />
-        </div>
-      </div>
-    </section>
+    <FinalCta />
 
     <!-- ══════ REAL FOOTER ══════ -->
     <footer class="bg-primary-950 text-primary-200">
