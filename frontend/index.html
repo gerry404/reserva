@@ -44,11 +44,14 @@
 
   <title>Réserva — Réservations en ligne</title>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet" />
+  <!--
+    Les polices sont auto-hébergées (src/assets/fonts/). Elles venaient du CDN
+    Google : deux connexions bloquantes vers un tiers avant le premier texte
+    affiché, sur un produit dont les utilisateurs sont majoritairement en 3G en
+    Afrique de l'Ouest et centrale. Servies avec le bundle, elles arrivent sur
+    la connexion déjà ouverte, fonctionnent hors ligne, et laissent retirer
+    fonts.googleapis.com et fonts.gstatic.com de la CSP.
+  -->
 </head>
 
 <body class="bg-gray-50 antialiased">

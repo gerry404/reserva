@@ -262,7 +262,7 @@ const stats = computed(() => {
               </span>
               <span class="flex items-center gap-1">
                 <CalendarDaysIcon class="w-3 h-3" />
-                {{ formatDate(b.date) }} · {{ b.time_slot }}
+                {{ formatDate(b.date) }} · <span class="numeric">{{ b.time_slot }}</span>
               </span>
             </div>
           </div>

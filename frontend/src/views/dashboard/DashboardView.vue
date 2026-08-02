@@ -353,7 +353,7 @@ const greeting = computed(() => {
               </div>
             </div>
             <div>
-              <p class="text-3xl font-black text-gray-900">{{ stats.monthly_bookings }}</p>
+              <p class="text-3xl font-black text-gray-900 numeric">{{ stats.monthly_bookings }}</p>
               <p class="text-sm text-gray-500 mt-0.5">Réservations ce mois</p>
             </div>
           </div>
@@ -369,7 +369,7 @@ const greeting = computed(() => {
               </span>
             </div>
             <div>
-              <p class="text-3xl font-black text-gray-900">{{ stats.today_bookings }}</p>
+              <p class="text-3xl font-black text-gray-900 numeric">{{ stats.today_bookings }}</p>
               <p class="text-sm text-gray-500 mt-0.5">Aujourd'hui</p>
             </div>
           </div>
@@ -386,7 +386,7 @@ const greeting = computed(() => {
               </span>
             </div>
             <div>
-              <p class="text-3xl font-black text-gray-900">{{ stats.pending_bookings }}</p>
+              <p class="text-3xl font-black text-gray-900 numeric">{{ stats.pending_bookings }}</p>
               <p class="text-sm text-gray-500 mt-0.5">En attente</p>
             </div>
           </RouterLink>
@@ -403,7 +403,7 @@ const greeting = computed(() => {
               </div>
             </div>
             <div>
-              <p class="text-3xl font-black text-gray-900">{{ formatRevenue(stats.revenue_this_month) }}</p>
+              <p class="text-3xl font-black text-gray-900 numeric">{{ formatRevenue(stats.revenue_this_month) }}</p>
               <p class="text-sm text-gray-500 mt-0.5">Revenus (F CFA)</p>
             </div>
           </div>
@@ -416,7 +416,7 @@ const greeting = computed(() => {
               <UsersIcon class="w-4.5 h-4.5 text-indigo-600" />
             </div>
             <div>
-              <p class="text-lg font-black text-gray-900">{{ stats.total_clients }}</p>
+              <p class="text-lg font-black text-gray-900 numeric">{{ stats.total_clients }}</p>
               <p class="text-[11px] text-gray-400">Clients total</p>
             </div>
           </div>
@@ -476,7 +476,7 @@ const greeting = computed(() => {
               <div class="flex items-center justify-between mb-2">
                 <p class="text-sm font-semibold text-gray-700">Réservations ce mois-ci</p>
                 <span class="text-sm font-bold" :class="quotaIsTight ? 'text-amber-600' : 'text-gray-900'">
-                  {{ stats.plan_used }} / {{ stats.plan_limit }}
+                  <span class="numeric">{{ stats.plan_used }} / {{ stats.plan_limit }}</span>
                 </span>
               </div>
               <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
@@ -551,7 +551,7 @@ const greeting = computed(() => {
                   />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                  <span class="text-2xl font-black text-gray-900">{{ statusTotal }}</span>
+                  <span class="text-2xl font-black text-gray-900 numeric">{{ statusTotal }}</span>
                   <span class="text-[10px] text-gray-400">total</span>
                 </div>
               </div>
@@ -793,7 +793,7 @@ const greeting = computed(() => {
                   <p class="text-sm font-semibold text-gray-900 truncate">{{ svc.name }}</p>
                   <p class="text-[11px] text-gray-400">{{ svc.bookings_count }} réservation(s)</p>
                 </div>
-                <span class="text-sm font-black text-gray-900">{{ formatRevenue(svc.revenue) }} F</span>
+                <span class="text-sm font-black text-gray-900 numeric">{{ formatRevenue(svc.revenue) }} F</span>
               </div>
             </div>
 

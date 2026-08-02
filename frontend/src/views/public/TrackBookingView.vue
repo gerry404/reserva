@@ -135,7 +135,7 @@ async function cancelBooking() {
             <p :class="['font-bold text-sm', statusConfig[booking.status]?.color ?? 'text-gray-700']">
               {{ statusConfig[booking.status]?.label ?? booking.status_label }}
             </p>
-            <p class="text-xs text-gray-500">Réf. {{ booking.reference }}</p>
+            <p class="text-xs text-gray-500">Réf. <span class="numeric">{{ booking.reference }}</span></p>
           </div>
         </div>
 

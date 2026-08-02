@@ -1,3 +1,6 @@
+/* Polices auto-hébergées — voir assets/fonts/fonts.css pour le rôle de chacune. */
+@import './assets/fonts/fonts.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,6 +22,15 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
+    /* Les titres serrent légèrement : Bricolage Grotesque respire beaucoup
+       en grande taille, et le crénage par défaut y laisse des trous. */
+    letter-spacing: -0.018em;
+  }
+
+  /* Aligne les chiffres en colonne partout, y compris dans les tableaux de
+     réservations où les heures se lisent les unes sous les autres. */
+  table, .tabular {
+    font-variant-numeric: tabular-nums;
   }
 
   ::-webkit-scrollbar {
@@ -59,6 +71,30 @@
 
   .card {
     @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
+  }
+
+  /*
+   * Chiffres en vedette : heures, prix, compteurs du tableau de bord.
+   *
+   * Yuzo a un dessin de chiffres nettement plus caractériel que Bricolage,
+   * ce qui donne un point d'accroche visuel exactement là où l'œil d'un
+   * commerçant se pose en premier — l'heure du prochain rendez-vous et le
+   * montant. Elle n'est jamais employée ailleurs : il lui manque trop
+   * d'accents pour porter du texte français.
+   *
+   * `tabular-nums` s'applique à la police de repli comme à Yuzo, pour que
+   * rien ne saute au moment où le woff2 finit de charger.
+   */
+  .numeric {
+    @apply font-numeric;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  /* Variante compacte pour les chiffres insérés dans une phrase. */
+  .numeric-inline {
+    @apply font-numeric;
+    font-variant-numeric: tabular-nums;
   }
 
   .badge {

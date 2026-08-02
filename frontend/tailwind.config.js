@@ -4,8 +4,23 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        // Texte courant : tout ce qui se lit par phrases.
         sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+
+        // Titres et marque. Pour passer à Dekatron une fois sa licence Webfont
+        // acquise, il suffit de l'ajouter en tête de cette liste.
         display: ['"Bricolage Grotesque"', '"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+
+        /*
+         * Chiffres en vedette — heures, prix, statistiques.
+         *
+         * Yuzo est volontairement sous-ensemblée aux chiffres : sur du texte,
+         * ses accents manquants casseraient les mots. La police de repli porte
+         * donc `font-feature-settings: tnum` via la classe .numeric, pour que
+         * les colonnes de nombres restent alignées si Yuzo n'a pas encore
+         * chargé.
+         */
+        numeric: ['"Yuzo"', '"Bricolage Grotesque"', 'ui-monospace', 'monospace'],
       },
       colors: {
         primary: {
