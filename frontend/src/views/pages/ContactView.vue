@@ -1,7 +1,7 @@
 <script setup>
 import { computed, reactive } from 'vue'
 
-const CONTACT_EMAIL = 'contact@reserva.cm'
+const CONTACT_EMAIL = 'contact@nuvo.app'
 
 const form = reactive({ name: '', email: '', subject: '', message: '' })
 
@@ -14,7 +14,7 @@ const form = reactive({ name: '', email: '', subject: '', message: '' })
  * inbox infrastructure to stand behind it.
  */
 const mailtoLink = computed(() => {
-  const subject = `[Réserva] ${form.subject || 'Contact'}`
+  const subject = `[Nuvo] ${form.subject || 'Contact'}`
   const body = [
     `Nom : ${form.name}`,
     `Email : ${form.email}`,
@@ -45,7 +45,7 @@ function submit() {
         <div class="md:col-span-2 space-y-8">
           <div>
             <h3 class="font-bold text-gray-900 mb-2">Email</h3>
-            <a href="mailto:contact@reserva.cm" class="text-primary-600 font-medium hover:underline">contact@reserva.cm</a>
+            <a href="mailto:contact@nuvo.app" class="text-primary-600 font-medium hover:underline">contact@nuvo.app</a>
           </div>
           <div>
             <h3 class="font-bold text-gray-900 mb-2">WhatsApp</h3>

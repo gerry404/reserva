@@ -40,7 +40,7 @@ const features = [
   {
     icon: GlobeAltIcon,
     title: 'Pensé pour tous',
-    desc: 'Interface en français et anglais, connexion lente tolérée, paiements MTN/Orange Money. Réserva comprend votre réalité.',
+    desc: 'Interface en français et anglais, connexion lente tolérée, paiements MTN/Orange Money. Nuvo comprend votre réalité.',
     gradient: 'from-violet-500 to-purple-400',
     bg: 'bg-violet-500/10',
   },
@@ -324,11 +324,11 @@ onUnmounted(() => {
       ]">
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center gap-2 shrink-0">
-          <img src="/logo.png" alt="Réserva" :class="['transition-all duration-300', scrolled ? 'w-7 h-7' : 'w-8 h-8']" />
+          <img src="/logo.svg" alt="Nuvo" :class="['transition-all duration-300', scrolled ? 'w-7 h-7' : 'w-8 h-8']" />
           <span :class="[
             'font-display font-black tracking-tight transition-all duration-300',
             scrolled ? 'text-base text-gray-900' : 'text-lg text-gray-900'
-          ]">Réserva</span>
+          ]">Nuvo</span>
         </RouterLink>
 
         <!-- Center nav links -->
@@ -467,7 +467,7 @@ onUnmounted(() => {
             </div>
             <div class="flex-1 bg-gray-700 rounded-lg px-3 py-1 text-xs text-gray-300 text-center max-w-xs mx-auto flex items-center justify-center gap-1.5">
               <svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-              reserva.cm/salon-elegance-douala
+              nuvo.app/salon-elegance-douala
             </div>
           </div>
 
@@ -726,7 +726,7 @@ onUnmounted(() => {
           <div class="grid md:grid-cols-3 gap-6">
             <div v-for="(s, i) in [
               { n: '01', title: 'Créez votre compte', desc: 'Inscrivez-vous en 5 minutes. Ajoutez le nom de votre commerce, vos services et vos horaires d\'ouverture.', icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z' },
-              { n: '02', title: 'Partagez votre lien', desc: 'Vous recevez une URL unique (ex: reserva.cm/mon-salon). Partagez-la sur WhatsApp, Instagram ou Facebook.', icon: 'M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244' },
+              { n: '02', title: 'Partagez votre lien', desc: 'Vous recevez une URL unique (ex: nuvo.app/mon-salon). Partagez-la sur WhatsApp, Instagram ou Facebook.', icon: 'M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244' },
               { n: '03', title: 'Recevez des réservations', desc: 'Recevez les réservations en temps réel. Confirmez, annulez ou reprogrammez en un clic depuis votre téléphone.', icon: 'M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0' },
             ]" :key="i"
               class="group relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-8 hover:bg-white/[0.08] hover:border-white/[0.15] transition-all duration-500">
@@ -964,8 +964,8 @@ onUnmounted(() => {
           <!-- Brand column -->
           <div class="col-span-2 md:col-span-1">
             <div class="flex items-center gap-2 mb-4">
-              <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
-              <span class="font-display font-extrabold text-white text-lg">Réserva</span>
+              <img src="/logo.svg" alt="Nuvo" class="w-8 h-8" />
+              <span class="font-display font-extrabold text-white text-lg">Nuvo</span>
             </div>
             <p class="text-sm leading-relaxed mb-6">La plateforme de réservation en ligne pensée pour les commerçants ambitieux.</p>
             <!-- Social links -->
@@ -1022,7 +1022,7 @@ onUnmounted(() => {
       <!-- Bottom bar -->
       <div class="border-t border-gray-800">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p class="text-sm text-gray-500">&copy; {{ new Date().getFullYear() }} Réserva. Tous droits réservés.</p>
+          <p class="text-sm text-gray-500">&copy; {{ new Date().getFullYear() }} Nuvo. Tous droits réservés.</p>
           <div class="flex items-center gap-6">
             <RouterLink to="/terms" class="text-sm text-gray-500 hover:text-gray-300 transition-colors">Conditions d'utilisation</RouterLink>
             <RouterLink to="/privacy" class="text-sm text-gray-500 hover:text-gray-300 transition-colors">Politique de confidentialité</RouterLink>

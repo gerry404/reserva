@@ -22,7 +22,7 @@ return [
     ],
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@reserva.cm'),
-        'name' => env('MAIL_FROM_NAME', 'Réserva'),
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@nuvo.app'),
+        'name' => env('MAIL_FROM_NAME', 'Nuvo'),
     ],
 ];

@@ -94,10 +94,10 @@ onUnmounted(() => {
           <div class="p-5">
             <div class="flex items-start gap-4">
               <!-- App icon -->
-              <img src="/logo.png" alt="Réserva" class="w-14 h-14 shrink-0" />
+              <img src="/logo.svg" alt="Nuvo" class="w-14 h-14 shrink-0" />
 
               <div class="flex-1 min-w-0">
-                <p class="font-bold text-gray-900 text-base leading-tight">Installer Réserva</p>
+                <p class="font-bold text-gray-900 text-base leading-tight">Installer Nuvo</p>
                 <p class="text-sm text-gray-500 mt-0.5">Accès rapide depuis votre écran d'accueil, même hors ligne.</p>
               </div>
 

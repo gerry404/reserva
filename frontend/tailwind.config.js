@@ -4,15 +4,16 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // Texte courant. Dekatron suit Yuzo dans la pile : elle complète les
-        // accents que Yuzo ne dessine pas (é, è, ç, œ, €).
-        sans: ['"Yuzo"', '"Dekatron"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Texte courant, sous-titres, formulaires : tout ce qui se lit par
+        // phrases. Roboto est neutre et couvre le français en entier.
+        sans: ['Roboto', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
 
-        // Titres, marque, interface.
-        display: ['"Dekatron"', '"Yuzo"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Titres et marque — là où le caractère de Dekatron se voit.
+        display: ['"Dekatron"', 'Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
 
-        // Chiffres en vedette — heures, prix, compteurs.
-        numeric: ['"Yuzo"', '"Dekatron"', 'ui-monospace', 'monospace'],
+        // Chiffres en vedette — heures, prix, compteurs. Roboto en repli :
+        // Yuzo ne dessine pas les accents, mais aucun chiffre n'en porte.
+        numeric: ['"Yuzo"', 'Roboto', 'ui-monospace', 'monospace'],
       },
       colors: {
         primary: {

@@ -294,7 +294,7 @@ const greeting = computed(() => {
               <RocketLaunchIcon class="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 class="font-bold text-white">Bienvenue sur Réserva !</h3>
+              <h3 class="font-bold text-white">Bienvenue sur Nuvo !</h3>
               <p class="text-white/70 text-sm">Complétez ces étapes pour recevoir vos premières réservations</p>
             </div>
             <div class="ml-auto hidden sm:flex items-center gap-2">

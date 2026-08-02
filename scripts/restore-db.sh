@@ -2,7 +2,7 @@
 #
 # Restore a dump produced by backup-db.sh.
 #
-#   ./scripts/restore-db.sh backups/reserva_2026-08-02_030000.sql.gz
+#   ./scripts/restore-db.sh backups/nuvo_2026-08-02_030000.sql.gz
 #
 # This overwrites the live database. It asks for confirmation and takes a
 # safety dump first, because the moment you need this script is the moment you
@@ -17,7 +17,7 @@ if [ -z "$archive" ]; then
     echo "Usage: $0 <backup.sql.gz>" >&2
     echo >&2
     echo "Available backups:" >&2
-    ls -1t ./backups/reserva_*.sql.gz 2>/dev/null | head -20 >&2 || echo "  (none)" >&2
+    ls -1t ./backups/nuvo_*.sql.gz 2>/dev/null | head -20 >&2 || echo "  (none)" >&2
     exit 1
 fi
 

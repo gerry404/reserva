@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nuvo">
+  <!--
+    Marque seule, sans pastille : pour les emplacements posés sur une surface
+    déjà colorée (barre latérale, en-tête, emails). Même géométrie que le
+    favicon, à l'échelle du cadre entier.
+  -->
+  <defs>
+    <linearGradient id="nuvo-mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#635BFF"/>
+      <stop offset="1" stop-color="#3D1FD6"/>
+    </linearGradient>
+  </defs>
+
+  <g fill="none" stroke="url(#nuvo-mark)" stroke-linecap="round">
+    <path d="M54.9 33.6A23.0 23.0 0 1 1 41.0 10.8" stroke-width="8.0"/>
+    <path d="M32 32 40.6 26.7" stroke-width="5.8"/>
+  </g>
+
+  <circle cx="51.6" cy="20.0" r="7.2" fill="url(#nuvo-mark)"/>
+</svg>

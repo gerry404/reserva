@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Réserva — edge configuration
+# Nuvo — edge configuration
 #
 # One origin for everything. The SPA, the API and the uploaded images all live
 # under the same hostname, which is why the app has no CORS configuration to

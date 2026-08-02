@@ -8,7 +8,7 @@
                 <tr>
                     <td style="background:linear-gradient(135deg,#9333ea,#7e22ce);padding:36px 32px;text-align:center;">
                         <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-                        <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:800;">Bienvenue sur Réserva !</h1>
+                        <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:800;">Bienvenue sur Nuvo !</h1>
                         <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">Votre commerce en ligne en quelques clics</p>
                     </td>
                 </tr>
@@ -16,7 +16,7 @@
                     <td style="padding:32px;">
                         <p style="margin:0 0 20px;color:#374151;font-size:15px;line-height:1.6;">
                             Bonjour <strong>{{ $user->name }}</strong>,<br><br>
-                            Merci d'avoir rejoint Réserva ! Votre compte a été créé avec succès.
+                            Merci d'avoir rejoint Nuvo ! Votre compte a été créé avec succès.
                             @if($user->plan !== 'free' && $user->plan_expires_at)
                             <br><br>🎁 Vous bénéficiez d'un <strong>essai Pro gratuit de 14 jours</strong>. Profitez de toutes les fonctionnalités premium !
                             @endif

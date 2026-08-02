@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         $this->createBookings($business, $services);
 
         $this->command->info('Données de démonstration créées.');
-        $this->command->info('  Connexion : demo@reserva.cm / password');
+        $this->command->info('  Connexion : demo@nuvo.app / password');
         $this->command->info('  Page publique : ' . $business->public_url);
     }
 
@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
     {
         return User::create([
             'name'            => 'Marie Nguema',
-            'email'           => 'demo@reserva.cm',
+            'email'           => 'demo@nuvo.app',
             'password'        => Hash::make('password'),
             'phone'           => '+237612345678',
             'plan'            => User::PLAN_PRO,
