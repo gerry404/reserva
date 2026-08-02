@@ -12,6 +12,16 @@ frontend/dev-dist
 .env.*.local
 backend/.env
 frontend/.env
+# Copies made while switching drivers locally — same secrets, same rules.
+.env.backup*
+backend/.env.backup*
+frontend/.env.backup*
+
+# Base de développement locale : données de travail, jamais du code source.
+backend/database/*.sqlite
+backend/database/*.sqlite-journal
+backend/database/*.sqlite-wal
+backend/database/*.sqlite-shm
 
 # IDE
 .idea
