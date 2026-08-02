@@ -1,6 +1,7 @@
 <script setup>
-import { ref, reactive } from 'vue'
-import api from '@/api'
+import { onMounted, reactive, ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import { publicApi } from '@/api'
 import {
   MagnifyingGlassIcon,
   CheckCircleIcon,
@@ -8,6 +9,8 @@ import {
   XCircleIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline'
+
+const route = useRoute()
 
 const loading  = ref(false)
 const error    = ref('')
@@ -25,6 +28,7 @@ const statusConfig = {
   confirmed: { label: 'Confirmée',                  icon: CheckCircleIcon, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
   completed: { label: 'Terminée',                   icon: CheckCircleIcon, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
   cancelled: { label: 'Annulée',                    icon: XCircleIcon, color: 'text-red-600', bg: 'bg-red-50 border-red-200' },
+  no_show:   { label: 'Non présenté',               icon: ExclamationTriangleIcon, color: 'text-gray-600', bg: 'bg-gray-50 border-gray-200' },
 }
 
 async function search() {
@@ -33,32 +37,33 @@ async function search() {
   cancelled.value = false
   loading.value = true
   try {
-    const { data } = await api.post('/track-booking', {
-      reference: form.reference.trim().toUpperCase(),
-      phone: form.phone.trim(),
-    })
-    booking.value = data
+    booking.value = await publicApi.track(form.reference.trim().toUpperCase(), form.phone.trim())
   } catch (e) {
-    error.value = e.response?.data?.message || 'Aucune réservation trouvée.'
+    error.value = e.message
   } finally {
     loading.value = false
   }
 }
 
+// Arriving from a confirmation email or the success screen: the reference is
+// already in the URL, so only the phone number is left to type.
+onMounted(() => {
+  if (typeof route.query.ref === 'string') form.reference = route.query.ref
+})
+
 async function cancelBooking() {
   if (!confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) return
+  error.value = ''
   cancelling.value = true
   try {
-    await api.post('/cancel-booking', {
-      reference: booking.value.reference,
-      phone: form.phone.trim(),
-    })
-    booking.value.status = 'cancelled'
-    booking.value.status_label = 'Annulée'
-    booking.value.can_cancel = false
+    // Take the server's version of the booking rather than patching the local
+    // copy: it knows the resulting state, including whether cancelling is
+    // still allowed at all.
+    const response = await publicApi.cancel(booking.value.reference, form.phone.trim())
+    booking.value  = response.booking?.data ?? response.booking
     cancelled.value = true
   } catch (e) {
-    error.value = e.response?.data?.message || 'Impossible d\'annuler.'
+    error.value = e.message
   } finally {
     cancelling.value = false
   }
@@ -146,11 +151,13 @@ async function cancelBooking() {
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-500">Date</span>
-            <span class="font-semibold text-gray-900 capitalize">{{ booking.date }}</span>
+            <span class="font-semibold text-gray-900 capitalize">{{ booking.date_label }}</span>
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-500">Heure</span>
-            <span class="font-semibold text-gray-900">{{ booking.time }}</span>
+            <span class="font-semibold text-gray-900">
+              {{ booking.time }}<template v-if="booking.ends_at_time"> – {{ booking.ends_at_time }}</template>
+            </span>
           </div>
 
           <!-- Contact business -->
@@ -181,7 +188,7 @@ async function cancelBooking() {
 
     <!-- Footer -->
     <div class="text-center py-6 text-xs text-gray-300">
-      Propulsé par <a href="/" class="font-semibold text-gray-400 hover:underline">Réserva</a>
+      Propulsé par <RouterLink to="/" class="font-semibold text-gray-400 hover:underline">Réserva</RouterLink>
     </div>
   </div>
 </template>

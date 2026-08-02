@@ -1,0 +1,31 @@
+# Keep the build context small and the image clean.
+#
+# vendor/ is excluded on purpose: it is installed inside the image from
+# composer.lock, so the host's copy (possibly built with a different PHP
+# version, possibly containing dev dependencies) can never leak into production.
+
+.git
+.gitignore
+
+vendor/
+node_modules/
+
+# Secrets must never enter an image layer.
+.env
+.env.*
+!.env.example
+
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/public/*
+bootstrap/cache/*
+
+tests/
+phpunit.xml
+.phpunit.cache/
+.phpunit.result.cache
+
+README.md
+*.md

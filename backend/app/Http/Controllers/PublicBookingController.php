@@ -2,235 +2,207 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBookingRequest;
+use App\Http\Resources\PublicBookingResource;
+use App\Http\Resources\PublicBusinessResource;
 use App\Models\Booking;
 use App\Models\Business;
-use Illuminate\Http\Request;
+use App\Models\Service;
+use App\Rules\PhoneNumber;
+use App\Services\AvailabilityService;
+use App\Services\BookingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
+/**
+ * The customer-facing booking flow.
+ *
+ * Nothing here is authenticated, so every route is rate limited (see
+ * routes/api.php), every lookup is scoped to a single active business, and
+ * responses go through the Public* resources, which deliberately expose less
+ * than the merchant-facing ones.
+ */
 class PublicBookingController extends Controller
 {
-    public function show(string $slug): JsonResponse
-    {
-        $business = Business::where('slug', $slug)
-            ->where('is_active', true)
-            ->with('services')
-            ->firstOrFail();
+    /** The calendar never asks for more than a month; refuse to scan a decade. */
+    private const MAX_RANGE_DAYS = 62;
 
-        return response()->json([
-            'id'            => $business->id,
-            'name'          => $business->name,
-            'slug'          => $business->slug,
-            'description'   => $business->description,
-            'category'      => $business->category,
-            'city'          => $business->city,
-            'country'       => $business->country,
-            'logo'          => $business->logo ? asset('storage/' . $business->logo) : null,
-            'cover_image'   => $business->cover_image ? asset('storage/' . $business->cover_image) : null,
-            'working_hours' => $business->working_hours,
-            'slot_duration' => $business->slot_duration,
-            'booking_notice' => $business->booking_notice,
-            'accent_color'  => $business->accent_color,
-            'services'      => $business->services->map(fn($s) => [
-                'id'                 => $s->id,
-                'name'               => $s->name,
-                'description'        => $s->description,
-                'duration'           => $s->duration,
-                'price'              => $s->price,
-                'formatted_price'    => $s->formatted_price,
-                'formatted_duration' => $s->formatted_duration,
-                'color'              => $s->color,
-                'category'           => $s->category,
-                'images'             => $s->images,
-            ]),
-        ]);
+    public function __construct(
+        private readonly AvailabilityService $availability,
+        private readonly BookingService $bookings,
+    ) {}
+
+    public function show(string $slug): PublicBusinessResource
+    {
+        $business = $this->resolveBusiness($slug)->load('services');
+
+        // Prices are rendered in the business currency, so each service needs
+        // its parent. We already hold it — handing it back beats one query per
+        // service, and beats eager-loading the same row N times.
+        $business->services->each->setRelation('business', $business);
+
+        return new PublicBusinessResource($business);
     }
 
+    /**
+     * Bookable start times for one service on one day.
+     *
+     * The service matters: availability depends on how long it runs, so a day
+     * can be wide open for a 30-minute cut and full for a three-hour braid.
+     */
     public function availableSlots(Request $request, string $slug): JsonResponse
     {
-        $request->validate(['date' => 'required|date|after_or_equal:today']);
-
-        $business = Business::where('slug', $slug)->where('is_active', true)->firstOrFail();
-
-        $date       = \Carbon\Carbon::parse($request->date);
-        $dayFr      = $this->dayToFrench($date->dayOfWeek);
-        $workHours  = $business->working_hours[$dayFr] ?? null;
-
-        if (!$workHours || !$workHours['is_open']) {
-            return response()->json(['slots' => [], 'message' => 'Fermé ce jour.']);
-        }
-
-        $slots         = $this->generateSlots($workHours['open'], $workHours['close'], $business->slot_duration);
-        $booked        = Booking::where('business_id', $business->id)
-            ->where('date', $request->date)
-            ->whereNotIn('status', ['cancelled'])
-            ->pluck('time_slot')
-            ->toArray();
-
-        $noticeMinutes = $business->booking_notice ?? 60;
-        $minTime       = now()->addMinutes($noticeMinutes);
-
-        $available = array_filter($slots, function ($slot) use ($booked, $date, $minTime) {
-            if (in_array($slot, $booked)) return false;
-            // If today, filter past slots
-            if ($date->isToday()) {
-                $slotTime = \Carbon\Carbon::parse($date->format('Y-m-d') . ' ' . $slot);
-                if ($slotTime->lessThan($minTime)) return false;
-            }
-            return true;
-        });
-
-        return response()->json(['slots' => array_values($available)]);
-    }
-
-    public function book(Request $request, string $slug): JsonResponse
-    {
-        $business = Business::where('slug', $slug)->where('is_active', true)->firstOrFail();
+        $business = $this->resolveBusiness($slug);
 
         $validated = $request->validate([
-            'service_id'     => 'required|exists:services,id',
-            'customer_name'  => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'customer_email' => 'nullable|email|max:255',
-            'date'           => 'required|date|after_or_equal:today',
-            'time_slot'      => 'required|string|max:5',
-            'notes'          => 'nullable|string|max:500',
+            'service_id' => ['required', 'integer'],
+            'date'       => ['required', 'date_format:Y-m-d'],
         ]);
 
-        // Check service belongs to business
-        $service = $business->services()->findOrFail($validated['service_id']);
-
-        // Check slot availability
-        $conflict = Booking::where('business_id', $business->id)
-            ->where('date', $validated['date'])
-            ->where('time_slot', $validated['time_slot'])
-            ->whereNotIn('status', ['cancelled'])
-            ->exists();
-
-        if ($conflict) {
-            return response()->json(['message' => 'Ce créneau n\'est plus disponible.'], 409);
-        }
-
-        // Check monthly limit for free plan
-        $user      = $business->user;
-        $thisMonth = now()->format('Y-m');
-        $used      = Booking::forBusiness($business->id)
-            ->whereYear('date', now()->year)
-            ->whereMonth('date', now()->month)
-            ->count();
-
-        if ($used >= $user->getMonthlyBookingLimit()) {
-            return response()->json(['message' => 'Le commerce a atteint sa limite mensuelle de réservations.'], 429);
-        }
-
-        $booking = Booking::create(array_merge($validated, [
-            'business_id' => $business->id,
-            'status'      => 'pending',
-        ]));
-
-        // Send notification to merchant
-        try {
-            dispatch(new \App\Jobs\NotifyMerchantNewBooking($booking->load('service', 'business')));
-        } catch (\Exception $e) {
-            \Log::error('Booking notification failed: ' . $e->getMessage());
-        }
+        $service = $this->resolveService($business, (int) $validated['service_id']);
 
         return response()->json([
-            'message'   => 'Réservation créée avec succès !',
-            'booking'   => [
-                'reference'      => $booking->reference,
-                'customer_name'  => $booking->customer_name,
-                'service'        => $service->name,
-                'date'           => $booking->date->locale('fr')->isoFormat('dddd D MMMM YYYY'),
-                'time'           => $booking->time_slot,
-                'status'         => $booking->status,
-                'business_name'  => $business->name,
-                'business_phone' => $business->whatsapp ?? $business->phone,
-            ],
-        ], 201);
-    }
-
-    /**
-     * Track a booking by reference and phone.
-     */
-    public function track(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'reference' => 'required|string',
-            'phone'     => 'required|string',
-        ]);
-
-        $booking = Booking::with('service', 'business')
-            ->where('reference', $validated['reference'])
-            ->where('customer_phone', $validated['phone'])
-            ->first();
-
-        if (!$booking) {
-            return response()->json(['message' => 'Aucune réservation trouvée avec ces informations.'], 404);
-        }
-
-        return response()->json([
-            'reference'      => $booking->reference,
-            'customer_name'  => $booking->customer_name,
-            'service'        => $booking->service?->name,
-            'business_name'  => $booking->business->name,
-            'business_phone' => $booking->business->whatsapp ?? $booking->business->phone,
-            'date'           => $booking->date->locale('fr')->isoFormat('dddd D MMMM YYYY'),
-            'time'           => $booking->time_slot,
-            'status'         => $booking->status,
-            'status_label'   => $booking->status_label,
-            'can_cancel'     => in_array($booking->status, ['pending', 'confirmed']) && $booking->date->isFuture(),
+            'date'  => $validated['date'],
+            'slots' => $this->availability->slotsFor($business, $service, $validated['date']),
         ]);
     }
 
     /**
-     * Cancel a booking by the customer.
+     * How many slots each day of a range still holds.
+     *
+     * Lets the calendar grey out full days up front, instead of making the
+     * customer discover them one wasted tap at a time.
      */
+    public function availability(Request $request, string $slug): JsonResponse
+    {
+        $business = $this->resolveBusiness($slug);
+
+        $validated = $request->validate([
+            'service_id' => ['required', 'integer'],
+            'from'       => ['required', 'date_format:Y-m-d'],
+            'to'         => ['required', 'date_format:Y-m-d', 'after_or_equal:from'],
+        ]);
+
+        $service = $this->resolveService($business, (int) $validated['service_id']);
+
+        $from = Carbon::parse($validated['from']);
+        $to   = Carbon::parse($validated['to']);
+        if ($from->diffInDays($to) > self::MAX_RANGE_DAYS) {
+            $to = $from->copy()->addDays(self::MAX_RANGE_DAYS);
+        }
+
+        return response()->json([
+            'days' => $this->availability->openDaysBetween(
+                $business,
+                $service,
+                $from->toDateString(),
+                $to->toDateString(),
+            ),
+        ]);
+    }
+
+    public function book(StoreBookingRequest $request, string $slug): JsonResponse
+    {
+        $business = $this->resolveBusiness($slug);
+        $service  = $this->resolveService($business, $request->integer('service_id'));
+
+        // Refusals surface as BookingException and are rendered centrally in
+        // bootstrap/app.php with the status the customer should actually see.
+        $booking = $this->bookings->create($business, $service, $request->validated());
+
+        return (new PublicBookingResource($booking))
+            ->additional(['message' => 'Réservation envoyée !'])
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    /**
+     * Look up a booking from its reference and the phone used to make it.
+     *
+     * Reference plus phone is the credential; a mismatch on either returns the
+     * same 404, so the endpoint cannot be used to probe whether a reference
+     * exists.
+     */
+    public function track(Request $request): JsonResponse|PublicBookingResource
+    {
+        $booking = $this->findByCredentials($request);
+
+        return $booking
+            ? new PublicBookingResource($booking)
+            : $this->notFound();
+    }
+
     public function cancelByCustomer(Request $request): JsonResponse
     {
+        $booking = $this->findByCredentials($request);
+
+        if (! $booking) {
+            return $this->notFound();
+        }
+
+        if (! $booking->isCancellable()) {
+            return response()->json([
+                'message' => 'Cette réservation ne peut plus être annulée. Contactez directement le commerce.',
+            ], 422);
+        }
+
+        $booking->update(['status' => Booking::STATUS_CANCELLED]);
+
+        return response()->json([
+            'message' => 'Votre réservation a bien été annulée.',
+            'booking' => new PublicBookingResource($booking->fresh()->load('service.business', 'business')),
+        ]);
+    }
+
+    // ─── Internals ───────────────────────────────────────────────────────
+
+    private function resolveBusiness(string $slug): Business
+    {
+        return Business::query()
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
+    }
+
+    /**
+     * Scoped through the relation on purpose: a service id belonging to another
+     * business must 404 here, not get booked into this one.
+     */
+    private function resolveService(Business $business, int $serviceId): Service
+    {
+        $service = $business->services()->findOrFail($serviceId);
+
+        // The parent is already in hand; setting it back saves a query when the
+        // resource formats the price in the business currency.
+        $service->setRelation('business', $business);
+
+        return $service;
+    }
+
+    private function findByCredentials(Request $request): ?Booking
+    {
         $validated = $request->validate([
-            'reference' => 'required|string',
-            'phone'     => 'required|string',
+            'reference' => ['required', 'string', 'max:32'],
+            'phone'     => ['required', 'string', 'max:32'],
         ]);
 
-        $booking = Booking::where('reference', $validated['reference'])
-            ->where('customer_phone', $validated['phone'])
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->where('date', '>=', now()->toDateString())
+        $booking = Booking::query()
+            ->with('service.business', 'business')
+            ->where('reference', strtoupper(trim($validated['reference'])))
             ->first();
 
-        if (!$booking) {
-            return response()->json(['message' => 'Impossible d\'annuler cette réservation.'], 404);
+        if (! $booking || ! PhoneNumber::matches($booking->customer_phone, $validated['phone'])) {
+            return null;
         }
 
-        $booking->update(['status' => 'cancelled']);
-
-        return response()->json(['message' => 'Votre réservation a été annulée.']);
+        return $booking;
     }
 
-    private function generateSlots(string $open, string $close, int $duration): array
+    private function notFound(): JsonResponse
     {
-        $slots   = [];
-        $current = \Carbon\Carbon::parse($open);
-        $end     = \Carbon\Carbon::parse($close);
-
-        while ($current->lessThan($end)) {
-            $slots[] = $current->format('H:i');
-            $current->addMinutes($duration);
-        }
-
-        return $slots;
-    }
-
-    private function dayToFrench(int $dayOfWeek): string
-    {
-        return match($dayOfWeek) {
-            1 => 'lundi',
-            2 => 'mardi',
-            3 => 'mercredi',
-            4 => 'jeudi',
-            5 => 'vendredi',
-            6 => 'samedi',
-            0 => 'dimanche',
-        };
+        return response()->json([
+            'message' => 'Aucune réservation ne correspond à ces informations.',
+        ], 404);
     }
 }

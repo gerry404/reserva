@@ -4,7 +4,6 @@ import { useRoute, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
   Bars3Icon,
-  BellIcon,
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
   UserCircleIcon,
@@ -71,18 +70,30 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
 
     <!-- Actions -->
     <div class="flex items-center gap-1.5">
-      <!-- Plan badge -->
-      <RouterLink v-if="auth.user?.plan === 'free'" to="/dashboard/settings"
-        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-full transition-colors">
+      <!-- Trial countdown, then the upgrade nudge. Pointing at billing, where
+           the upgrade actually happens, rather than at settings. -->
+      <RouterLink
+        v-if="auth.onTrial"
+        :to="{ name: 'billing' }"
+        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-full transition-colors"
+      >
+        <SparklesIcon class="w-3.5 h-3.5" />
+        Essai Pro — {{ auth.trialDaysLeft }} j
+      </RouterLink>
+      <RouterLink
+        v-else-if="!auth.isPro"
+        :to="{ name: 'billing' }"
+        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-full transition-colors"
+      >
         <SparklesIcon class="w-3.5 h-3.5" />
         Passer Pro
       </RouterLink>
 
-      <!-- Notification bell -->
-      <button class="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors relative">
-        <BellIcon class="w-5 h-5" />
-        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-      </button>
+      <!--
+        The notification bell used to live here with a permanently pulsing red
+        dot behind no notification system at all. Removed rather than faked: an
+        indicator that never means anything trains merchants to ignore it.
+      -->
 
       <!-- Avatar menu -->
       <div ref="menuRef" class="relative">

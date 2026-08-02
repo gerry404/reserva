@@ -72,18 +72,14 @@ const durations = [
   { v: 180, l: '3h' },    { v: 240, l: '4h' },
 ]
 
-const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || ''
+// Images arrive as { path, url }: `url` renders, `path` is what the API wants
+// back in existing_images. Building URLs here is the server's job, not ours.
 
-function imageUrl(path) {
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  return `${backendUrl}/storage/${path}`
-}
 
 async function loadServices() {
   loading.value = true
   try {
-    const { data } = await servicesApi.list()
+    const data = await servicesApi.list()
     services.value = data
   } finally {
     loading.value = false
@@ -121,8 +117,10 @@ function openEdit(svc) {
   })
   errors.value = {}
   resetImageState()
-  existingImages.value = svc.images ? [...svc.images] : []
-  imagePreviews.value = existingImages.value.map(p => ({ url: imageUrl(p), isExisting: true, path: p }))
+  existingImages.value = (svc.images ?? []).map(image => image.path)
+  imagePreviews.value  = (svc.images ?? []).map(image => ({
+    url: image.url, isExisting: true, path: image.path,
+  }))
   modal.value  = true
 }
 
@@ -165,10 +163,12 @@ function buildFormData() {
   }
 
   if (editing.value) {
-    fd.append('_method', 'PUT')
+    // Always sent, even when empty: an absent key means "no opinion", while an
+    // empty list means "the merchant removed every picture".
     for (const path of existingImages.value) {
       fd.append('existing_images[]', path)
     }
+    if (existingImages.value.length === 0) fd.append('existing_images', '')
   }
 
   return fd
@@ -180,23 +180,23 @@ async function save() {
   try {
     const fd = buildFormData()
     if (editing.value) {
-      const { data } = await servicesApi.update(editing.value, fd)
+      const data = await servicesApi.update(editing.value, fd)
       const idx = services.value.findIndex(s => s.id === editing.value)
       if (idx !== -1) services.value[idx] = data
     } else {
-      const { data } = await servicesApi.create(fd)
+      const data = await servicesApi.create(fd)
       services.value.unshift(data)
     }
     modal.value = false
   } catch (e) {
-    errors.value = e.response?.data?.errors ?? {}
+    errors.value = e.fieldErrors
   } finally {
     saving.value = false
   }
 }
 
 async function toggleService(svc) {
-  const { data } = await servicesApi.toggle(svc.id)
+  const data = await servicesApi.toggle(svc.id)
   const idx = services.value.findIndex(s => s.id === svc.id)
   if (idx !== -1) services.value[idx] = data
 }
@@ -206,7 +206,7 @@ async function deleteService(id) {
     await servicesApi.delete(id)
     services.value = services.value.filter(s => s.id !== id)
   } catch (e) {
-    alert(e.response?.data?.message ?? 'Impossible de supprimer ce service.')
+    alert(e.message ?? 'Impossible de supprimer ce service.')
   } finally {
     deleting.value = null
   }
@@ -266,7 +266,7 @@ function formatDuration(min) {
       >
         <!-- Image banner (click to open gallery) -->
         <div v-if="svc.images && svc.images.length" class="relative h-36 overflow-hidden bg-gray-100 cursor-pointer group/img" @click.stop="openGallery(svc)">
-          <img :src="imageUrl(svc.images[0])" :alt="svc.name" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
+          <img :src="svc.images[0].url" :alt="svc.name" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
           <div class="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors flex items-center justify-center">
             <PhotoIcon class="w-6 h-6 text-white opacity-0 group-hover/img:opacity-100 transition-opacity drop-shadow-lg" />
           </div>
@@ -455,7 +455,7 @@ function formatDuration(min) {
         </button>
 
         <!-- Image -->
-        <img :src="imageUrl(gallery.images[gallery.index])" :alt="gallery.name" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl" />
+        <img :src="gallery.images[gallery.index].url" :alt="gallery.name" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl" />
 
         <!-- Next -->
         <button v-if="gallery.images.length > 1" @click="galleryNext" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">
@@ -470,7 +470,7 @@ function formatDuration(min) {
             @click="gallery.index = i"
             :class="['w-14 h-14 rounded-lg overflow-hidden border-2 transition-all', gallery.index === i ? 'border-white scale-110' : 'border-transparent opacity-60 hover:opacity-100']"
           >
-            <img :src="imageUrl(img)" class="w-full h-full object-cover" />
+            <img :src="img.url" class="w-full h-full object-cover" />
           </button>
         </div>
       </div>

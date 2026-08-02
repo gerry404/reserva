@@ -2,93 +2,120 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdateBusinessRequest;
+use App\Models\Business;
+use App\Models\User;
+use App\Rules\PhoneNumber;
+use App\Support\Uploads;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 
 class BusinessController extends Controller
 {
     public function show(Request $request): JsonResponse
     {
-        $business = $request->user()->business;
-
-        if (!$business) {
-            return response()->json(['message' => 'Aucun commerce trouvé.'], 404);
-        }
-
-        return response()->json($business);
+        return response()->json($request->user()->business);
     }
 
-    public function update(Request $request): JsonResponse
+    public function update(UpdateBusinessRequest $request): JsonResponse
     {
         $business = $request->user()->business;
+        $data     = $request->safe()->except(['logo', 'cover_image']);
 
-        $validated = $request->validate([
-            'name'                   => 'sometimes|string|max:255',
-            'description'            => 'sometimes|nullable|string|max:1000',
-            'category'               => 'sometimes|string|max:100',
-            'address'                => 'sometimes|nullable|string|max:500',
-            'city'                   => 'sometimes|string|max:100',
-            'country'                => 'sometimes|string|max:100',
-            'phone'                  => 'sometimes|string|max:20',
-            'whatsapp'               => 'sometimes|nullable|string|max:20',
-            'working_hours'          => 'sometimes|array',
-            'slot_duration'          => 'sometimes|integer|in:15,30,45,60,90,120',
-            'booking_notice'         => 'sometimes|integer|min:0',
-            'notifications_whatsapp' => 'sometimes|boolean',
-            'notifications_sms'      => 'sometimes|boolean',
-            'notifications_email'    => 'sometimes|boolean',
-            'is_active'              => 'sometimes|boolean',
-            'accent_color'           => 'sometimes|string|max:7',
-            'slug'                   => ['sometimes', 'string', 'max:60', 'regex:/^[a-z0-9][a-z0-9-]*[a-z0-9]$/', 'unique:businesses,slug,' . $business->id],
-        ]);
-
-        // Handle logo upload
-        if ($request->hasFile('logo')) {
-            $request->validate(['logo' => 'image|max:2048']);
-            if ($business->logo) {
-                Storage::disk('public')->delete($business->logo);
-            }
-            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+        // A custom link is a paid feature; a free account keeps the slug it was
+        // given. Enforced here rather than in the request so the merchant gets
+        // an explanation instead of a validation error they cannot act on.
+        if (isset($data['slug']) && $data['slug'] !== $business->slug && ! $request->user()->hasPlan(User::PLAN_PRO)) {
+            return response()->json([
+                'message'       => 'Le lien personnalisé est réservé aux abonnés Pro.',
+                'required_plan' => User::PLAN_PRO,
+                'errors'        => ['slug' => ['Passez au plan Pro pour personnaliser votre lien.']],
+            ], 402);
         }
 
-        // Handle cover upload
-        if ($request->hasFile('cover_image')) {
-            $request->validate(['cover_image' => 'image|max:5120']);
-            if ($business->cover_image) {
-                Storage::disk('public')->delete($business->cover_image);
-            }
-            $validated['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+        // Changing country realigns the clock and currency, unless the merchant
+        // is overriding them in the same request.
+        if (isset($data['country']) && $data['country'] !== $business->country) {
+            $defaults = Business::defaultsForCountry($data['country']);
+            $data['timezone'] ??= $defaults['timezone'];
+            $data['currency'] ??= $defaults['currency'];
         }
 
-        $business->update($validated);
+        foreach (['logo' => 'logos', 'cover_image' => 'covers'] as $field => $folder) {
+            if ($request->hasFile($field)) {
+                $data[$field] = $this->replaceImage($request->file($field), $folder, $business->{$field});
+            }
+        }
+
+        $business->update($data);
 
         return response()->json($business->fresh());
     }
 
+    /**
+     * First-run setup for accounts created through Google, which arrive with no
+     * business attached.
+     */
     public function setup(Request $request): JsonResponse
     {
         $user = $request->user();
 
         if ($user->business) {
-            return response()->json(['message' => 'Commerce déjà configuré.'], 409);
+            return response()->json(['message' => 'Votre commerce est déjà configuré.'], 409);
         }
 
         $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'city'     => 'required|string|max:100',
-            'phone'    => 'required|string|max:20',
+            'name'     => ['required', 'string', 'min:2', 'max:120'],
+            'category' => ['required', 'string', 'max:100'],
+            'city'     => ['required', 'string', 'max:100'],
+            'country'  => ['nullable', 'string', 'size:2'],
+            'phone'    => ['required', 'string', new PhoneNumber()],
         ]);
 
-        $business = $user->business()->create(array_merge($validated, [
-            'country'       => 'CM',
-            'working_hours' => (new \App\Models\Business())->getDefaultWorkingHours(),
-            'slot_duration' => 30,
-            'is_active'     => true,
-            'accent_color'  => '#6366f1',
-        ]));
+        $country  = strtoupper($validated['country'] ?? 'CM');
+        $defaults = Business::defaultsForCountry($country);
+
+        $business = $user->business()->create([
+            'name'                   => $validated['name'],
+            'category'               => $validated['category'],
+            'city'                   => $validated['city'],
+            'country'                => $country,
+            'timezone'               => $defaults['timezone'],
+            'currency'               => $defaults['currency'],
+            'phone'                  => $validated['phone'],
+            'whatsapp'               => $validated['phone'],
+            'working_hours'          => Business::defaultWorkingHours(),
+            'slot_duration'          => 30,
+            'booking_notice'         => 60,
+            'notifications_whatsapp' => true,
+            'notifications_email'    => true,
+            'notifications_sms'      => false,
+            'is_active'              => true,
+            'accent_color'           => '#6366f1',
+        ]);
+
+        // Keep the merchant's phone on the account too, so notifications and
+        // support have something to reach them on.
+        $user->forceFill(['phone' => $validated['phone']])->save();
 
         return response()->json($business, 201);
+    }
+
+    /**
+     * Store a new image and drop the one it replaces.
+     *
+     * Deleting after the upload succeeds, never before: a failed upload must not
+     * also cost the merchant the logo they already had.
+     */
+    private function replaceImage(UploadedFile $file, string $folder, ?string $previous): string
+    {
+        $path = Uploads::store($file, $folder);
+
+        if ($previous && $previous !== $path) {
+            Uploads::delete([$previous]);
+        }
+
+        return $path;
     }
 }

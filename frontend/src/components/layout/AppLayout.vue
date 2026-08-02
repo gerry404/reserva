@@ -24,7 +24,12 @@ const sidebarOpen = ref(false)
 
       <main class="flex-1 overflow-y-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <RouterView :key="$route.path" />
+          <!--
+            No :key here. Keying on the path force-remounted every view on each
+            navigation, so the whole dashboard refetched and lost its state on a
+            round trip between two tabs.
+          -->
+          <RouterView />
         </div>
       </main>
     </div>

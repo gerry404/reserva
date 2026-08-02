@@ -1,122 +1,107 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    // Landing
+    { path: '/', name: 'landing', component: () => import('@/views/LandingPage.vue'), meta: { guestOnly: true } },
+
+    // ─── Auth ────────────────────────────────────────────────────────────
+    { path: '/login',    name: 'login',    component: () => import('@/views/auth/LoginView.vue'),    meta: { guestOnly: true } },
+    { path: '/register', name: 'register', component: () => import('@/views/auth/RegisterView.vue'), meta: { guestOnly: true } },
     {
-      path: '/',
-      name: 'landing',
-      component: () => import('@/views/LandingPage.vue'),
-      meta: { guest: true },
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/views/auth/ForgotPasswordView.vue'),
+      meta: { guestOnly: true },
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('@/views/auth/ResetPasswordView.vue'),
+      meta: { guestOnly: true },
     },
 
-    // Auth
+    // Where a Google signup lands: authenticated, but with no business yet, so
+    // it deliberately sits outside the dashboard layout.
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/auth/LoginView.vue'),
-      meta: { guest: true },
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: () => import('@/views/auth/RegisterView.vue'),
-      meta: { guest: true },
+      path: '/bienvenue',
+      name: 'onboarding',
+      component: () => import('@/views/auth/OnboardingView.vue'),
+      meta: { requiresAuth: true },
     },
 
-    // Dashboard (protected)
+    // ─── Dashboard ───────────────────────────────────────────────────────
     {
       path: '/dashboard',
       component: () => import('@/components/layout/AppLayout.vue'),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, requiresBusiness: true },
       children: [
-        {
-          path: '',
-          name: 'dashboard',
-          component: () => import('@/views/dashboard/DashboardView.vue'),
-        },
-        {
-          path: 'bookings',
-          name: 'bookings',
-          component: () => import('@/views/dashboard/BookingsView.vue'),
-        },
-        {
-          path: 'services',
-          name: 'services',
-          component: () => import('@/views/dashboard/ServicesView.vue'),
-        },
-        {
-          path: 'settings',
-          name: 'settings',
-          component: () => import('@/views/dashboard/SettingsView.vue'),
-        },
-        {
-          path: 'billing',
-          name: 'billing',
-          component: () => import('@/views/dashboard/BillingView.vue'),
-        },
+        { path: '',          name: 'dashboard', component: () => import('@/views/dashboard/DashboardView.vue') },
+        { path: 'bookings',  name: 'bookings',  component: () => import('@/views/dashboard/BookingsView.vue') },
+        { path: 'services',  name: 'services',  component: () => import('@/views/dashboard/ServicesView.vue') },
+        { path: 'settings',  name: 'settings',  component: () => import('@/views/dashboard/SettingsView.vue') },
+        { path: 'billing',   name: 'billing',   component: () => import('@/views/dashboard/BillingView.vue') },
       ],
     },
 
-    // Public booking page
-    {
-      path: '/b/:slug',
-      name: 'public-booking',
-      component: () => import('@/views/public/PublicBookingView.vue'),
-    },
+    // ─── Public ──────────────────────────────────────────────────────────
+    { path: '/b/:slug', name: 'public-booking', component: () => import('@/views/public/PublicBookingView.vue') },
+    { path: '/track',   name: 'track-booking',  component: () => import('@/views/public/TrackBookingView.vue') },
 
-    // Booking tracking page (client)
-    {
-      path: '/track',
-      name: 'track-booking',
-      component: () => import('@/views/public/TrackBookingView.vue'),
-    },
-
-    // Static pages (with shared layout)
     {
       path: '/',
       component: () => import('@/views/pages/StaticLayout.vue'),
       children: [
-        { path: 'about', name: 'about', component: () => import('@/views/pages/AboutView.vue') },
-        { path: 'careers', name: 'careers', component: () => import('@/views/pages/CareersView.vue') },
+        { path: 'about',   name: 'about',   component: () => import('@/views/pages/AboutView.vue') },
         { path: 'contact', name: 'contact', component: () => import('@/views/pages/ContactView.vue') },
-        { path: 'blog', name: 'blog', component: () => import('@/views/pages/BlogView.vue') },
-        { path: 'help', name: 'help', component: () => import('@/views/pages/HelpView.vue') },
-        { path: 'guide', name: 'guide', component: () => import('@/views/pages/GuideView.vue') },
-        { path: 'api-docs', name: 'api-docs', component: () => import('@/views/pages/ApiDocsView.vue') },
-        { path: 'terms', name: 'terms', component: () => import('@/views/pages/TermsView.vue') },
+        { path: 'help',    name: 'help',    component: () => import('@/views/pages/HelpView.vue') },
+        { path: 'guide',   name: 'guide',   component: () => import('@/views/pages/GuideView.vue') },
+        { path: 'terms',   name: 'terms',   component: () => import('@/views/pages/TermsView.vue') },
         { path: 'privacy', name: 'privacy', component: () => import('@/views/pages/PrivacyView.vue') },
       ],
     },
 
-    // Catch all
-    {
-      path: '/:pathMatch(.*)*',
-      redirect: '/',
-    },
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFoundView.vue') },
   ],
-  scrollBehavior: (to, from, savedPosition) => {
+
+  scrollBehavior(to, from, savedPosition) {
     if (to.hash) return { el: to.hash, behavior: 'smooth' }
-    if (savedPosition) return savedPosition
-    return { top: 0 }
+    return savedPosition ?? { top: 0 }
   },
 })
 
-// Navigation guard
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('reserva_token')
-  const isAuth = !!token
+/**
+ * One guard, three questions: signed in, business configured, and — for the
+ * marketing and auth pages — not signed in already.
+ *
+ * It awaits auth.init() so a page opened directly by URL is judged on a loaded
+ * session rather than on the mere presence of a token in storage.
+ */
+router.beforeEach(async (to) => {
+  const auth = useAuthStore()
+  await auth.init()
 
-  if (to.meta.requiresAuth && !isAuth) {
-    return next({ name: 'login', query: { redirect: to.fullPath } })
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
 
-  if (to.meta.guest && isAuth && to.name !== 'landing') {
-    return next({ name: 'dashboard' })
+  // A signed-in merchant who has not finished setup gets sent to it, from
+  // anywhere — otherwise every dashboard request comes back 409.
+  if (to.meta.requiresBusiness && auth.needsSetup) {
+    return { name: 'onboarding' }
   }
 
-  next()
+  if (to.name === 'onboarding' && auth.isAuthenticated && !auth.needsSetup) {
+    return { name: 'dashboard' }
+  }
+
+  // The landing page stays readable while signed in — it is the marketing site.
+  if (to.meta.guestOnly && auth.isAuthenticated && to.name !== 'landing') {
+    return { name: 'dashboard' }
+  }
+
+  return true
 })
 
 export default router

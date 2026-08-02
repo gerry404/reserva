@@ -1,65 +1,83 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { bookingsApi } from '@/api'
 
 export const useBookingsStore = defineStore('bookings', () => {
-  const bookings    = ref([])
-  const pagination  = ref(null)
-  const loading     = ref(false)
-  const filters     = ref({ status: '', search: '', date: '' })
+  const bookings   = ref([])
+  const pagination = ref(null)
+  const loading    = ref(false)
+  const error      = ref('')
+
+  const filters = reactive({ status: '', search: '', date: '' })
+
+  const hasFilters = computed(() => Object.values(filters).some(Boolean))
 
   async function fetchBookings(params = {}) {
     loading.value = true
+    error.value   = ''
     try {
-      const { data } = await bookingsApi.list({ ...filters.value, ...params })
-      bookings.value   = data.data
+      // Blank filters are dropped rather than sent as empty strings: the API
+      // validates `status` against a fixed list, and "" is not on it.
+      const query = Object.fromEntries(
+        Object.entries({ ...filters, ...params }).filter(([, value]) => value !== '' && value != null),
+      )
+
+      const response   = await bookingsApi.list(query)
+      bookings.value   = response.data
       pagination.value = {
-        current_page: data.current_page,
-        last_page:    data.last_page,
-        total:        data.total,
-        per_page:     data.per_page,
+        currentPage: response.meta.current_page,
+        lastPage:    response.meta.last_page,
+        total:       response.meta.total,
+        perPage:     response.meta.per_page,
       }
+    } catch (e) {
+      error.value    = e.message
+      bookings.value = []
     } finally {
       loading.value = false
     }
   }
 
+  /**
+   * @returns the full response, including the WhatsApp link the API builds
+   * when a booking moves to confirmed.
+   */
   async function updateStatus(id, status) {
-    const { data } = await bookingsApi.updateStatus(id, status)
-    const idx = bookings.value.findIndex(b => b.id === id)
-    if (idx !== -1) bookings.value[idx] = data
-    return data
+    const response = await bookingsApi.updateStatus(id, status)
+    replace(response.booking.data ?? response.booking)
+    return response
   }
 
   async function cancelBooking(id) {
-    await bookingsApi.cancel(id)
-    const idx = bookings.value.findIndex(b => b.id === id)
-    if (idx !== -1) bookings.value[idx].status = 'cancelled'
+    const response = await bookingsApi.cancel(id)
+    replace(response.booking.data ?? response.booking)
   }
 
   async function exportCsv() {
-    const { data } = await bookingsApi.exportCsv()
-    const url  = URL.createObjectURL(new Blob([data]))
+    const response = await bookingsApi.exportCsv()
+
+    const url  = URL.createObjectURL(new Blob([response.data], { type: 'text/csv;charset=utf-8' }))
     const link = document.createElement('a')
-    link.href  = url
-    link.setAttribute('download', `reservations-${new Date().toISOString().slice(0, 10)}.csv`)
+    link.href     = url
+    link.download = `reservations-${new Date().toISOString().slice(0, 10)}.csv`
     document.body.appendChild(link)
     link.click()
     link.remove()
     URL.revokeObjectURL(url)
   }
 
-  function setFilter(key, value) {
-    filters.value[key] = value
+  /** Swap a row in place, so the list does not jump while the merchant works. */
+  function replace(booking) {
+    const index = bookings.value.findIndex((b) => b.id === booking.id)
+    if (index !== -1) bookings.value[index] = booking
   }
 
   function resetFilters() {
-    filters.value = { status: '', search: '', date: '' }
+    Object.assign(filters, { status: '', search: '', date: '' })
   }
 
   return {
-    bookings, pagination, loading, filters,
-    fetchBookings, updateStatus, cancelBooking, exportCsv,
-    setFilter, resetFilters,
+    bookings, pagination, loading, error, filters, hasFilters,
+    fetchBookings, updateStatus, cancelBooking, exportCsv, resetFilters,
   }
 })

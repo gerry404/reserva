@@ -1,0 +1,23 @@
+# Context for the edge image (docker/caddy/Dockerfile), which needs frontend/
+# sources plus the Caddyfile — and nothing else.
+
+.git
+.gitignore
+
+backend/
+backups/
+scripts/
+
+frontend/node_modules/
+frontend/dist/
+frontend/dev-dist/
+
+# Secrets must never enter an image layer.
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+*.md

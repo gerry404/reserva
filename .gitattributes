@@ -1,0 +1,38 @@
+# Normalise line endings so a checkout behaves the same on every machine.
+#
+# The repository is edited on Windows and deployed on Linux. Anything executed
+# by a shell or copied into a container must keep LF: a CRLF shebang makes the
+# kernel look for an interpreter literally named "bash\r", which fails with the
+# famously unhelpful "bad interpreter: No such file or directory".
+
+* text=auto eol=lf
+
+# Executed on Linux — LF is not a preference here, it is a requirement.
+*.sh              text eol=lf
+Dockerfile        text eol=lf
+*.Dockerfile      text eol=lf
+Caddyfile         text eol=lf
+docker-entrypoint.sh text eol=lf
+*.yml             text eol=lf
+*.yaml            text eol=lf
+
+# Windows-only tooling keeps CRLF.
+*.bat             text eol=crlf
+*.cmd             text eol=crlf
+
+# Binary: never touched, never diffed as text.
+*.png             binary
+*.jpg             binary
+*.jpeg            binary
+*.gif             binary
+*.ico             binary
+*.webp            binary
+*.woff            binary
+*.woff2           binary
+*.ttf             binary
+*.eot             binary
+*.pdf             binary
+
+# Generated — collapse them in pull request diffs.
+package-lock.json  linguist-generated=true -diff
+composer.lock      linguist-generated=true -diff

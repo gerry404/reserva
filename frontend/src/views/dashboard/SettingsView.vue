@@ -1,8 +1,9 @@
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { businessApi } from '@/api'
-import api from '@/api'
+import { COUNTRIES } from '@/composables/usePhoneInput'
 import {
   LinkIcon,
   CheckCircleIcon,
@@ -13,13 +14,22 @@ import {
   PhotoIcon,
 } from '@heroicons/vue/24/outline'
 
-const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || ''
-
-const auth    = useAuthStore()
-const saving  = ref(false)
-const saved   = ref(false)
+const auth       = useAuthStore()
+const saving     = ref(false)
+const saved      = ref(false)
 const linkCopied = ref(false)
-const errors  = ref({})
+const errors     = ref({})
+const saveError  = ref('')
+
+// `window` is not exposed to templates — reading it there threw before the page
+// could render. Resolve it once, here.
+const origin = window.location.origin
+
+// Computed, not a one-off const: on a page refresh the business is still being
+// fetched when this file runs, and a snapshot would freeze `/b/undefined`.
+const publicUrl = computed(() =>
+  auth.business?.slug ? `${origin}/b/${auth.business.slug}` : '',
+)
 
 const logoFile    = ref(null)
 const coverFile   = ref(null)
@@ -84,84 +94,101 @@ const accentColors = [
   '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#ef4444', '#06b6d4', '#f97316',
 ]
 
-onMounted(() => {
-  const b = auth.business
-  if (!b) return
-  Object.assign(form, {
-    name:                b.name ?? '',
-    slug:                b.slug ?? '',
-    description:         b.description ?? '',
-    category:            b.category ?? '',
-    city:                b.city ?? '',
-    address:             b.address ?? '',
-    phone:               b.phone ?? '',
-    whatsapp:            b.whatsapp ?? '',
-    slot_duration:       b.slot_duration ?? 30,
-    booking_notice:      b.booking_notice ?? 60,
-    notifications_whatsapp: b.notifications_whatsapp ?? true,
-    notifications_sms:   b.notifications_sms ?? false,
-    notifications_email: b.notifications_email ?? true,
-    accent_color:        b.accent_color ?? '#6366f1',
-    working_hours:       b.working_hours ?? defaultWorkingHours(),
-  })
-  if (b.logo) logoPreview.value = backendUrl + '/storage/' + b.logo
-  if (b.cover_image) coverPreview.value = backendUrl + '/storage/' + b.cover_image
-})
+/**
+ * Fill the form from the store.
+ *
+ * Watched rather than read once in onMounted: on a page refresh the session is
+ * still loading when this component mounts, so a one-shot read produced an
+ * empty form and, on save, wiped the merchant's settings with blanks.
+ */
+watch(
+  () => auth.business,
+  (business) => {
+    if (!business) return
+
+    Object.assign(form, {
+      name:                   business.name ?? '',
+      slug:                   business.slug ?? '',
+      description:            business.description ?? '',
+      category:               business.category ?? '',
+      city:                   business.city ?? '',
+      address:                business.address ?? '',
+      country:                business.country ?? 'CM',
+      phone:                  business.phone ?? '',
+      whatsapp:               business.whatsapp ?? '',
+      slot_duration:          business.slot_duration ?? 30,
+      booking_notice:         business.booking_notice ?? 60,
+      notifications_whatsapp: business.notifications_whatsapp ?? true,
+      notifications_sms:      business.notifications_sms ?? false,
+      notifications_email:    business.notifications_email ?? true,
+      accent_color:           business.accent_color ?? '#6366f1',
+      working_hours:          business.working_hours ?? defaultWorkingHours(),
+    })
+
+    logoPreview.value  = business.logo_url ?? null
+    coverPreview.value = business.cover_image_url ?? null
+  },
+  { immediate: true, deep: false },
+)
 
 function defaultWorkingHours() {
-  return Object.fromEntries(days.map(d => [d, {
-    is_open: d !== 'dimanche',
-    open:    '08:00',
-    close:   '18:00',
+  return Object.fromEntries(days.map((day) => [day, {
+    is_open: day !== 'dimanche',
+    open: '08:00',
+    close: '18:00',
   }]))
 }
 
-async function save() {
-  errors.value = {}
-  saving.value = true
-  try {
-    let response
-    if (logoFile.value || coverFile.value) {
-      const fd = new FormData()
-      fd.append('_method', 'PUT')
-      for (const [key, val] of Object.entries(form)) {
-        if (key === 'working_hours') {
-          fd.append(key, JSON.stringify(val))
-        } else if (typeof val === 'boolean') {
-          fd.append(key, val ? '1' : '0')
-        } else {
-          fd.append(key, val ?? '')
-        }
-      }
-      if (logoFile.value) fd.append('logo', logoFile.value)
-      if (coverFile.value) fd.append('cover_image', coverFile.value)
-      response = await api.post('/business', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+function toFormData() {
+  const data = new FormData()
+
+  for (const [key, value] of Object.entries(form)) {
+    if (key === 'working_hours') {
+      data.append(key, JSON.stringify(value))
+    } else if (typeof value === 'boolean') {
+      data.append(key, value ? '1' : '0')
     } else {
-      response = await businessApi.update(form)
+      data.append(key, value ?? '')
     }
-    const { data } = response
-    auth.updateBusiness(data)
-    logoFile.value = null
+  }
+
+  if (logoFile.value) data.append('logo', logoFile.value)
+  if (coverFile.value) data.append('cover_image', coverFile.value)
+
+  return data
+}
+
+async function save() {
+  errors.value    = {}
+  saveError.value = ''
+  saving.value    = true
+
+  try {
+    const hasFiles = logoFile.value || coverFile.value
+    const business = hasFiles
+      ? await businessApi.updateWithFiles(toFormData())
+      : await businessApi.update(form)
+
+    auth.setBusiness(business)
+    logoFile.value  = null
     coverFile.value = null
-    if (data.logo) logoPreview.value = backendUrl + '/storage/' + data.logo
-    if (data.cover_image) coverPreview.value = backendUrl + '/storage/' + data.cover_image
+
     saved.value = true
-    setTimeout(() => saved.value = false, 3000)
+    setTimeout(() => { saved.value = false }, 3000)
   } catch (e) {
-    errors.value = e.response?.data?.errors ?? {}
+    errors.value = e.fieldErrors
+    // 402 means a Pro-only field (the custom link); the message explains which.
+    if (!Object.keys(e.fieldErrors).length) saveError.value = e.message
   } finally {
     saving.value = false
   }
 }
 
-const publicUrl = `${window.location.origin}/b/${auth.business?.slug}`
-
 async function copyLink() {
-  await navigator.clipboard.writeText(publicUrl)
+  if (!publicUrl.value) return
+  await navigator.clipboard.writeText(publicUrl.value)
   linkCopied.value = true
-  setTimeout(() => linkCopied.value = false, 2000)
+  setTimeout(() => { linkCopied.value = false }, 2000)
 }
 </script>
 
@@ -183,10 +210,10 @@ async function copyLink() {
         <div class="flex-1 flex items-center px-4 py-2.5 bg-primary-50 border border-primary-200 rounded-xl text-sm font-mono text-primary-700 overflow-hidden">
           <span class="truncate">{{ publicUrl }}</span>
         </div>
-        <button @click="copyLink" class="btn-primary px-4 whitespace-nowrap">
+        <button type="button" class="btn-primary px-4 whitespace-nowrap" @click="copyLink">
           {{ linkCopied ? '✓ Copié' : 'Copier' }}
         </button>
-        <a :href="publicUrl" target="_blank" class="btn-secondary px-3">↗</a>
+        <a :href="publicUrl" target="_blank" rel="noopener" class="btn-secondary px-3" aria-label="Ouvrir la page publique">↗</a>
       </div>
     </div>
 
@@ -243,13 +270,35 @@ async function copyLink() {
           </div>
 
           <div class="sm:col-span-2">
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5">URL personnalisée (slug)</label>
-            <div class="flex items-center gap-0">
-              <span class="px-3 py-2.5 bg-gray-100 border border-r-0 border-gray-200 rounded-l-xl text-sm text-gray-500 whitespace-nowrap">{{ window.location.origin }}/b/</span>
-              <input v-model="form.slug" type="text" class="input-field rounded-l-none flex-1" placeholder="mon-salon" pattern="[a-z0-9][a-z0-9-]*[a-z0-9]" />
+            <label for="slug" class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Lien personnalisé
+              <span v-if="!auth.isPro" class="ml-1.5 text-[10px] font-bold uppercase tracking-wide bg-primary-50 text-primary-600 px-1.5 py-0.5 rounded">
+                Pro
+              </span>
+            </label>
+            <div class="flex items-stretch">
+              <span class="px-3 py-2.5 bg-gray-100 border border-r-0 border-gray-200 rounded-l-xl text-sm text-gray-500 whitespace-nowrap flex items-center">
+                {{ origin }}/b/
+              </span>
+              <input
+                id="slug"
+                v-model="form.slug"
+                type="text"
+                class="input-field rounded-l-none flex-1 disabled:bg-gray-50 disabled:text-gray-400"
+                placeholder="mon-salon"
+                :disabled="!auth.isPro"
+              />
             </div>
             <p v-if="errors.slug" class="text-red-500 text-xs mt-1">{{ errors.slug[0] }}</p>
-            <p class="text-[11px] text-gray-400 mt-1">Lettres minuscules, chiffres et tirets uniquement</p>
+            <p v-else-if="!auth.isPro" class="text-[11px] text-gray-400 mt-1">
+              <RouterLink :to="{ name: 'billing' }" class="text-primary-600 font-semibold hover:underline">
+                Passez au plan Pro
+              </RouterLink>
+              pour choisir votre propre lien.
+            </p>
+            <p v-else class="text-[11px] text-gray-400 mt-1">
+              Lettres minuscules, chiffres et tirets uniquement.
+            </p>
           </div>
 
           <div class="sm:col-span-2">
@@ -263,8 +312,22 @@ async function copyLink() {
           </div>
 
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Ville</label>
-            <input v-model="form.city" type="text" class="input-field" placeholder="ex: Douala" />
+            <label for="city" class="block text-sm font-semibold text-gray-700 mb-1.5">Ville</label>
+            <input id="city" v-model="form.city" type="text" class="input-field" placeholder="ex : Douala" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="country" class="block text-sm font-semibold text-gray-700 mb-1.5">Pays</label>
+            <select id="country" v-model="form.country" class="input-field">
+              <option v-for="c in COUNTRIES" :key="c.code" :value="c.code">
+                {{ c.flag }} {{ c.name }}
+              </option>
+            </select>
+            <!-- Not cosmetic: the country sets the clock your opening hours are
+                 read against, and the currency your prices are shown in. -->
+            <p class="text-[11px] text-gray-400 mt-1">
+              Détermine votre fuseau horaire et votre devise.
+            </p>
           </div>
 
           <div class="sm:col-span-2">
@@ -400,6 +463,11 @@ async function copyLink() {
           </div>
         </label>
       </div>
+
+      <!-- Errors that belong to no single field (e.g. a Pro-only feature) -->
+      <p v-if="saveError" class="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+        {{ saveError }}
+      </p>
 
       <!-- Save button -->
       <div class="flex items-center gap-4">

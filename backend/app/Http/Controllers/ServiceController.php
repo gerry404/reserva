@@ -2,137 +2,128 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ServiceRequest;
+use App\Http\Resources\ServiceResource;
 use App\Models\Service;
-use Illuminate\Http\Request;
+use App\Support\Uploads;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $business  = $request->user()->business;
-        $services  = $business->allServices()->get();
+        $business = $request->user()->business;
 
-        return response()->json($services);
+        $services = $business->allServices()->get()
+            // The parent is in hand; setting it back keeps price formatting from
+            // firing one query per service.
+            ->each(fn (Service $service) => $service->setRelation('business', $business));
+
+        return ServiceResource::collection($services)->response();
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(ServiceRequest $request): JsonResponse
     {
         $business = $request->user()->business;
 
-        $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'duration'    => 'required|integer|min:5|max:480',
-            'price'       => 'required|numeric|min:0',
-            'category'    => 'nullable|string|max:100',
-            'color'       => 'nullable|string|max:7',
-            'images'      => 'nullable|array|max:5',
-            'images.*'    => 'image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
-
-        $imagePaths = $this->uploadImages($request);
-
-        $service = $business->allServices()->create(array_merge($validated, [
+        $service = $business->allServices()->create([
+            ...$request->safe()->except(['images', 'existing_images']),
+            'color'     => $request->input('color') ?: '#6366f1',
             'is_active' => true,
-            'color'     => $validated['color'] ?? '#6366f1',
-            'images'    => $imagePaths ?: null,
-        ]));
-
-        return response()->json($service, 201);
-    }
-
-    public function show(Request $request, Service $service): JsonResponse
-    {
-        $this->authorizeService($request, $service);
-        return response()->json($service);
-    }
-
-    public function update(Request $request, Service $service): JsonResponse
-    {
-        $this->authorizeService($request, $service);
-
-        $validated = $request->validate([
-            'name'            => 'sometimes|string|max:255',
-            'description'     => 'sometimes|nullable|string|max:500',
-            'duration'        => 'sometimes|integer|min:5|max:480',
-            'price'           => 'sometimes|numeric|min:0',
-            'category'        => 'sometimes|nullable|string|max:100',
-            'color'           => 'sometimes|nullable|string|max:7',
-            'is_active'       => 'sometimes|boolean',
-            'images'          => 'nullable|array|max:5',
-            'images.*'        => 'image|mimes:jpg,jpeg,png,webp|max:2048',
-            'existing_images' => 'nullable|array|max:5',
-            'existing_images.*' => 'string',
+            'images'    => $this->storeUploads($request) ?: null,
         ]);
 
-        // Keep existing images the user didn't remove
-        $existing = $request->input('existing_images', []);
-        // Delete removed images from disk
-        $oldImages = $service->images ?? [];
-        foreach ($oldImages as $old) {
-            if (!in_array($old, $existing)) {
-                Storage::disk('public')->delete($old);
-            }
+        $service->setRelation('business', $business);
+
+        return (new ServiceResource($service))->response()->setStatusCode(201);
+    }
+
+    public function show(Request $request, Service $service): ServiceResource
+    {
+        $this->authorize('view', $service);
+
+        return new ServiceResource($service);
+    }
+
+    public function update(ServiceRequest $request, Service $service): ServiceResource
+    {
+        $this->authorize('update', $service);
+
+        $data = $request->safe()->except(['images', 'existing_images']);
+
+        if ($request->has('existing_images') || $request->hasFile('images')) {
+            $data['images'] = $this->reconcileImages($request, $service);
         }
 
-        // Upload new images
-        $newPaths = $this->uploadImages($request);
-        $allImages = array_merge($existing, $newPaths);
+        $service->update($data);
 
-        // Enforce max 5
-        $allImages = array_slice($allImages, 0, 5);
-
-        unset($validated['images'], $validated['existing_images']);
-        $validated['images'] = $allImages ?: null;
-
-        $service->update($validated);
-
-        return response()->json($service->fresh());
+        return new ServiceResource($service->fresh());
     }
 
-    public function toggle(Request $request, Service $service): JsonResponse
+    public function toggle(Request $request, Service $service): ServiceResource
     {
-        $this->authorizeService($request, $service);
-        $service->update(['is_active' => !$service->is_active]);
-        return response()->json($service->fresh());
+        $this->authorize('update', $service);
+
+        $service->update(['is_active' => ! $service->is_active]);
+
+        return new ServiceResource($service->fresh());
     }
 
     public function destroy(Request $request, Service $service): JsonResponse
     {
-        $this->authorizeService($request, $service);
+        $this->authorize('delete', $service);
 
+        // Refusing rather than cascading: those customers are expecting to be
+        // seen, and the merchant should cancel them deliberately.
         if ($service->bookings()->upcoming()->exists()) {
             return response()->json([
-                'message' => 'Impossible de supprimer un service avec des réservations à venir.'
+                'message' => 'Ce service a des réservations à venir. Désactivez-le plutôt que de le supprimer.',
             ], 422);
         }
 
-        // Clean up images
-        foreach ($service->images ?? [] as $path) {
-            Storage::disk('public')->delete($path);
-        }
-
+        Uploads::delete($service->images ?? []);
         $service->delete();
 
         return response()->json(['message' => 'Service supprimé.']);
     }
 
-    private function uploadImages(Request $request): array
+    // ─── Internals ───────────────────────────────────────────────────────
+
+    /** @return list<string> */
+    private function storeUploads(ServiceRequest $request): array
     {
-        $paths = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                $paths[] = $file->store('services', 'public');
-            }
+        if (! $request->hasFile('images')) {
+            return [];
         }
-        return $paths;
+
+        return collect($request->file('images'))
+            ->map(fn ($file) => Uploads::store($file, 'services'))
+            ->all();
     }
 
-    private function authorizeService(Request $request, Service $service): void
+    /**
+     * Merge kept images with newly uploaded ones and bin the rest.
+     *
+     * `existing_images` is filtered against what the service actually owns:
+     * without that check, a crafted request could name any path on the public
+     * disk and have it deleted, or adopted into somebody else's gallery.
+     *
+     * @return list<string>|null
+     */
+    private function reconcileImages(ServiceRequest $request, Service $service): ?array
     {
-        $business = $request->user()->business;
-        abort_unless($service->business_id === $business->id, 403);
+        $current = $service->images ?? [];
+
+        $kept = array_values(array_intersect(
+            $current,
+            $request->input('existing_images', []),
+        ));
+
+        Uploads::delete(array_diff($current, $kept));
+
+        $images = array_slice([...$kept, ...$this->storeUploads($request)], 0, Service::MAX_IMAGES);
+
+        return $images ?: null;
     }
 }

@@ -57,7 +57,7 @@ import { RouterLink } from 'vue-router'
       <div class="max-w-2xl mx-auto text-center">
         <h2 class="text-2xl font-extrabold text-gray-900 mb-4">Envie de nous rejoindre ?</h2>
         <p class="text-gray-500 mb-8">Nous recrutons des personnes passionnées pour construire l'avenir de la réservation en ligne.</p>
-        <RouterLink to="/careers" class="btn-primary">Voir les postes ouverts</RouterLink>
+        <RouterLink to="/contact" class="btn-primary">Nous contacter</RouterLink>
       </div>
     </section>
   </div>

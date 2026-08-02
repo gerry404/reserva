@@ -1,7 +1,13 @@
 <?php
 
 return [
-    'default' => env('CACHE_DRIVER', 'file'),
+    /*
+     * CACHE_STORE is the Laravel 11 name; CACHE_DRIVER is kept as a fallback so
+     * existing deployments keep working. Rate limiting lives in this store, so
+     * picking the wrong one has teeth: on `file` the counters survive across
+     * processes, which is right in production and wrong in a test run.
+     */
+    'default' => env('CACHE_STORE', env('CACHE_DRIVER', 'file')),
 
     'stores' => [
         'file' => [

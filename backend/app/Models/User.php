@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,6 +26,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id',
     ];
 
     protected $casts = [
@@ -33,7 +35,29 @@ class User extends Authenticatable
         'password'          => 'hashed',
     ];
 
-    const PLANS = ['free', 'pro', 'business'];
+    public const PLAN_FREE     = 'free';
+    public const PLAN_PRO      = 'pro';
+    public const PLAN_BUSINESS = 'business';
+
+    public const PLANS = [self::PLAN_FREE, self::PLAN_PRO, self::PLAN_BUSINESS];
+
+    /** Plans ranked, so "at least Pro" is a comparison and not a list. */
+    private const PLAN_RANK = [
+        self::PLAN_FREE     => 0,
+        self::PLAN_PRO      => 1,
+        self::PLAN_BUSINESS => 2,
+    ];
+
+    /** Bookings per calendar month, per plan. null means unmetered. */
+    private const MONTHLY_BOOKING_LIMITS = [
+        self::PLAN_FREE     => 30,
+        self::PLAN_PRO      => null,
+        self::PLAN_BUSINESS => null,
+    ];
+
+    public const TRIAL_DAYS = 14;
+
+    // ─── Relations ───────────────────────────────────────────────────────
 
     public function business()
     {
@@ -42,21 +66,72 @@ class User extends Authenticatable
 
     public function payments()
     {
-        return $this->hasMany(\App\Models\Payment::class);
+        return $this->hasMany(Payment::class);
     }
 
-    public function isProOrHigher(): bool
+    // ─── Plan ────────────────────────────────────────────────────────────
+
+    /**
+     * The plan actually in force right now.
+     *
+     * A stored plan whose expiry has passed is worth nothing, and leaning on a
+     * nightly job to write that back leaves a window where an expired
+     * subscriber still gets paid features. Entitlement is therefore computed,
+     * never read from the column alone.
+     */
+    public function effectivePlan(): string
     {
-        return in_array($this->plan, ['pro', 'business']);
+        if ($this->plan === self::PLAN_FREE) {
+            return self::PLAN_FREE;
+        }
+
+        if ($this->plan_expires_at && $this->plan_expires_at->isPast()) {
+            return self::PLAN_FREE;
+        }
+
+        return $this->plan ?? self::PLAN_FREE;
     }
 
-    public function getMonthlyBookingLimit(): int
+    public function hasPlan(string $minimum): bool
     {
-        return match($this->plan) {
-            'free'     => 30,
-            'pro'      => PHP_INT_MAX,
-            'business' => PHP_INT_MAX,
-            default    => 30,
-        };
+        return (self::PLAN_RANK[$this->effectivePlan()] ?? 0) >= (self::PLAN_RANK[$minimum] ?? 0);
+    }
+
+    public function isPro(): bool
+    {
+        return $this->hasPlan(self::PLAN_PRO);
+    }
+
+    /** On the free Pro trial: entitled to Pro, but has never paid for it. */
+    public function onTrial(): bool
+    {
+        return $this->isPro()
+            && $this->payments()->where('status', Payment::STATUS_SUCCESSFUL)->doesntExist();
+    }
+
+    /**
+     * Bookings allowed this month, or null when unmetered.
+     *
+     * array_key_exists, not ??: null is a meaningful value here (unmetered),
+     * so a null-coalesce would quietly meter every paid plan at the free cap.
+     */
+    public function monthlyBookingLimit(): ?int
+    {
+        $plan = $this->effectivePlan();
+
+        return array_key_exists($plan, self::MONTHLY_BOOKING_LIMITS)
+            ? self::MONTHLY_BOOKING_LIMITS[$plan]
+            : self::MONTHLY_BOOKING_LIMITS[self::PLAN_FREE];
+    }
+
+    // ─── Notifications ───────────────────────────────────────────────────
+
+    /**
+     * Password resets are completed in the SPA, not in a Blade page, so the
+     * link has to point at the frontend rather than at a Laravel route.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
