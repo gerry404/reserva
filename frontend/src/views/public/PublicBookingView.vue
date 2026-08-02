@@ -3,6 +3,9 @@ import { computed, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { publicApi } from '@/api'
 import { useAccent } from '@/composables/useAccent'
+import { DAY_END, DAY_START } from '@/composables/useDuration'
+import DurationBar from '@/components/time/DurationBar.vue'
+import TimeRibbon from '@/components/time/TimeRibbon.vue'
 import {
   CalendarDaysIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon,
   ClockIcon, MapPinIcon,
@@ -114,6 +117,83 @@ watch(() => selected.date, async (date) => {
 
 const morningSlots   = computed(() => slots.value.filter((t) => Number(t.slice(0, 2)) < 12))
 const afternoonSlots = computed(() => slots.value.filter((t) => Number(t.slice(0, 2)) >= 12))
+
+/**
+ * Traduit la liste des créneaux libres en blocs de temps continus.
+ *
+ * L'API renvoie des points de départ ; le ruban a besoin de longueurs. Les
+ * départs consécutifs sont fusionnés en une seule plage, sinon on afficherait
+ * vingt segments accolés là où il n'y a qu'une matinée libre.
+ */
+const toMinutes = (time) => {
+  const [h, m] = time.split(':').map(Number)
+  return h * 60 + m
+}
+
+const freeBlocks = computed(() => {
+  if (!slots.value.length) return []
+
+  const step = business.value?.slot_duration || 30
+  const starts = [...slots.value].sort()
+  const blocks = []
+
+  let runStart = starts[0]
+  let runEnd = toMinutes(starts[0]) + step
+
+  for (const start of starts.slice(1)) {
+    const value = toMinutes(start)
+    if (value === runEnd) {
+      runEnd = value + step
+    } else {
+      blocks.push({ start: runStart, minutes: runEnd - toMinutes(runStart) })
+      runStart = start
+      runEnd = value + step
+    }
+  }
+  blocks.push({ start: runStart, minutes: runEnd - toMinutes(runStart) })
+
+  return blocks
+})
+
+/**
+ * Le complément : tout ce que la journée d'ouverture ne laisse pas libre.
+ *
+ * Déduit plutôt que demandé au serveur — l'API ne divulgue pas les rendez-vous
+ * d'autrui, et elle a raison. Ce qui n'est pas proposé est occupé ou fermé, et
+ * dans les deux cas le client n'a rien à y faire.
+ */
+const busyBlocks = computed(() => {
+  if (!slots.value.length) return []
+
+  const gaps = []
+  let cursor = DAY_START
+
+  for (const block of freeBlocks.value) {
+    const start = toMinutes(block.start)
+    if (start > cursor) {
+      gaps.push({ start: fromMinutes(cursor), minutes: start - cursor })
+    }
+    cursor = Math.max(cursor, start + block.minutes)
+  }
+
+  if (cursor < DAY_END) {
+    gaps.push({ start: fromMinutes(cursor), minutes: DAY_END - cursor })
+  }
+
+  return gaps
+})
+
+function fromMinutes(value) {
+  const h = Math.floor(value / 60)
+  const m = value % 60
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+}
+
+/** La prestation en cours de choix, posée sur le ruban. */
+const selectedBlock = computed(() => {
+  if (!selected.time || !selected.service) return null
+  return { start: selected.time, minutes: selected.service.duration }
+})
 
 // ─── Flow ──────────────────────────────────────────────────────────────────
 function selectService(service) {
@@ -288,16 +368,31 @@ loadBusiness()
           >✦</span>
 
           <span class="flex-1 min-w-0">
-            <span class="block font-bold text-gray-900">{{ service.name }}</span>
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="font-bold text-gray-900">{{ service.name }}</span>
+              <span class="text-xs font-semibold numeric shrink-0" :style="{ color: service.color }">
+                {{ service.formatted_price }}
+              </span>
+            </span>
+
             <span v-if="service.description" class="block text-sm text-gray-400 mt-0.5 truncate">
               {{ service.description }}
             </span>
-            <span class="flex items-center gap-3 mt-1.5">
-              <span class="flex items-center gap-1 text-xs text-gray-500">
-                <ClockIcon class="w-3.5 h-3.5" /> {{ service.formatted_duration }}
-              </span>
-              <span class="text-xs font-semibold numeric-inline" :style="{ color: service.color }">
-                {{ service.formatted_price }}
+
+            <!--
+              La durée devient une longueur : côte à côte, on voit qu'une pose
+              de tresses mobilise l'après-midi là où une manucure tient dans une
+              pause. Le chiffre reste, mais il confirme ce que l'œil a déjà lu.
+            -->
+            <span class="flex items-center gap-2.5 mt-2">
+              <DurationBar
+                :minutes="service.duration"
+                :color="service.color"
+                size="sm"
+                class="max-w-[180px]"
+              />
+              <span class="text-xs text-gray-500 numeric shrink-0">
+                {{ service.formatted_duration }}
               </span>
             </span>
           </span>
@@ -396,6 +491,28 @@ loadBusiness()
           <CalendarDaysIcon class="w-4 h-4" />
           {{ selected.date ? format(selected.date, 'EEEE d MMMM yyyy', { locale: fr }) : '' }}
         </p>
+
+        <!--
+          La journée entière, d'un coup d'œil.
+
+          Les hachures sont ce qui est déjà pris, la teinte claire ce qui reste,
+          et le bloc plein la place qu'occuperait la prestation choisie. Une
+          grille de boutons présentait toutes les heures comme équivalentes et
+          taisait l'essentiel : ce salon est-il plein, et mon rendez-vous
+          tient-il quelque part ?
+        -->
+        <div v-if="!slotsLoading && slots.length" class="card p-4">
+          <TimeRibbon :busy="busyBlocks" :free="freeBlocks" :selected="selectedBlock" />
+          <p class="text-[11px] text-gray-400 mt-2.5 flex items-center gap-3">
+            <span class="flex items-center gap-1.5">
+              <span class="legend legend--busy" />Occupé
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="legend legend--free" />Disponible
+            </span>
+            <span class="ml-auto numeric">{{ selected.service?.formatted_duration }} nécessaires</span>
+          </p>
+        </div>
 
         <div v-if="slotsLoading" class="grid grid-cols-4 gap-2">
           <span v-for="i in 8" :key="i" class="h-11 bg-gray-100 rounded-xl animate-pulse" />
@@ -645,6 +762,26 @@ loadBusiness()
   background-color: var(--accent);
   color: var(--accent-fg);
   transform: scale(1.05);
+}
+
+/* Pastilles de légende du ruban : mêmes matières que les blocs. */
+.legend {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.legend--busy {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgb(0 0 0 / 0.28) 0 2px,
+    rgb(0 0 0 / 0.14) 2px 4px
+  );
+}
+
+.legend--free {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 .slot-button {
