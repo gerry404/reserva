@@ -296,7 +296,7 @@ loadBusiness()
               <span class="flex items-center gap-1 text-xs text-gray-500">
                 <ClockIcon class="w-3.5 h-3.5" /> {{ service.formatted_duration }}
               </span>
-              <span class="text-xs font-semibold" :style="{ color: service.color }">
+              <span class="text-xs font-semibold numeric-inline" :style="{ color: service.color }">
                 {{ service.formatted_price }}
               </span>
             </span>
@@ -322,7 +322,7 @@ loadBusiness()
           >✦</span>
           <span>
             <span class="block font-semibold text-gray-900 text-sm">{{ selected.service?.name }}</span>
-            <span class="block text-xs text-gray-500">
+            <span class="block text-xs text-gray-500 numeric-inline">
               {{ selected.service?.formatted_duration }} · {{ selected.service?.formatted_price }}
             </span>
           </span>
@@ -426,7 +426,7 @@ loadBusiness()
                   v-for="time in group.times"
                   :key="time"
                   type="button"
-                  class="slot-button"
+                  class="slot-button numeric"
                   :class="{ 'is-selected': selected.time === time }"
                   @click="selectTime(time)"
                 >
@@ -460,7 +460,7 @@ loadBusiness()
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Heure</dt>
-            <dd class="font-semibold">{{ selected.time }}</dd>
+            <dd class="font-semibold numeric">{{ selected.time }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Durée</dt>
@@ -468,7 +468,7 @@ loadBusiness()
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Prix</dt>
-            <dd class="font-semibold" style="color: var(--accent)">{{ selected.service?.formatted_price }}</dd>
+            <dd class="font-semibold numeric" style="color: var(--accent)">{{ selected.service?.formatted_price }}</dd>
           </div>
         </dl>
 
@@ -547,7 +547,7 @@ loadBusiness()
         <dl class="card p-5 text-left space-y-3 text-sm">
           <div class="flex justify-between">
             <dt class="text-gray-500">Référence</dt>
-            <dd class="font-mono font-bold text-gray-900">{{ booking.reference }}</dd>
+            <dd class="numeric font-bold text-gray-900">{{ booking.reference }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Service</dt>
@@ -559,7 +559,7 @@ loadBusiness()
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Heure</dt>
-            <dd class="font-semibold">{{ booking.time }} – {{ booking.ends_at_time }}</dd>
+            <dd class="font-semibold numeric">{{ booking.time }} – {{ booking.ends_at_time }}</dd>
           </div>
         </dl>
 

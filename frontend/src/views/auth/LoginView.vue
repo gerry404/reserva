@@ -106,14 +106,20 @@ onMounted(() => {
           </p>
         </div>
 
+        <!--
+          Ici s'affichaient « +500 commerces actifs » et « 98 % de satisfaction ».
+          Aucun des deux n'était mesuré. Remplacés par ce que le produit fait
+          réellement — vérifiable, et au moins aussi convaincant pour quelqu'un
+          qui est déjà en train de se connecter.
+        -->
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
-            <p class="text-3xl font-extrabold text-white mb-1">+500</p>
-            <p class="text-sm text-gray-500">Commerces actifs</p>
+            <p class="text-3xl font-extrabold text-white mb-1">24h/24</p>
+            <p class="text-sm text-gray-500">Vos clients réservent</p>
           </div>
           <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
-            <p class="text-3xl font-extrabold text-white mb-1">98%</p>
-            <p class="text-sm text-gray-500">Satisfaction client</p>
+            <p class="text-3xl font-extrabold text-white mb-1">0</p>
+            <p class="text-sm text-gray-500">Appel manqué</p>
           </div>
         </div>
       </div>
