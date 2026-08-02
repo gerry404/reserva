@@ -8,7 +8,7 @@ use App\Rules\PhoneNumber;
 /**
  * Pre-filled wa.me links.
  *
- * Most merchants on Réserva do not have (and cannot afford) the WhatsApp
+ * Most merchants on Nuvo do not have (and cannot afford) the WhatsApp
  * Business API. The fallback that actually works is a deep link they tap, which
  * opens WhatsApp with the message already written — so these strings are a real
  * product surface, not a convenience.

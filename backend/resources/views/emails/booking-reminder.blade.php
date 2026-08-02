@@ -54,7 +54,7 @@
                 </tr>
                 <tr>
                     <td style="padding:20px 32px;border-top:1px solid #e5e7eb;text-align:center;">
-                        <p style="margin:0;color:#9ca3af;font-size:12px;">Cet email a été envoyé automatiquement par Réserva.</p>
+                        <p style="margin:0;color:#9ca3af;font-size:12px;">Cet email a été envoyé automatiquement par Nuvo.</p>
                     </td>
                 </tr>
             </table>

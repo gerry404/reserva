@@ -1,4 +1,4 @@
-# Réserva
+# Nuvo
 
 Réservation en ligne pour les commerces de service en Afrique francophone.
 Le commerçant publie une page de réservation, ses clients réservent 24h/24, il
@@ -60,7 +60,7 @@ npm run dev                  # http://localhost:5173
 
 | Champ | Valeur |
 |---|---|
-| Email | `demo@reserva.cm` |
+| Email | `demo@nuvo.app` |
 | Mot de passe | `password` |
 | Page publique | `http://localhost:5173/b/salon-elegance-douala` |
 
@@ -158,7 +158,7 @@ client, et sans le `scheduler` aucun rappel ne part jamais.
 ### Première installation
 
 ```bash
-git clone <votre-dépôt> /srv/reserva && cd /srv/reserva
+git clone <votre-dépôt> /srv/nuvo && cd /srv/nuvo
 
 cp .env.example .env
 nano .env                    # domaine, mot de passe base, SMTP, clés Flutterwave
@@ -192,10 +192,10 @@ dans le crontab de l'hôte, sinon elles n'existent pas :
 
 ```bash
 crontab -e
-0 3 * * * cd /srv/reserva && ./scripts/backup-db.sh >> /var/log/reserva-backup.log 2>&1
+0 3 * * * cd /srv/nuvo && ./scripts/backup-db.sh >> /var/log/nuvo-backup.log 2>&1
 ```
 
-Restauration : `./scripts/restore-db.sh backups/reserva_2026-08-02_030000.sql.gz`
+Restauration : `./scripts/restore-db.sh backups/nuvo_2026-08-02_030000.sql.gz`
 (demande confirmation et prend un instantané de sécurité avant d'écraser).
 
 > Une sauvegarde jamais restaurée est une hypothèse, pas une sauvegarde.
@@ -217,7 +217,7 @@ Restauration : `./scripts/restore-db.sh backups/reserva_2026-08-02_030000.sql.gz
 docker compose logs -f app worker      # suivre les logs
 docker compose ps                      # état des conteneurs
 docker compose exec app php artisan tinker
-docker compose exec postgres psql -U reserva reserva
+docker compose exec postgres psql -U nuvo nuvo
 docker compose restart worker          # après un changement de config de queue
 ```
 

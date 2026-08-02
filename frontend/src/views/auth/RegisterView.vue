@@ -173,8 +173,8 @@ onMounted(() => {
 
       <div class="relative flex flex-col justify-between h-full p-12">
         <RouterLink to="/" class="flex items-center gap-2.5">
-          <img src="/logo.png" alt="Réserva" class="w-10 h-10" />
-          <span class="font-display font-extrabold text-white text-xl tracking-tight">Réserva</span>
+          <img src="/logo.svg" alt="Nuvo" class="w-10 h-10" />
+          <span class="font-display font-extrabold text-white text-xl tracking-tight">Nuvo</span>
         </RouterLink>
 
         <div>
@@ -221,8 +221,8 @@ onMounted(() => {
     <div class="flex-1 flex items-center justify-center p-6 sm:p-10 bg-gray-50">
       <div class="w-full max-w-[440px]">
         <RouterLink to="/" class="flex items-center gap-2 mb-10 lg:hidden">
-          <img src="/logo.png" alt="Réserva" class="w-9 h-9" />
-          <span class="font-display font-extrabold text-gray-900 text-lg">Réserva</span>
+          <img src="/logo.svg" alt="Nuvo" class="w-9 h-9" />
+          <span class="font-display font-extrabold text-gray-900 text-lg">Nuvo</span>
         </RouterLink>
 
         <!-- Step progress -->

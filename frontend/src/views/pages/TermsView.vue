@@ -139,7 +139,7 @@
               <span class="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">11</span>
               <h2 class="text-xl font-bold text-gray-900">Contact</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">Pour toute question relative aux presentes conditions, vous pouvez nous contacter a l'adresse : <a href="mailto:legal@reserva.cm" class="text-primary-600 font-medium hover:underline">legal@reserva.cm</a></p>
+            <p class="text-gray-600 leading-relaxed pl-11">Pour toute question relative aux presentes conditions, vous pouvez nous contacter a l'adresse : <a href="mailto:legal@nuvo.app" class="text-primary-600 font-medium hover:underline">legal@nuvo.app</a></p>
           </article>
         </div>
 

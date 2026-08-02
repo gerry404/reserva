@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Réserva API
+# Nuvo API
 #
 # The same image runs all three roles — web, queue worker, scheduler — because
 # they execute the same code and must never drift apart. The role is chosen by

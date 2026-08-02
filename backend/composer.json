@@ -1,7 +1,7 @@
 {
-    "name": "reserva/backend",
+    "name": "nuvo/backend",
     "type": "project",
-    "description": "Réserva - Système de réservation pour commerces africains",
+    "description": "Nuvo - Système de réservation pour commerces africains",
     "keywords": ["laravel", "booking", "reservation"],
     "license": "MIT",
     "require": {

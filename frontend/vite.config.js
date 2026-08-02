@@ -13,14 +13,14 @@ import { fileURLToPath, URL } from 'node:url'
  */
 function siteUrlPlugin(siteUrl) {
   return {
-    name: 'reserva-site-url',
+    name: 'nuvo-site-url',
     transformIndexHtml: (html) => html.replaceAll('__SITE_URL__', siteUrl),
   }
 }
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const siteUrl = (env.VITE_SITE_URL || 'https://reserva.cm').replace(/\/$/, '')
+  const siteUrl = (env.VITE_SITE_URL || 'https://nuvo.app').replace(/\/$/, '')
 
   return {
   plugins: [
@@ -35,10 +35,10 @@ export default defineConfig(({ mode }) => {
 
       // Manifest de l'application
       manifest: {
-        name: 'Réserva — Réservations en ligne',
-        short_name: 'Réserva',
+        name: 'Nuvo — Réservations en ligne',
+        short_name: 'Nuvo',
         description: 'Gérez vos réservations sans stress. Notifications WhatsApp, calendrier et tableau de bord pour commerçants et entreprises.',
-        theme_color: '#6366f1',
+        theme_color: '#635BFF',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',

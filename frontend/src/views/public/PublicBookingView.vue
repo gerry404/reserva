@@ -584,7 +584,7 @@ loadBusiness()
     </main>
 
     <footer class="text-center py-6 text-xs text-gray-400">
-      Propulsé par <RouterLink to="/" class="font-semibold hover:underline">Réserva</RouterLink>
+      Propulsé par <RouterLink to="/" class="font-semibold hover:underline">Nuvo</RouterLink>
     </footer>
   </div>
 </template>

@@ -57,7 +57,7 @@ class Business extends Model
      */
     public const RESERVED_SLUGS = [
         'admin', 'api', 'app', 'auth', 'b', 'billing', 'dashboard', 'help',
-        'login', 'logout', 'new', 'register', 'reserva', 'settings', 'signup',
+        'login', 'logout', 'new', 'register', 'nuvo', 'settings', 'signup',
         'support', 'track', 'www',
     ];
 

@@ -13,7 +13,7 @@ const api = axios.create({
   withCredentials: false,
 })
 
-export const TOKEN_KEY = 'reserva_token'
+export const TOKEN_KEY = 'nuvo_token'
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY)

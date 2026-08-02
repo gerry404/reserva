@@ -147,7 +147,7 @@
               <span class="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center text-sm font-bold text-violet-600">7</span>
               <h2 class="text-xl font-bold text-gray-900">Vos droits</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">Vous disposez d'un droit d'acces, de rectification, de suppression et de portabilite de vos donnees. Pour exercer ces droits, contactez-nous a <a href="mailto:privacy@reserva.cm" class="text-primary-600 font-medium hover:underline">privacy@reserva.cm</a>.</p>
+            <p class="text-gray-600 leading-relaxed pl-11">Vous disposez d'un droit d'acces, de rectification, de suppression et de portabilite de vos donnees. Pour exercer ces droits, contactez-nous a <a href="mailto:privacy@nuvo.app" class="text-primary-600 font-medium hover:underline">privacy@nuvo.app</a>.</p>
           </article>
 
           <article id="section-8">
@@ -171,7 +171,7 @@
               <span class="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center text-sm font-bold text-violet-600">10</span>
               <h2 class="text-xl font-bold text-gray-900">Contact</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">Pour toute question : <a href="mailto:privacy@reserva.cm" class="text-primary-600 font-medium hover:underline">privacy@reserva.cm</a></p>
+            <p class="text-gray-600 leading-relaxed pl-11">Pour toute question : <a href="mailto:privacy@nuvo.app" class="text-primary-600 font-medium hover:underline">privacy@nuvo.app</a></p>
           </article>
         </div>
 

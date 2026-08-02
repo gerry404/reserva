@@ -20,8 +20,8 @@ function goBack() {
           </button>
           <div class="w-px h-5 bg-gray-200" />
           <RouterLink to="/" class="flex items-center gap-2">
-            <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
-            <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
+            <img src="/logo.svg" alt="Nuvo" class="w-8 h-8" />
+            <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Nuvo</span>
           </RouterLink>
         </div>
         <div class="flex items-center gap-2">
@@ -43,8 +43,8 @@ function goBack() {
           <!-- Brand column -->
           <div class="col-span-2 md:col-span-1">
             <div class="flex items-center gap-2 mb-4">
-              <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
-              <span class="font-display font-extrabold text-white text-lg">Réserva</span>
+              <img src="/logo.svg" alt="Nuvo" class="w-8 h-8" />
+              <span class="font-display font-extrabold text-white text-lg">Nuvo</span>
             </div>
             <p class="text-sm leading-relaxed mb-6">La plateforme de réservation en ligne pensée pour les commerçants ambitieux.</p>
             <div class="flex items-center gap-3">
@@ -99,7 +99,7 @@ function goBack() {
       <!-- Bottom bar -->
       <div class="border-t border-gray-800">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p class="text-sm text-gray-500">&copy; {{ new Date().getFullYear() }} Réserva. Tous droits réservés.</p>
+          <p class="text-sm text-gray-500">&copy; {{ new Date().getFullYear() }} Nuvo. Tous droits réservés.</p>
           <div class="flex items-center gap-6">
             <RouterLink to="/terms" class="text-sm text-gray-500 hover:text-gray-300 transition-colors">Conditions d'utilisation</RouterLink>
             <RouterLink to="/privacy" class="text-sm text-gray-500 hover:text-gray-300 transition-colors">Politique de confidentialité</RouterLink>
