@@ -20,7 +20,7 @@ class WelcomeNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '🎉 Bienvenue sur Réserva !',
+            subject: '🎉 Bienvenue sur Nuvo !',
         );
     }
 

@@ -53,8 +53,8 @@ function onNav() {
     <div class="flex flex-col flex-1 overflow-hidden">
       <!-- Logo -->
       <div class="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100">
-        <img src="/logo.png" alt="Réserva" class="w-9 h-9 shrink-0" />
-        <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
+        <img src="/logo.svg" alt="Nuvo" class="w-9 h-9 shrink-0" />
+        <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Nuvo</span>
       </div>
 
       <!-- Nav -->
@@ -113,8 +113,8 @@ function onNav() {
       <!-- Mobile header -->
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
         <div class="flex items-center gap-2.5">
-          <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
-          <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Réserva</span>
+          <img src="/logo.svg" alt="Nuvo" class="w-8 h-8" />
+          <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Nuvo</span>
         </div>
         <button @click="emit('close')" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
           <XMarkIcon class="w-5 h-5" />

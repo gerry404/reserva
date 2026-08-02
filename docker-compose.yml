@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Réserva — production stack for a self-hosted VPS
+# Nuvo — production stack for a self-hosted VPS
 #
 #   caddy      TLS (Let's Encrypt), serves the Vue build, proxies /api
 #   app        Laravel on FrankenPHP
@@ -15,7 +15,7 @@
 #   docker compose up -d --build
 # ─────────────────────────────────────────────────────────────────────────────
 
-name: reserva
+name: nuvo
 
 services:
   caddy:
@@ -44,7 +44,7 @@ services:
     depends_on:
       app:
         condition: service_healthy
-    networks: [reserva]
+    networks: [nuvo]
 
   app:
     build:
@@ -67,7 +67,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s          # generous: first boot runs the migrations
-    networks: [reserva]
+    networks: [nuvo]
 
   worker:
     build:
@@ -88,7 +88,7 @@ services:
       app:
         condition: service_healthy
     stop_grace_period: 60s       # let an in-flight job finish
-    networks: [reserva]
+    networks: [nuvo]
 
   scheduler:
     build:
@@ -108,7 +108,7 @@ services:
     depends_on:
       app:
         condition: service_healthy
-    networks: [reserva]
+    networks: [nuvo]
 
   postgres:
     image: postgres:16-alpine
@@ -129,7 +129,7 @@ services:
       retries: 5
     # Not published to the host: the database is reachable only from this
     # network. Use `docker compose exec postgres psql` for a shell.
-    networks: [reserva]
+    networks: [nuvo]
 
 volumes:
   postgres_data:
@@ -139,5 +139,5 @@ volumes:
   caddy_config:
 
 networks:
-  reserva:
+  nuvo:
     driver: bridge

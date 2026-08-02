@@ -50,7 +50,7 @@ class FlutterwaveGateway
                 'phonenumber' => $user->phone ?? '',
             ],
             'customizations' => [
-                'title'       => 'Réserva ' . Payment::labelFor($payment->plan),
+                'title'       => 'Nuvo ' . Payment::labelFor($payment->plan),
                 'description' => 'Abonnement ' . Payment::labelFor($payment->plan) . ' — ' . $payment->cycleLabel(),
                 'logo'        => config('app.frontend_url') . '/icons/icon-192.png',
             ],

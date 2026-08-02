@@ -19,7 +19,7 @@ const faqs = [
   },
   {
     q: 'Puis-je personnaliser ma page ?',
-    a: 'Oui. Vous pouvez choisir votre couleur d\'accent, ajouter une description, votre logo, et configurer vos jours et horaires d\'ouverture. Avec le plan Pro, le branding Réserva est supprimé.',
+    a: 'Oui. Vous pouvez choisir votre couleur d\'accent, ajouter une description, votre logo, et configurer vos jours et horaires d\'ouverture. Avec le plan Pro, le branding Nuvo est supprimé.',
   },
   {
     q: 'Comment fonctionne le plan gratuit ?',

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Gate a route behind a paid plan: `->middleware('plan:pro')`.
  *
- * Réserva sold advanced statistics, unlimited exports and custom links as Pro
+ * Nuvo sold advanced statistics, unlimited exports and custom links as Pro
  * features while every free account could reach all of them, which left no
  * reason to pay. Entitlement is read from User::effectivePlan(), so an expired
  * subscription loses access the moment it lapses rather than when a nightly job

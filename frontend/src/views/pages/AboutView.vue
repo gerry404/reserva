@@ -7,7 +7,7 @@ import { RouterLink } from 'vue-router'
     <!-- Hero -->
     <section class="py-20 px-4 sm:px-6 bg-gradient-to-b from-gray-50 to-white">
       <div class="max-w-3xl mx-auto text-center">
-        <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-6">À propos de Réserva</h1>
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-6">À propos de Nuvo</h1>
         <p class="text-lg text-gray-500 leading-relaxed">Nous construisons la plateforme de réservation la plus simple et la plus accessible pour les commerçants indépendants.</p>
       </div>
     </section>
@@ -17,9 +17,9 @@ import { RouterLink } from 'vue-router'
       <div class="max-w-3xl mx-auto">
         <h2 class="text-2xl font-extrabold text-gray-900 mb-6">Notre histoire</h2>
         <div class="prose prose-gray max-w-none space-y-5 text-gray-600 leading-relaxed">
-          <p>Réserva est née d'un constat simple : des millions de commerçants perdent des clients chaque jour parce qu'ils ne peuvent pas répondre au téléphone pendant qu'ils travaillent.</p>
+          <p>Nuvo est née d'un constat simple : des millions de commerçants perdent des clients chaque jour parce qu'ils ne peuvent pas répondre au téléphone pendant qu'ils travaillent.</p>
           <p>Un coiffeur en plein service, un médecin en consultation, un restaurateur en plein rush. Tous ces professionnels manquent des appels. Chaque appel manqué est un client perdu.</p>
-          <p>Nous avons créé Réserva pour résoudre ce problème. Une page de réservation en ligne que n'importe qui peut créer en 5 minutes, sans aucune compétence technique. Le client réserve, le commerçant reçoit une notification WhatsApp. Simple.</p>
+          <p>Nous avons créé Nuvo pour résoudre ce problème. Une page de réservation en ligne que n'importe qui peut créer en 5 minutes, sans aucune compétence technique. Le client réserve, le commerçant reçoit une notification WhatsApp. Simple.</p>
         </div>
 
         <div class="grid sm:grid-cols-3 gap-6 mt-16">

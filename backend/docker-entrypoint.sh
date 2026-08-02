@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Boot sequence shared by every Réserva container (app, worker, scheduler).
+# Boot sequence shared by every Nuvo container (app, worker, scheduler).
 #
 # `set -e` matters: if migrations fail the container must die and the deploy
 # must be seen to fail, rather than coming up to serve a schema the code does
@@ -8,7 +8,7 @@
 set -e
 
 role="${CONTAINER_ROLE:-app}"
-echo "▸ Starting Réserva [${role}]"
+echo "▸ Starting Nuvo [${role}]"
 
 # ─── Wait for the database ───────────────────────────────────────────────
 # Compose already gates on the postgres healthcheck, but a database can accept

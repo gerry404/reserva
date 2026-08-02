@@ -21,7 +21,7 @@ use Laravel\Socialite\Facades\Socialite;
 class AuthController extends Controller
 {
     /** Tokens are named so a future "signed-in devices" screen has something to show. */
-    private const TOKEN_NAME = 'reserva-spa';
+    private const TOKEN_NAME = 'nuvo-spa';
 
     public function register(RegisterRequest $request): JsonResponse
     {

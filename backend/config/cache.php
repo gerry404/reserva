@@ -28,5 +28,5 @@ return [
         ],
     ],
 
-    'prefix' => env('CACHE_PREFIX', 'reserva_cache_'),
+    'prefix' => env('CACHE_PREFIX', 'nuvo_cache_'),
 ];

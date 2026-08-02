@@ -30,8 +30,8 @@ async function submit() {
   <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
     <div class="w-full max-w-md">
       <RouterLink to="/" class="flex items-center justify-center gap-2.5 mb-8">
-        <img src="/logo.png" alt="" class="w-9 h-9" />
-        <span class="font-display font-extrabold text-gray-900 text-xl">Réserva</span>
+        <img src="/logo.svg" alt="" class="w-9 h-9" />
+        <span class="font-display font-extrabold text-gray-900 text-xl">Nuvo</span>
       </RouterLink>
 
       <div class="card p-8">

@@ -7,7 +7,7 @@
 # Self-hosting means backups are your responsibility. Install this in the host
 # crontab so it actually runs:
 #
-#   0 3 * * * cd /srv/reserva && ./scripts/backup-db.sh >> /var/log/reserva-backup.log 2>&1
+#   0 3 * * * cd /srv/nuvo && ./scripts/backup-db.sh >> /var/log/nuvo-backup.log 2>&1
 #
 # A backup you have never restored is a hypothesis, not a backup — restore one
 # into a scratch database occasionally (see restore-db.sh).
@@ -49,8 +49,8 @@ fi
 printf '\033[0;32m✓ %s (%s)\033[0m\n' "$target" "$(du -h "$target" | cut -f1)"
 
 # Prune only our own files, and only after a successful dump.
-find "$BACKUP_DIR" -name 'reserva_*.sql.gz' -type f -mtime "+${RETENTION_DAYS}" -delete
+find "$BACKUP_DIR" -name 'nuvo_*.sql.gz' -type f -mtime "+${RETENTION_DAYS}" -delete
 
 printf '  %s backup(s) kept (retention: %s days)\n' \
-    "$(find "$BACKUP_DIR" -name 'reserva_*.sql.gz' -type f | wc -l | tr -d ' ')" \
+    "$(find "$BACKUP_DIR" -name 'nuvo_*.sql.gz' -type f | wc -l | tr -d ' ')" \
     "$RETENTION_DAYS"

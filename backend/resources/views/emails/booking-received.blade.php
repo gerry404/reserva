@@ -80,7 +80,7 @@
                     <tr>
                         <td style="padding:20px 32px;background-color:#f9fafb;text-align:center;">
                             <p style="margin:0;color:#9ca3af;font-size:12px;">
-                                Réservation effectuée via <strong style="color:#6b7280;">Réserva</strong>
+                                Réservation effectuée via <strong style="color:#6b7280;">Nuvo</strong>
                             </p>
                         </td>
                     </tr>

@@ -75,8 +75,8 @@ async function cancelBooking() {
     <!-- Header -->
     <div class="bg-gradient-to-r from-primary-600 to-violet-600 py-10 px-4 text-center">
       <RouterLink to="/" class="inline-flex items-center gap-2 mb-6">
-        <img src="/logo.png" alt="Réserva" class="w-8 h-8" />
-        <span class="font-display font-extrabold text-white text-lg">Réserva</span>
+        <img src="/logo.svg" alt="Nuvo" class="w-8 h-8" />
+        <span class="font-display font-extrabold text-white text-lg">Nuvo</span>
       </RouterLink>
       <h1 class="text-2xl font-black text-white">Suivre ma réservation</h1>
       <p class="text-white/70 text-sm mt-1">Entrez votre référence et votre numéro de téléphone</p>
@@ -188,7 +188,7 @@ async function cancelBooking() {
 
     <!-- Footer -->
     <div class="text-center py-6 text-xs text-gray-300">
-      Propulsé par <RouterLink to="/" class="font-semibold text-gray-400 hover:underline">Réserva</RouterLink>
+      Propulsé par <RouterLink to="/" class="font-semibold text-gray-400 hover:underline">Nuvo</RouterLink>
     </div>
   </div>
 </template>

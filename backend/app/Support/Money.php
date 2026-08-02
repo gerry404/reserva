@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /**
- * Formatting prices for the currencies Réserva actually serves.
+ * Formatting prices for the currencies Nuvo actually serves.
  *
  * Zero-decimal currencies are the norm here — nobody quotes 5 000,00 F CFA —
  * so the decimal count is per currency rather than a blanket two.

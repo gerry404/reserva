@@ -13,7 +13,7 @@ use Tests\TestCase;
 /**
  * The rules that decide what a customer is allowed to book.
  *
- * The headline case is the one Réserva shipped wrong: a booking used to occupy
+ * The headline case is the one Nuvo shipped wrong: a booking used to occupy
  * only the slot it started on, so a three-hour service left every half hour
  * after it bookable and six customers could be promised the same chair.
  */

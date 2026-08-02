@@ -24,7 +24,7 @@ const pageTitle = {
 }
 
 function getTitle() {
-  return pageTitle[route.name] ?? 'Réserva'
+  return pageTitle[route.name] ?? 'Nuvo'
 }
 
 async function handleLogout() {
@@ -56,8 +56,8 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
 
     <!-- Logo (visible on mobile when sidebar hidden) -->
     <div class="flex items-center gap-2 lg:hidden">
-      <img src="/logo.png" alt="Réserva" class="w-7 h-7" />
-      <span class="font-display font-extrabold text-gray-900 text-base tracking-tight">Réserva</span>
+      <img src="/logo.svg" alt="Nuvo" class="w-7 h-7" />
+      <span class="font-display font-extrabold text-gray-900 text-base tracking-tight">Nuvo</span>
     </div>
 
     <!-- Page title + business name -->

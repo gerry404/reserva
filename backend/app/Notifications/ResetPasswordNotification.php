@@ -32,13 +32,13 @@ class ResetPasswordNotification extends Notification
         $minutes = config('auth.passwords.users.expire', 60);
 
         return (new MailMessage())
-            ->subject('Réinitialisez votre mot de passe Réserva')
+            ->subject('Réinitialisez votre mot de passe Nuvo')
             ->greeting('Bonjour ' . $notifiable->name . ',')
-            ->line('Vous avez demandé à réinitialiser votre mot de passe Réserva.')
+            ->line('Vous avez demandé à réinitialiser votre mot de passe Nuvo.')
             ->action('Choisir un nouveau mot de passe', $this->resetUrl($notifiable))
             ->line("Ce lien expire dans {$minutes} minutes.")
             ->line('Si vous n\'êtes pas à l\'origine de cette demande, ignorez cet email : votre mot de passe reste inchangé.')
-            ->salutation('L\'équipe Réserva');
+            ->salutation('L\'équipe Nuvo');
     }
 
     private function resetUrl(object $notifiable): string

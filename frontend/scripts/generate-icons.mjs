@@ -51,52 +51,70 @@ function buildPNG(size, pixels /* Uint8Array, RGB triplets */) {
 }
 
 // ─── Draw icon pixels ─────────────────────────────────────────────────────────
+
+/**
+ * Dessine la marque Nuvo : un arc ouvert et son point.
+ *
+ * Même géométrie que public/favicon.svg, rasterisée à la main — ce script n'a
+ * aucune dépendance externe et Node ne sait pas rendre du SVG seul.
+ */
 function drawIcon(size, maskable = false) {
   const pixels = Buffer.allocUnsafe(size * size * 3)
-  const r      = maskable ? 0 : Math.round(size * 0.22) // corner radius
 
-  // Gradient: #6366f1 → #8b5cf6
-  const fromR = 0x63, fromG = 0x66, fromB = 0xf1
-  const toR   = 0x8b, toG   = 0x5c, toB   = 0xf6
+  // Une icône maskable est rognée par le système : le fond couvre tout le
+  // carré et le motif reste dans la zone sûre centrale.
+  const r = maskable ? 0 : Math.round(size * 0.22)
 
-  // Simple bitmap letter "R" at ~56% font size (precomputed 8×11 grid, scaled)
-  function isLetterR(px, py, s) {
-    const fw   = s * 0.32  // letter width
-    const fh   = s * 0.56  // letter height
-    const ox   = (s - fw) / 2
-    const oy   = (s - fh) / 2
+  // Dégradé de marque : #635BFF → #3D1FD6.
+  const fromR = 0x63, fromG = 0x5b, fromB = 0xff
+  const toR   = 0x3d, toG   = 0x1f, toB   = 0xd6
 
-    const x = (px - ox) / fw  // 0..1 within letter box
-    const y = (py - oy) / fh
+  // Fractions du côté — l'échelle se réduit sur une maskable pour rester dans
+  // la zone sûre.
+  const k        = maskable ? 0.80 : 1
+  const RADIUS   = 0.281 * k   // rayon de l'arc, du centre à son axe
+  const STROKE   = 0.050 * k   // demi-épaisseur du trait
+  const DOT_R    = 0.088 * k   // rayon du point
+  const DOT_ANG  = -0.55       // position angulaire du point, en radians
 
-    if (x < 0 || x > 1 || y < 0 || y > 1) return false
+  // Ouverture de l'arc autour du point. Assez large pour que le point s'en
+  // détache nettement : trop serrée, les deux se soudent en une seule masse.
+  const GAP      = 0.62
 
-    const strokeW = 0.18  // relative stroke width
+  const dotX = Math.cos(DOT_ANG) * RADIUS
+  const dotY = Math.sin(DOT_ANG) * RADIUS
 
-    // Vertical bar (left)
-    if (x < strokeW) return true
+  // L'aiguille : du centre vers le point, sans le toucher.
+  const HAND_LEN    = RADIUS * 0.44
+  const HAND_STROKE = STROKE * 0.72
 
-    // Top horizontal bar
-    if (y < strokeW && x < 0.85) return true
+  /** Le pixel appartient-il à la marque ? */
+  function inMark(px, py, s) {
+    const x = (px + 0.5) / s - 0.5
+    const y = (py + 0.5) / s - 0.5
 
-    // Middle horizontal bar
-    if (y > 0.44 && y < 0.44 + strokeW && x < 0.85) return true
+    // Le point plein.
+    const ddx = x - dotX, ddy = y - dotY
+    if (ddx * ddx + ddy * ddy <= DOT_R * DOT_R) return true
 
-    // Right arc top half (rough circle approximation)
-    if (y < 0.5) {
-      const cx = 0.85, cy = 0.25
-      const dx = x - cx, dy = y - cy
-      const dist = Math.sqrt(dx * dx + dy * dy)
-      if (dist < 0.38 && dist > 0.38 - strokeW) return true
-    }
+    // L'aiguille : distance au segment [centre → HAND_LEN dans la direction
+    // du point]. C'est elle qui fait lire une horloge plutôt qu'un anneau.
+    const hx = Math.cos(DOT_ANG) * HAND_LEN
+    const hy = Math.sin(DOT_ANG) * HAND_LEN
+    const t = Math.max(0, Math.min(1, (x * hx + y * hy) / (hx * hx + hy * hy)))
+    const px2 = x - hx * t, py2 = y - hy * t
+    if (px2 * px2 + py2 * py2 <= HAND_STROKE * HAND_STROKE) return true
 
-    // Diagonal leg (bottom right)
-    if (y > 0.5) {
-      const legX = strokeW + (y - 0.5) * 1.3
-      if (Math.abs(x - legX) < strokeW * 0.85) return true
-    }
+    // L'arc : un anneau, moins l'ouverture autour du point.
+    const dist = Math.sqrt(x * x + y * y)
+    if (Math.abs(dist - RADIUS) > STROKE) return false
 
-    return false
+    // Écart angulaire au point, ramené dans [-π, π].
+    let delta = Math.atan2(y, x) - DOT_ANG
+    while (delta > Math.PI) delta -= 2 * Math.PI
+    while (delta < -Math.PI) delta += 2 * Math.PI
+
+    return Math.abs(delta) > GAP
   }
 
   function inRoundedRect(px, py, s, rad) {
@@ -110,25 +128,21 @@ function drawIcon(size, maskable = false) {
   for (let y = 0; y < size; y++) {
     const t = y / (size - 1)
     for (let x = 0; x < size; x++) {
-      const i   = (y * size + x) * 3
-      const inBg = inRoundedRect(x, y, size, r)
+      const i = (y * size + x) * 3
 
-      if (!inBg) {
-        // Transparent → white background in PNG (no alpha channel, use white)
-        pixels[i] = 0xf9; pixels[i+1] = 0xfa; pixels[i+2] = 0xfb
+      if (!inRoundedRect(x, y, size, r)) {
+        // Pas de canal alpha dans ce PNG : hors pastille, on peint le gris de
+        // fond de l'application.
+        pixels[i] = 0xf9; pixels[i + 1] = 0xfa; pixels[i + 2] = 0xfb
         continue
       }
 
-      // Gradient color
-      const gr  = Math.round(fromR + (toR - fromR) * t)
-      const gg  = Math.round(fromG + (toG - fromG) * t)
-      const gb  = Math.round(fromB + (toB - fromB) * t)
-
-      if (isLetterR(x, y, size)) {
-        // White letter with slight shadow effect
-        pixels[i] = 255; pixels[i+1] = 255; pixels[i+2] = 255
+      if (inMark(x, y, size)) {
+        pixels[i] = 255; pixels[i + 1] = 255; pixels[i + 2] = 255
       } else {
-        pixels[i] = gr; pixels[i+1] = gg; pixels[i+2] = gb
+        pixels[i]     = Math.round(fromR + (toR - fromR) * t)
+        pixels[i + 1] = Math.round(fromG + (toG - fromG) * t)
+        pixels[i + 2] = Math.round(fromB + (toB - fromB) * t)
       }
     }
   }
