@@ -292,7 +292,7 @@ function formatDuration(min) {
               @click="toggleService(svc)"
               :class="['relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-200', svc.is_active ? 'bg-primary-600' : 'bg-gray-200']"
             >
-              <span :class="['absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200', svc.is_active ? 'translate-x-4' : 'translate-x-0']" />
+              <span :class="['absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-clay-50 shadow transition-transform duration-200', svc.is_active ? 'translate-x-4' : 'translate-x-0']" />
             </button>
           </div>
 
@@ -326,7 +326,7 @@ function formatDuration(min) {
   <Teleport to="body">
     <Transition name="fade">
       <div v-if="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-up">
+        <div class="bg-clay-50 rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-up">
           <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <h2 class="font-bold text-gray-900 text-lg">{{ editing ? 'Modifier le service' : 'Nouveau service' }}</h2>
             <button @click="modal = false" class="btn-ghost p-2">✕</button>
@@ -481,7 +481,7 @@ function formatDuration(min) {
   <Teleport to="body">
     <Transition name="fade">
       <div v-if="deleting" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm animate-slide-up">
+        <div class="bg-clay-50 rounded-2xl shadow-xl p-6 w-full max-w-sm animate-slide-up">
           <h3 class="font-bold text-gray-900 text-lg mb-2">Supprimer ce service ?</h3>
           <p class="text-sm text-gray-500 mb-6">Cette action est irréversible. Les réservations passées seront conservées.</p>
           <div class="flex gap-3">

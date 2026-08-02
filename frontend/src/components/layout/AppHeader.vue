@@ -107,7 +107,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
         <Transition name="menu">
           <div
             v-if="showMenu"
-            class="absolute right-0 mt-2.5 w-64 bg-white rounded-2xl shadow-2xl shadow-black/12 border border-gray-100 overflow-hidden z-50"
+            class="absolute right-0 mt-2.5 w-64 bg-clay-50 rounded-2xl shadow-2xl shadow-black/12 border border-gray-100 overflow-hidden z-50"
           >
             <!-- User info -->
             <div class="px-4 py-4 border-b border-gray-50 bg-gray-50/50">
@@ -120,7 +120,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
                   <p class="text-xs text-gray-500 truncate">{{ auth.user?.email }}</p>
                 </div>
               </div>
-              <div v-if="auth.business?.name" class="mt-2.5 px-2.5 py-1.5 bg-white rounded-lg border border-gray-100">
+              <div v-if="auth.business?.name" class="mt-2.5 px-2.5 py-1.5 bg-clay-50 rounded-lg border border-gray-100">
                 <p class="text-[11px] text-gray-400 font-medium">Commerce</p>
                 <p class="text-xs font-semibold text-gray-700 truncate">{{ auth.business.name }}</p>
               </div>

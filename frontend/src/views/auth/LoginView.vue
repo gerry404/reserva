@@ -147,7 +147,7 @@ onMounted(() => {
 
         <!-- Google Sign-In -->
         <button @click="loginWithGoogle" :disabled="googleLoading || auth.loading"
-          class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-60 mb-6 shadow-sm">
+          class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-clay-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-60 mb-6 shadow-sm">
           <span v-if="googleLoading" class="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
           <template v-else>
             <svg class="w-5 h-5" viewBox="0 0 24 24">
