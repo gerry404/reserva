@@ -5,6 +5,15 @@ import { bookingsApi } from '@/api'
 export const useBookingsStore = defineStore('bookings', () => {
   const bookings   = ref([])
   const pagination = ref(null)
+
+  /**
+   * Le nombre de réservations par statut, calculé par le serveur.
+   *
+   * Il ne peut pas se déduire de `bookings` : cette liste est paginée et déjà
+   * filtrée. Compter dedans donnait zéro « en attente » dès qu'on filtrait sur
+   * « confirmé », et ne voyait jamais au-delà de la première page.
+   */
+  const counts = ref({ all: 0 })
   const loading    = ref(false)
   const error      = ref('')
 
@@ -24,6 +33,7 @@ export const useBookingsStore = defineStore('bookings', () => {
 
       const response   = await bookingsApi.list(query)
       bookings.value   = response.data
+      counts.value     = response.meta.counts ?? { all: response.meta.total ?? 0 }
       pagination.value = {
         currentPage: response.meta.current_page,
         lastPage:    response.meta.last_page,
@@ -77,7 +87,7 @@ export const useBookingsStore = defineStore('bookings', () => {
   }
 
   return {
-    bookings, pagination, loading, error, filters, hasFilters,
+    bookings, pagination, counts, loading, error, filters, hasFilters,
     fetchBookings, updateStatus, cancelBooking, exportCsv, resetFilters,
   }
 })
