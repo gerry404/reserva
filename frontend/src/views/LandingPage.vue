@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import FinalCta from '@/components/marketing/FinalCta.vue'
+import HowItWorks from '@/components/marketing/HowItWorks.vue'
 import { useAuthStore } from '@/stores/auth'
 import {
   DevicePhoneMobileIcon,
@@ -694,65 +695,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- How it works -->
-    <div class="relative">
-      <!-- Wave top -->
-      <svg class="block w-full h-16 sm:h-24 -mb-px" viewBox="0 0 1440 100" preserveAspectRatio="none" fill="#030712">
-        <path d="M0,100 C360,0 720,80 1080,20 C1260,-10 1380,30 1440,10 L1440,100 Z" />
-      </svg>
-
-      <section class="px-4 sm:px-6 bg-primary-950 text-white relative overflow-hidden py-20 sm:py-28">
-        <!-- Polygon grid background -->
-        <svg class="absolute inset-0 w-full h-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="hiw-poly" width="80" height="92" patternUnits="userSpaceOnUse" patternTransform="scale(0.8)">
-              <path d="M40 0L80 23L80 69L40 92L0 69L0 23Z" fill="none" stroke="white" stroke-width="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hiw-poly)" />
-        </svg>
-        <!-- Glow -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary-600/8 rounded-full blur-[120px]" />
-
-        <div class="max-w-5xl mx-auto relative">
-          <div class="text-center mb-20">
-            <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-5">
-              Opérationnel en
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-violet-400">3 étapes</span>
-            </h2>
-            <p class="text-lg text-gray-400 max-w-lg mx-auto">Pas de formation, pas de consultant. Juste vous et 5 minutes.</p>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-6">
-            <div v-for="(s, i) in [
-              { n: '01', title: 'Créez votre compte', desc: 'Inscrivez-vous en 5 minutes. Ajoutez le nom de votre commerce, vos services et vos horaires d\'ouverture.', icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z' },
-              { n: '02', title: 'Partagez votre lien', desc: 'Vous recevez une URL unique (ex: nuvo.app/mon-salon). Partagez-la sur WhatsApp, Instagram ou Facebook.', icon: 'M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244' },
-              { n: '03', title: 'Recevez des réservations', desc: 'Recevez les réservations en temps réel. Confirmez, annulez ou reprogrammez en un clic depuis votre téléphone.', icon: 'M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0' },
-            ]" :key="i"
-              class="group relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-8 hover:bg-white/[0.08] hover:border-white/[0.15] transition-all duration-500">
-              <!-- Icon -->
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center mb-5 group-hover:from-primary-500/30 group-hover:to-violet-500/30 transition-all duration-500">
-                <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="s.icon"/></svg>
-              </div>
-              <!-- Step number -->
-              <span class="absolute top-6 right-7 text-4xl font-extrabold text-white/[0.04] group-hover:text-primary-500/10 transition-colors duration-500">{{ s.n }}</span>
-              <h3 class="font-bold text-white text-lg mb-3">{{ s.title }}</h3>
-              <p class="text-gray-400 text-sm leading-relaxed">{{ s.desc }}</p>
-
-              <!-- Connector arrow (not on last) -->
-              <div v-if="i < 2" class="hidden md:flex absolute top-1/2 -right-3.5 w-7 items-center justify-center -translate-y-1/2">
-                <svg class="w-4 h-4 text-white/15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Wave bottom -->
-      <svg class="block w-full h-16 sm:h-24 -mt-px" viewBox="0 0 1440 100" preserveAspectRatio="none" fill="#030712">
-        <path d="M0,0 C240,80 480,10 720,60 C960,110 1200,20 1440,50 L1440,0 Z" />
-      </svg>
-    </div>
+    <HowItWorks />
 
     <!-- Pricing -->
     <section id="pricing" class="py-28 px-4 sm:px-6">
