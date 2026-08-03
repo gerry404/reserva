@@ -1,4 +1,6 @@
 <script setup>
+import BaseSelect from '@/components/ui/BaseSelect.vue'
+import BaseDateField from '@/components/ui/BaseDateField.vue'
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useBookingsStore } from '@/stores/bookings'
 import {
@@ -24,7 +26,7 @@ import { STATUS_FILTER_OPTIONS, describeStatus } from '@/constants/bookingStatus
 
 /** Les libellés et couleurs viennent de constants/bookingStatus. */
 const statusOptions = STATUS_FILTER_OPTIONS
-import { fr } from 'date-fns/locale'
+import { fr } from 'date-fns/locale'
 import BrandIcon from '@/components/ui/BrandIcon.vue'
 
 
@@ -121,18 +123,19 @@ onUnmounted(() => {
   document.removeEventListener('click', onClickOutside, true)
 })
 
-// Stats
-const stats = computed(() => {
-  const all = store.bookings
-  return {
-    total: store.pagination?.total ?? 0,
-    pending: all.filter(b => b.status === 'pending').length,
-    confirmed: all.filter(b => b.status === 'confirmed').length,
-    today: all.filter(b => {
-      try { return format(parseISO(b.date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') } catch { return false }
-    }).length,
-  }
-})
+/**
+ * Les compteurs viennent du serveur, jamais de `store.bookings`.
+ *
+ * Cette liste est paginée et déjà filtrée : y compter les statuts affichait
+ * zéro « en attente » dès qu'on filtrait sur « confirmé », et ne voyait de
+ * toute façon jamais au-delà de la première page.
+ */
+const stats = computed(() => store.counts)
+
+/** Un second clic sur la même pastille relâche le filtre. */
+function basculerStatut(statut) {
+  store.filters.status = store.filters.status === statut ? '' : statut
+}
 </script>
 
 <template>
@@ -169,21 +172,28 @@ const stats = computed(() => {
 
     <!-- Mini stat pills -->
     <div class="flex flex-wrap gap-2">
-      <div class="flex items-center gap-2 px-3.5 py-2 bg-clay-50 border border-gray-100 rounded-xl text-sm">
-        <span class="font-bold text-gray-900">{{ stats.total }}</span>
-        <span class="text-gray-400">total</span>
-      </div>
-      <button @click="store.filters.status = 'pending'; store.fetchBookings()"
-        class="flex items-center gap-2 px-3.5 py-2 bg-amber-50 border border-amber-100 rounded-control text-sm hover:bg-amber-100 transition-colors">
-        <span class="w-2 h-2 rounded-full bg-amber-400" />
-        <span class="font-bold text-amber-700">{{ stats.pending }}</span>
-        <span class="text-amber-600/70">en attente</span>
+      <button
+        @click="store.filters.status = ''"
+        :class="['flex items-center gap-2 px-3.5 py-2 border rounded-control text-sm transition-colors',
+                 store.filters.status === '' ? 'bg-gray-900 border-gray-900 text-white' : 'bg-clay-50 border-gray-100 hover:bg-gray-100']">
+        <span class="font-bold">{{ stats.all }}</span>
+        <span :class="store.filters.status === '' ? 'text-white/70' : 'text-gray-400'">au total</span>
       </button>
-      <button @click="store.filters.status = 'confirmed'; store.fetchBookings()"
-        class="flex items-center gap-2 px-3.5 py-2 bg-emerald-50 border border-emerald-100 rounded-control text-sm hover:bg-emerald-100 transition-colors">
-        <span class="w-2 h-2 rounded-full bg-emerald-400" />
-        <span class="font-bold text-emerald-700">{{ stats.confirmed }}</span>
-        <span class="text-emerald-600/70">confirmés</span>
+      <button
+        @click="basculerStatut('pending')"
+        :class="['flex items-center gap-2 px-3.5 py-2 border rounded-control text-sm transition-colors',
+                 store.filters.status === 'pending' ? 'bg-amber-500 border-amber-500 text-white' : 'bg-amber-50 border-amber-100 hover:bg-amber-100']">
+        <span :class="['w-2 h-2 rounded-full', store.filters.status === 'pending' ? 'bg-white' : 'bg-amber-400']" />
+        <span :class="['font-bold', store.filters.status === 'pending' ? 'text-white' : 'text-amber-700']">{{ stats.pending }}</span>
+        <span :class="store.filters.status === 'pending' ? 'text-white/75' : 'text-amber-600/70'">en attente</span>
+      </button>
+      <button
+        @click="basculerStatut('confirmed')"
+        :class="['flex items-center gap-2 px-3.5 py-2 border rounded-control text-sm transition-colors',
+                 store.filters.status === 'confirmed' ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-emerald-50 border-emerald-100 hover:bg-emerald-100']">
+        <span :class="['w-2 h-2 rounded-full', store.filters.status === 'confirmed' ? 'bg-white' : 'bg-emerald-400']" />
+        <span :class="['font-bold', store.filters.status === 'confirmed' ? 'text-white' : 'text-emerald-700']">{{ stats.confirmed }}</span>
+        <span :class="store.filters.status === 'confirmed' ? 'text-white/75' : 'text-emerald-600/70'">confirmés</span>
       </button>
     </div>
 
@@ -199,11 +209,18 @@ const stats = computed(() => {
         />
       </div>
 
-      <select v-model="store.filters.status" class="input-field sm:w-48">
-        <option v-for="o in statusOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
-      </select>
+      <div class="sm:w-48">
+        <BaseSelect
+          v-model="store.filters.status"
+          :options="statusOptions"
+          placeholder="Tous les statuts"
+          aria-label="Filtrer par statut"
+        />
+      </div>
 
-      <input v-model="store.filters.date" type="date" class="input-field sm:w-44" />
+      <div class="sm:w-52">
+        <BaseDateField v-model="store.filters.date" aria-label="Filtrer par date" />
+      </div>
 
       <button v-if="store.filters.search || store.filters.status || store.filters.date" @click="store.resetFilters(); store.fetchBookings()" class="btn-ghost text-sm">
         <X class="w-4 h-4" /> Réinitialiser
