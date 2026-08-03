@@ -8,7 +8,7 @@
       </div>
       <div class="max-w-3xl mx-auto">
         <div class="inline-flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+          <FileText class="w-4 h-4" />
           Document juridique
         </div>
         <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">Conditions d'utilisation</h1>
@@ -148,7 +148,7 @@
           <p class="text-gray-500 text-sm mb-4">Des questions sur nos conditions ?</p>
           <RouterLink to="/contact" class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-gray-700 bg-clay-50 border border-gray-200 hover:border-gray-300 rounded-control hover:shadow-sm transition-all duration-200">
             Contactez-nous
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            <ArrowRight class="w-4 h-4" />
           </RouterLink>
         </div>
       </div>
@@ -157,5 +157,6 @@
 </template>
 
 <script setup>
-import { RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
+import { ArrowRight, FileText } from 'lucide-vue-next'
 </script>

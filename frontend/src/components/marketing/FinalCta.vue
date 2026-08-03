@@ -1,5 +1,6 @@
 <script setup>
-import { RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
+import { ArrowRight } from 'lucide-vue-next'
 
 /*
  * ── La semaine qui se remplit, en fond du dernier appel à l'action ──
@@ -113,10 +114,7 @@ const ctaWeek = (() => {
 
         <RouterLink to="/register" class="cta__button">
           <span>Créer ma page</span>
-          <svg class="cta__arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M4 10h11m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
+          <ArrowRight class="cta__arrow" />
         </RouterLink>
 
         <p class="cta__reassurance">

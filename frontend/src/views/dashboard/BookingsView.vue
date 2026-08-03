@@ -2,18 +2,18 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useBookingsStore } from '@/stores/bookings'
 import {
-  MagnifyingGlassIcon,
-  FunnelIcon,
-  ArrowDownTrayIcon,
-  CheckIcon,
-  XMarkIcon,
-  EllipsisHorizontalIcon,
-  CalendarDaysIcon,
-  PhoneIcon,
-  ClockIcon,
-  EnvelopeIcon,
-  ChatBubbleLeftIcon,
-} from '@heroicons/vue/24/outline'
+  Search,
+  Funnel,
+  Download,
+  Check,
+  X,
+  Ellipsis,
+  CalendarDays,
+  Phone,
+  Clock,
+  Mail,
+  MessageCircle,
+} from 'lucide-vue-next'
 import { format, parseISO } from 'date-fns'
 import DurationBar from '@/components/time/DurationBar.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
@@ -24,7 +24,9 @@ import { STATUS_FILTER_OPTIONS, describeStatus } from '@/constants/bookingStatus
 
 /** Les libellés et couleurs viennent de constants/bookingStatus. */
 const statusOptions = STATUS_FILTER_OPTIONS
-import { fr } from 'date-fns/locale'
+import { fr } from 'date-fns/locale'
+import BrandIcon from '@/components/ui/BrandIcon.vue'
+
 
 const store       = useBookingsStore()
 const actionMenu  = ref(null)
@@ -142,7 +144,7 @@ const stats = computed(() => {
         <p class="text-sm text-gray-500 mt-0.5">Gérez et suivez toutes vos réservations</p>
       </div>
       <button @click="store.exportCsv()" class="btn-secondary text-sm">
-        <ArrowDownTrayIcon class="w-4 h-4" />
+        <Download class="w-4 h-4" />
         Exporter CSV
       </button>
     </div>
@@ -151,7 +153,7 @@ const stats = computed(() => {
     <Transition name="fade">
       <div v-if="toast" class="relative flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
         <button @click="toast = null" class="absolute top-2 right-2 text-emerald-400 hover:text-emerald-600">
-          <XMarkIcon class="w-4 h-4" />
+          <X class="w-4 h-4" />
         </button>
         <p class="text-sm text-emerald-800 font-medium pr-6">{{ toast.message }}</p>
         <a
@@ -159,7 +161,7 @@ const stats = computed(() => {
           target="_blank"
           class="btn-whatsapp shrink-0 px-4 py-2 text-sm shadow-sm"
         >
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+          <BrandIcon name="whatsapp" class="w-4 h-4" />
           Envoyer sur WhatsApp
         </a>
       </div>
@@ -188,7 +190,7 @@ const stats = computed(() => {
     <!-- Filters -->
     <div class="flex flex-wrap gap-3 items-center">
       <div class="relative flex-1 min-w-[220px]">
-        <MagnifyingGlassIcon class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
           v-model="store.filters.search"
           type="search"
@@ -204,7 +206,7 @@ const stats = computed(() => {
       <input v-model="store.filters.date" type="date" class="input-field sm:w-44" />
 
       <button v-if="store.filters.search || store.filters.status || store.filters.date" @click="store.resetFilters(); store.fetchBookings()" class="btn-ghost text-sm">
-        <XMarkIcon class="w-4 h-4" /> Réinitialiser
+        <X class="w-4 h-4" /> Réinitialiser
       </button>
     </div>
 
@@ -223,7 +225,7 @@ const stats = computed(() => {
     <!-- Empty state -->
     <div v-else-if="store.bookings.length === 0" class="card p-16 text-center">
       <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-        <CalendarDaysIcon class="w-8 h-8 text-gray-300" />
+        <CalendarDays class="w-8 h-8 text-gray-300" />
       </div>
       <h3 class="font-bold text-gray-900 mb-2">Aucune réservation trouvée</h3>
       <p class="text-gray-400 text-sm">Essayez de modifier les filtres ou attendez vos prochaines réservations</p>
@@ -252,7 +254,7 @@ const stats = computed(() => {
                 {{ b.service.name }}
               </span>
               <span class="flex items-center gap-1">
-                <CalendarDaysIcon class="w-3 h-3" />
+                <CalendarDays class="w-3 h-3" />
                 {{ formatDate(b.date) }} ·
                 <span class="numeric">{{ b.time_slot }}–{{ b.ends_at_time }}</span>
               </span>
@@ -274,7 +276,7 @@ const stats = computed(() => {
           <!-- Action button -->
           <div data-menu-trigger>
             <button @click.stop="toggleMenu(b.id, $event)" class="p-2 rounded-control text-gray-300 hover:text-gray-600 hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100">
-              <EllipsisHorizontalIcon class="w-5 h-5" />
+              <Ellipsis class="w-5 h-5" />
             </button>
           </div>
 
@@ -288,19 +290,19 @@ const stats = computed(() => {
               >
                 <template v-if="b.status === 'pending'">
                   <button @click="openConfirm(b.id, 'confirm')" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-emerald-700 hover:bg-emerald-50 transition-colors">
-                    <CheckIcon class="w-4 h-4" /> Confirmer
+                    <Check class="w-4 h-4" /> Confirmer
                   </button>
                 </template>
                 <template v-if="['pending', 'confirmed'].includes(b.status)">
                   <button @click="openConfirm(b.id, 'complete')" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-blue-700 hover:bg-blue-50 transition-colors">
-                    <CheckIcon class="w-4 h-4" /> Marquer terminé
+                    <Check class="w-4 h-4" /> Marquer terminé
                   </button>
                   <button @click="openConfirm(b.id, 'cancel')" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                    <XMarkIcon class="w-4 h-4" /> Annuler
+                    <X class="w-4 h-4" /> Annuler
                   </button>
                 </template>
                 <button @click="actionMenu = null" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 transition-colors border-t border-gray-50">
-                  <XMarkIcon class="w-4 h-4" /> Fermer
+                  <X class="w-4 h-4" /> Fermer
                 </button>
               </div>
             </Transition>
@@ -314,13 +316,13 @@ const stats = computed(() => {
               <div>
                 <p class="text-[11px] text-gray-400 font-medium mb-0.5">Téléphone</p>
                 <a :href="'tel:' + b.customer_phone" class="text-sm font-semibold text-gray-900 flex items-center gap-1 hover:text-primary-600">
-                  <PhoneIcon class="w-3.5 h-3.5 text-gray-400" /> {{ b.customer_phone }}
+                  <Phone class="w-3.5 h-3.5 text-gray-400" /> {{ b.customer_phone }}
                 </a>
               </div>
               <div v-if="b.customer_email">
                 <p class="text-[11px] text-gray-400 font-medium mb-0.5">Email</p>
                 <a :href="'mailto:' + b.customer_email" class="text-sm font-semibold text-gray-900 flex items-center gap-1 hover:text-primary-600 truncate">
-                  <EnvelopeIcon class="w-3.5 h-3.5 text-gray-400 shrink-0" /> {{ b.customer_email }}
+                  <Mail class="w-3.5 h-3.5 text-gray-400 shrink-0" /> {{ b.customer_email }}
                 </a>
               </div>
               <div>
@@ -334,7 +336,7 @@ const stats = computed(() => {
             </div>
             <div v-if="b.notes" class="mt-3 p-3 bg-gray-50 rounded-xl">
               <p class="text-[11px] text-gray-400 font-medium mb-1 flex items-center gap-1">
-                <ChatBubbleLeftIcon class="w-3 h-3" /> Notes du client
+                <MessageCircle class="w-3 h-3" /> Notes du client
               </p>
               <p class="text-sm text-gray-600">{{ b.notes }}</p>
             </div>
@@ -342,10 +344,10 @@ const stats = computed(() => {
             <!-- Quick actions -->
             <div v-if="b.status === 'pending'" class="flex gap-2 mt-3">
               <button @click.stop="openConfirm(b.id, 'confirm')" class="btn-primary text-xs py-2 flex-1">
-                <CheckIcon class="w-3.5 h-3.5" /> Confirmer
+                <Check class="w-3.5 h-3.5" /> Confirmer
               </button>
               <button @click.stop="openConfirm(b.id, 'cancel')" class="btn-danger text-xs py-2 flex-1">
-                <XMarkIcon class="w-3.5 h-3.5" /> Annuler
+                <X class="w-3.5 h-3.5" /> Annuler
               </button>
             </div>
           </div>

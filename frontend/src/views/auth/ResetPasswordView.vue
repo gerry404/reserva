@@ -2,7 +2,7 @@
 import { computed, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { authApi } from '@/api'
-import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
+import { Eye, EyeOff } from 'lucide-vue-next'
 
 const route  = useRoute()
 const router = useRouter()
@@ -80,8 +80,8 @@ async function submit() {
                   :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                   @click="showPassword = !showPassword"
                 >
-                  <EyeSlashIcon v-if="showPassword" class="w-5 h-5" />
-                  <EyeIcon v-else class="w-5 h-5" />
+                  <EyeOff v-if="showPassword" class="w-5 h-5" />
+                  <Eye v-else class="w-5 h-5" />
                 </button>
               </div>
               <p v-if="fieldErrors.password" class="text-red-500 text-xs mt-1">

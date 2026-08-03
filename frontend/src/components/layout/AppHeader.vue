@@ -3,12 +3,12 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
-  Bars3Icon,
-  ArrowRightOnRectangleIcon,
-  Cog6ToothIcon,
-  UserCircleIcon,
-  SparklesIcon,
-} from '@heroicons/vue/24/outline'
+  Menu,
+  LogOut,
+  Settings,
+  CircleUser,
+  Sparkles,
+} from 'lucide-vue-next'
 
 const emit = defineEmits(['toggle-sidebar'])
 const route = useRoute()
@@ -51,7 +51,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
       class="p-2 -ml-2 rounded-control text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors lg:hidden"
       aria-label="Menu"
     >
-      <Bars3Icon class="w-5 h-5" />
+      <Menu class="w-5 h-5" />
     </button>
 
     <!-- Logo (visible on mobile when sidebar hidden) -->
@@ -77,7 +77,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
         :to="{ name: 'billing' }"
         class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-full transition-colors"
       >
-        <SparklesIcon class="w-3.5 h-3.5" />
+        <Sparkles class="w-3.5 h-3.5" />
         Essai Pro — {{ auth.trialDaysLeft }} j
       </RouterLink>
       <RouterLink
@@ -85,7 +85,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
         :to="{ name: 'billing' }"
         class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-full transition-colors"
       >
-        <SparklesIcon class="w-3.5 h-3.5" />
+        <Sparkles class="w-3.5 h-3.5" />
         Passer Pro
       </RouterLink>
 
@@ -130,12 +130,12 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
             <div class="py-1.5">
               <RouterLink @click="showMenu = false" to="/dashboard/settings"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                <Cog6ToothIcon class="w-4 h-4 text-gray-400" />
+                <Settings class="w-4 h-4 text-gray-400" />
                 Paramètres
               </RouterLink>
               <RouterLink @click="showMenu = false" to="/"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                <UserCircleIcon class="w-4 h-4 text-gray-400" />
+                <CircleUser class="w-4 h-4 text-gray-400" />
                 Voir le site
               </RouterLink>
             </div>
@@ -146,7 +146,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
                 @click="handleLogout"
                 class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
               >
-                <ArrowRightOnRectangleIcon class="w-4 h-4" />
+                <LogOut class="w-4 h-4" />
                 Se déconnecter
               </button>
             </div>

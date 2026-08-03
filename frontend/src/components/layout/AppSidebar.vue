@@ -3,14 +3,14 @@ import { computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
-  HomeIcon,
-  CalendarDaysIcon,
-  Squares2X2Icon,
-  Cog6ToothIcon,
-  CreditCardIcon,
-  ArrowTopRightOnSquareIcon,
-  XMarkIcon,
-} from '@heroicons/vue/24/outline'
+  House,
+  CalendarDays,
+  LayoutGrid,
+  Settings,
+  CreditCard,
+  ExternalLink,
+  X,
+} from 'lucide-vue-next'
 
 const props = defineProps({ open: Boolean })
 const emit  = defineEmits(['close'])
@@ -19,11 +19,11 @@ const route = useRoute()
 const auth  = useAuthStore()
 
 const navItems = [
-  { name: 'Tableau de bord', to: '/dashboard',          icon: HomeIcon },
-  { name: 'Réservations',    to: '/dashboard/bookings', icon: CalendarDaysIcon },
-  { name: 'Services',        to: '/dashboard/services', icon: Squares2X2Icon },
-  { name: 'Paramètres',      to: '/dashboard/settings', icon: Cog6ToothIcon },
-  { name: 'Abonnement',     to: '/dashboard/billing',  icon: CreditCardIcon },
+  { name: 'Tableau de bord', to: '/dashboard',          icon: House },
+  { name: 'Réservations',    to: '/dashboard/bookings', icon: CalendarDays },
+  { name: 'Services',        to: '/dashboard/services', icon: LayoutGrid },
+  { name: 'Paramètres',      to: '/dashboard/settings', icon: Settings },
+  { name: 'Abonnement',     to: '/dashboard/billing',  icon: CreditCard },
 ]
 
 const publicUrl = computed(() => {
@@ -82,7 +82,7 @@ function onNav() {
           target="_blank"
           class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-control transition-colors"
         >
-          <ArrowTopRightOnSquareIcon class="w-4 h-4 shrink-0" />
+          <ExternalLink class="w-4 h-4 shrink-0" />
           <span class="truncate">Ma page publique</span>
         </a>
       </div>
@@ -117,7 +117,7 @@ function onNav() {
           <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Nuvo</span>
         </div>
         <button @click="emit('close')" class="p-1.5 rounded-control text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
-          <XMarkIcon class="w-5 h-5" />
+          <X class="w-5 h-5" />
         </button>
       </div>
 
@@ -144,7 +144,7 @@ function onNav() {
       <div v-if="publicUrl" class="px-3 py-3 border-t border-gray-100">
         <a :href="publicUrl" target="_blank"
           class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-control transition-colors">
-          <ArrowTopRightOnSquareIcon class="w-4 h-4 shrink-0" />
+          <ExternalLink class="w-4 h-4 shrink-0" />
           <span class="truncate">Ma page publique</span>
         </a>
       </div>

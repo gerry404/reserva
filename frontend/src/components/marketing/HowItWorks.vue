@@ -1,4 +1,6 @@
 <script setup>
+import { Link2, UserRound, BellRing } from 'lucide-vue-next'
+
 /**
  * « Opérationnel en 3 étapes », et ses transitions de vague.
  *
@@ -22,19 +24,19 @@ const steps = [
     n: '01',
     title: 'Créez votre compte',
     desc: "Inscrivez-vous en 5 minutes. Ajoutez le nom de votre commerce, vos services et vos horaires d'ouverture.",
-    icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z',
+    icon: UserRound,
   },
   {
     n: '02',
     title: 'Partagez votre lien',
     desc: 'Vous recevez une adresse unique — nuvo.app/mon-salon. Partagez-la sur WhatsApp, Instagram ou Facebook.',
-    icon: 'M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244',
+    icon: Link2,
   },
   {
     n: '03',
     title: 'Recevez des réservations',
     desc: 'Les demandes arrivent en temps réel. Confirmez, annulez ou reprogrammez en un geste, depuis votre téléphone.',
-    icon: 'M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0',
+    icon: BellRing,
   },
 ]
 </script>
@@ -79,9 +81,7 @@ const steps = [
             <span class="hiw__number numeric">{{ step.n }}</span>
 
             <span class="hiw__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                <path :d="step.icon" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
+              <component :is="step.icon" :size="22" :stroke-width="1.6" />
             </span>
 
             <h3 class="hiw__step-title">{{ step.title }}</h3>

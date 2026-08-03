@@ -5,15 +5,15 @@ import { useAuthStore } from '@/stores/auth'
 import { paymentsApi } from '@/api'
 import { describePayment } from '@/constants/paymentStatus'
 import {
-  CheckIcon,
-  SparklesIcon,
-  RocketLaunchIcon,
-  CreditCardIcon,
-  ArrowPathIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ClockIcon,
-} from '@heroicons/vue/24/outline'
+  Check,
+  Sparkles,
+  Rocket,
+  CreditCard,
+  RefreshCw,
+  CircleCheck,
+  CircleX,
+  Clock,
+} from 'lucide-vue-next'
 
 const route = useRoute()
 const auth  = useAuthStore()
@@ -30,7 +30,7 @@ const plans = [
   {
     id: 'pro',
     name: 'Pro',
-    icon: SparklesIcon,
+    icon: Sparkles,
     color: 'from-primary-500 to-violet-600',
     monthly: 2900,
     yearly: 24900,
@@ -46,7 +46,7 @@ const plans = [
   {
     id: 'business',
     name: 'Business',
-    icon: RocketLaunchIcon,
+    icon: Rocket,
     color: 'from-amber-500 to-orange-600',
     monthly: 7900,
     yearly: 69900,
@@ -170,8 +170,8 @@ async function verifyPayment(txRef) {
     <Transition name="fade">
       <div v-if="toast" :class="['p-4 rounded-xl border flex items-center gap-3',
         toast.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800']">
-        <CheckCircleIcon v-if="toast.type === 'success'" class="w-5 h-5 shrink-0" />
-        <XCircleIcon v-else class="w-5 h-5 shrink-0" />
+        <CircleCheck v-if="toast.type === 'success'" class="w-5 h-5 shrink-0" />
+        <CircleX v-else class="w-5 h-5 shrink-0" />
         <p class="text-sm font-medium">{{ toast.message }}</p>
       </div>
     </Transition>
@@ -198,7 +198,7 @@ async function verifyPayment(txRef) {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
               <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center', subscription?.plan === 'free' ? 'bg-gray-200' : 'bg-white/20']">
-                <SparklesIcon :class="['w-6 h-6', subscription?.plan === 'free' ? 'text-gray-500' : 'text-white']" />
+                <Sparkles :class="['w-6 h-6', subscription?.plan === 'free' ? 'text-gray-500' : 'text-white']" />
               </div>
               <div>
                 <h3 :class="['text-lg font-black', subscription?.plan === 'free' ? 'text-gray-900' : 'text-white']">
@@ -213,7 +213,7 @@ async function verifyPayment(txRef) {
             </div>
             <span v-if="subscription?.is_active && subscription?.plan !== 'free'"
               class="hidden sm:flex items-center gap-1.5 bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-full">
-              <CheckCircleIcon class="w-4 h-4" /> Actif
+              <CircleCheck class="w-4 h-4" /> Actif
             </span>
           </div>
         </div>
@@ -245,7 +245,7 @@ async function verifyPayment(txRef) {
 
           <ul class="space-y-3 flex-1 mb-6">
             <li v-for="f in freePlan.features" :key="f" class="flex items-start gap-2 text-sm text-gray-600">
-              <CheckIcon class="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+              <Check class="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
               {{ f }}
             </li>
           </ul>
@@ -279,7 +279,7 @@ async function verifyPayment(txRef) {
 
           <ul class="space-y-3 flex-1 mb-6">
             <li v-for="f in plan.features" :key="f" class="flex items-start gap-2 text-sm text-gray-600">
-              <CheckIcon class="w-4 h-4 text-primary-500 shrink-0 mt-0.5" />
+              <Check class="w-4 h-4 text-primary-500 shrink-0 mt-0.5" />
               {{ f }}
             </li>
           </ul>
@@ -289,7 +289,7 @@ async function verifyPayment(txRef) {
             disabled
             class="w-full py-3 rounded-control border-2 border-primary-200 text-sm font-bold text-primary-400 cursor-not-allowed"
           >
-            <CheckCircleIcon class="w-4 h-4 inline -mt-0.5" /> Plan actuel
+            <CircleCheck class="w-4 h-4 inline -mt-0.5" /> Plan actuel
           </button>
           <button
             v-else
@@ -302,7 +302,7 @@ async function verifyPayment(txRef) {
               Redirection…
             </span>
             <span v-else class="flex items-center justify-center gap-2">
-              <CreditCardIcon class="w-4 h-4" />
+              <CreditCard class="w-4 h-4" />
               Passer au {{ plan.name }}
             </span>
           </button>
@@ -312,7 +312,7 @@ async function verifyPayment(txRef) {
       <!-- Payment methods info -->
       <div class="card p-5">
         <div class="flex items-center gap-3 mb-3">
-          <CreditCardIcon class="w-5 h-5 text-gray-400" />
+          <CreditCard class="w-5 h-5 text-gray-400" />
           <h3 class="font-bold text-gray-900 text-sm">Moyens de paiement acceptés</h3>
         </div>
         <div class="flex flex-wrap gap-3">

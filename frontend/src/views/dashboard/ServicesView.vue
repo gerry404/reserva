@@ -4,17 +4,17 @@ import { useAuthStore } from '@/stores/auth'
 import { servicesApi } from '@/api'
 import { defaultAccent, swatches } from '@/design/tokens'
 import {
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
-  Squares2X2Icon,
-  ClockIcon,
-  BanknotesIcon,
-  PhotoIcon,
-  XMarkIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from '@heroicons/vue/24/outline'
+  Plus,
+  Pencil,
+  Trash2,
+  LayoutGrid,
+  Clock,
+  Banknote,
+  Image,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-vue-next'
 
 const auth    = useAuthStore()
 const services = ref([])
@@ -231,7 +231,7 @@ function formatDuration(min) {
         <p class="text-sm text-gray-500 mt-0.5">{{ services.length }} service(s) configuré(s)</p>
       </div>
       <button @click="openCreate" class="btn-primary">
-        <PlusIcon class="w-4 h-4" />
+        <Plus class="w-4 h-4" />
         Nouveau service
       </button>
     </div>
@@ -247,11 +247,11 @@ function formatDuration(min) {
 
     <!-- Empty state -->
     <div v-else-if="services.length === 0" class="card p-16 text-center">
-      <Squares2X2Icon class="w-16 h-16 text-gray-200 mx-auto mb-4" />
+      <LayoutGrid class="w-16 h-16 text-gray-200 mx-auto mb-4" />
       <h3 class="font-bold text-gray-900 mb-2">Aucun service encore</h3>
       <p class="text-gray-400 text-sm mb-6">Ajoutez vos services pour que vos clients puissent réserver.</p>
       <button @click="openCreate" class="btn-primary mx-auto">
-        <PlusIcon class="w-4 h-4" /> Créer mon premier service
+        <Plus class="w-4 h-4" /> Créer mon premier service
       </button>
     </div>
 
@@ -266,7 +266,7 @@ function formatDuration(min) {
         <div v-if="svc.images && svc.images.length" class="relative h-36 overflow-hidden bg-gray-100 cursor-pointer group/img" @click.stop="openGallery(svc)">
           <img :src="svc.images[0].url" :alt="svc.name" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
           <div class="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors flex items-center justify-center">
-            <PhotoIcon class="w-6 h-6 text-white opacity-0 group-hover/img:opacity-100 transition-opacity drop-shadow-lg" />
+            <Image class="w-6 h-6 text-white opacity-0 group-hover/img:opacity-100 transition-opacity drop-shadow-lg" />
           </div>
           <span v-if="svc.images.length > 1" class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
             +{{ svc.images.length - 1 }}
@@ -298,21 +298,21 @@ function formatDuration(min) {
 
           <div class="flex items-center gap-4 text-sm">
             <div class="flex items-center gap-1.5 text-gray-600">
-              <ClockIcon class="w-4 h-4 text-gray-400" />
+              <Clock class="w-4 h-4 text-gray-400" />
               {{ formatDuration(svc.duration) }}
             </div>
             <div class="flex items-center gap-1.5 font-semibold text-gray-900">
-              <BanknotesIcon class="w-4 h-4 text-gray-400" />
+              <Banknote class="w-4 h-4 text-gray-400" />
               {{ formatPrice(svc.price) }}
             </div>
           </div>
 
           <div class="flex gap-2 pt-1 border-t border-gray-50 mt-auto">
             <button @click="openEdit(svc)" class="btn-ghost text-xs flex-1 py-1.5">
-              <PencilIcon class="w-3.5 h-3.5" /> Modifier
+              <Pencil class="w-3.5 h-3.5" /> Modifier
             </button>
             <button @click="deleting = svc.id" class="btn-ghost text-xs text-red-500 hover:text-red-700 hover:bg-red-50 flex-1 py-1.5">
-              <TrashIcon class="w-3.5 h-3.5" /> Supprimer
+              <Trash2 class="w-3.5 h-3.5" /> Supprimer
             </button>
           </div>
         </div>
@@ -391,14 +391,14 @@ function formatDuration(min) {
                     @click="removeImage(idx)"
                     class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                   >
-                    <XMarkIcon class="w-5 h-5 text-white" />
+                    <X class="w-5 h-5 text-white" />
                   </button>
                 </div>
 
                 <!-- Add button -->
                 <label v-if="canAddMore"
                   class="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-primary-400 hover:bg-primary-50/50 flex flex-col items-center justify-center cursor-pointer transition-colors">
-                  <PhotoIcon class="w-5 h-5 text-gray-300" />
+                  <Image class="w-5 h-5 text-gray-300" />
                   <span class="text-[10px] text-gray-400 mt-1">Ajouter</span>
                   <input
                     type="file"
@@ -434,7 +434,7 @@ function formatDuration(min) {
     <Transition name="fade">
       <div v-if="gallery" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm" @click.self="gallery = null">
         <button @click="gallery = null" class="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors z-10">
-          <XMarkIcon class="w-7 h-7" />
+          <X class="w-7 h-7" />
         </button>
 
         <!-- Counter -->
@@ -449,7 +449,7 @@ function formatDuration(min) {
 
         <!-- Prev -->
         <button v-if="gallery.images.length > 1" @click="galleryPrev" class="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">
-          <ChevronLeftIcon class="w-6 h-6" />
+          <ChevronLeft class="w-6 h-6" />
         </button>
 
         <!-- Image -->
@@ -457,7 +457,7 @@ function formatDuration(min) {
 
         <!-- Next -->
         <button v-if="gallery.images.length > 1" @click="galleryNext" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">
-          <ChevronRightIcon class="w-6 h-6" />
+          <ChevronRight class="w-6 h-6" />
         </button>
 
         <!-- Thumbnails -->

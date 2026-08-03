@@ -8,14 +8,16 @@ import { DAY_END, DAY_START } from '@/composables/useDuration'
 import DurationBar from '@/components/time/DurationBar.vue'
 import TimeRibbon from '@/components/time/TimeRibbon.vue'
 import {
-  CalendarDaysIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon,
-  ClockIcon, MapPinIcon,
-} from '@heroicons/vue/24/outline'
+  CalendarDays, CircleCheck, ChevronLeft, ChevronRight,
+  Clock, MapPin,
+} from 'lucide-vue-next'
 import {
   addMonths, eachDayOfInterval, endOfMonth, format, getDay, isBefore,
   isSameDay, isSameMonth, isToday, startOfMonth, subMonths,
 } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import { fr } from 'date-fns/locale'
+import BrandIcon from '@/components/ui/BrandIcon.vue'
+
 
 const route = useRoute()
 const slug  = computed(() => route.params.slug)
@@ -335,7 +337,7 @@ loadBusiness()
         <h1 class="text-2xl font-black mb-1">{{ business.name }}</h1>
         <p class="opacity-80 text-sm">{{ business.category }}</p>
         <p v-if="business.city" class="flex items-center justify-center gap-1 mt-3 text-sm opacity-75">
-          <MapPinIcon class="w-4 h-4" /> {{ business.city }}
+          <MapPin class="w-4 h-4" /> {{ business.city }}
         </p>
         <p v-if="business.description" class="mt-4 opacity-80 text-sm max-w-md mx-auto leading-relaxed">
           {{ business.description }}
@@ -352,7 +354,7 @@ loadBusiness()
             :class="step > i ? 'bg-emerald-500 text-white' : step === i ? 'accent-bg' : 'bg-gray-200 text-gray-400'"
             :aria-current="step === i ? 'step' : undefined"
           >
-            <CheckCircleIcon v-if="step > i" class="w-4 h-4" />
+            <CircleCheck v-if="step > i" class="w-4 h-4" />
             <span v-else>{{ i }}</span>
           </li>
           <li v-if="i < 4" class="w-8 h-0.5" :class="step > i ? 'bg-emerald-400' : 'bg-gray-200'" />
@@ -416,7 +418,7 @@ loadBusiness()
             </span>
           </span>
 
-          <ChevronRightIcon class="w-5 h-5 text-gray-300 shrink-0" />
+          <ChevronRight class="w-5 h-5 text-gray-300 shrink-0" />
         </button>
       </section>
 
@@ -424,7 +426,7 @@ loadBusiness()
       <section v-else-if="step === STEPS.DATE" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.SERVICE">
-            <ChevronLeftIcon class="w-5 h-5" />
+            <ChevronLeft class="w-5 h-5" />
           </button>
           <h2 class="text-lg font-black text-gray-900">Choisissez une date</h2>
         </div>
@@ -451,7 +453,7 @@ loadBusiness()
               aria-label="Mois précédent"
               @click="currentMonth = subMonths(currentMonth, 1)"
             >
-              <ChevronLeftIcon class="w-4 h-4" />
+              <ChevronLeft class="w-4 h-4" />
             </button>
             <h3 class="font-semibold text-gray-900 capitalize">
               {{ format(currentMonth, 'MMMM yyyy', { locale: fr }) }}
@@ -462,7 +464,7 @@ loadBusiness()
               aria-label="Mois suivant"
               @click="currentMonth = addMonths(currentMonth, 1)"
             >
-              <ChevronRightIcon class="w-4 h-4" />
+              <ChevronRight class="w-4 h-4" />
             </button>
           </div>
 
@@ -501,13 +503,13 @@ loadBusiness()
       <section v-else-if="step === STEPS.TIME" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.DATE">
-            <ChevronLeftIcon class="w-5 h-5" />
+            <ChevronLeft class="w-5 h-5" />
           </button>
           <h2 class="text-lg font-black text-gray-900">Choisissez un horaire</h2>
         </div>
 
         <p class="text-sm text-gray-500 flex items-center gap-2 capitalize">
-          <CalendarDaysIcon class="w-4 h-4" />
+          <CalendarDays class="w-4 h-4" />
           {{ selected.date ? format(selected.date, 'EEEE d MMMM yyyy', { locale: fr }) : '' }}
         </p>
 
@@ -538,7 +540,7 @@ loadBusiness()
         </div>
 
         <div v-else-if="!slots.length" class="card p-8 text-center">
-          <ClockIcon class="w-12 h-12 text-gray-200 mx-auto mb-3" />
+          <Clock class="w-12 h-12 text-gray-200 mx-auto mb-3" />
           <p class="text-gray-500 font-medium">Aucun créneau disponible</p>
           <p class="text-gray-400 text-sm mt-1">
             Ce service dure {{ selected.service?.formatted_duration }} — essayez une autre date.
@@ -578,7 +580,7 @@ loadBusiness()
       <section v-else-if="step === STEPS.DETAILS" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.TIME">
-            <ChevronLeftIcon class="w-5 h-5" />
+            <ChevronLeft class="w-5 h-5" />
           </button>
           <h2 class="text-lg font-black text-gray-900">Vos coordonnées</h2>
         </div>
@@ -672,7 +674,7 @@ loadBusiness()
       <!-- STEP 5 — done -->
       <section v-else-if="booking" class="text-center py-8 space-y-6">
         <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto">
-          <CheckCircleIcon class="w-10 h-10 text-emerald-500" />
+          <CircleCheck class="w-10 h-10 text-emerald-500" />
         </div>
 
         <div>
@@ -703,7 +705,7 @@ loadBusiness()
           <p class="text-sm text-gray-500">Prévenez le commerçant directement :</p>
           <a :href="whatsappLink" target="_blank" rel="noopener"
             class="btn-whatsapp py-3.5 px-6 shadow-lg">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+            <BrandIcon name="whatsapp" class="w-5 h-5" />
             Envoyer sur WhatsApp
           </a>
         </div>
