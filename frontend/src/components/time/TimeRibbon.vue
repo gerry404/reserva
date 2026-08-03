@@ -142,11 +142,11 @@ function position(block) {
 }
 
 .ribbon__block--free {
-  background: color-mix(in srgb, var(--accent, #635BFF) 16%, transparent);
+  background: color-mix(in srgb, var(--accent, var(--forest-600)) 16%, transparent);
 }
 
 .ribbon__block--selected {
-  background: var(--accent, #635BFF);
+  background: var(--accent, var(--forest-600));
   box-shadow: 0 0 0 2px #fff, 0 2px 8px rgb(0 0 0 / 0.18);
   z-index: 1;
   animation: ribbon-settle 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;

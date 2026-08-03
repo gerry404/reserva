@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
+import FinalCta from '@/components/marketing/FinalCta.vue'
+import HowItWorks from '@/components/marketing/HowItWorks.vue'
 import { useAuthStore } from '@/stores/auth'
 import {
   DevicePhoneMobileIcon,
@@ -100,7 +102,7 @@ const plans = computed(() => [
     desc: 'Pour les équipes & multi-sites',
     color: 'border-gray-200',
     cta: 'Essai gratuit de 14 jours',
-    ctaClass: 'block w-full py-3 rounded-xl text-sm font-bold text-center border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-all',
+    ctaClass: 'block w-full py-3 rounded-xl text-sm font-bold text-center border-2 border-primary-600 text-primary-700 hover:bg-primary-600 hover:text-white transition-all',
     features: [
       'Tout le plan Pro',
       'Multi-employés (bientôt)',
@@ -152,7 +154,6 @@ const useCases = [
     color: 'from-amber-500 to-orange-500',
   },
 ]
-
 
 
 // ── Testimonials carousel ──
@@ -348,7 +349,7 @@ onUnmounted(() => {
         <!-- Right actions -->
         <div class="hidden sm:flex items-center gap-1.5">
           <template v-if="auth.isAuthenticated">
-            <RouterLink to="/dashboard" class="inline-flex items-center gap-2 px-5 py-1.5 text-sm font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all duration-200 shadow-md shadow-gray-900/15 hover:shadow-lg hover:shadow-gray-900/20 hover:-translate-y-px">
+            <RouterLink to="/dashboard" class="inline-flex items-center gap-2 px-5 py-1.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-200 shadow-md shadow-primary-900/20 hover:shadow-lg hover:shadow-primary-900/25 hover:-translate-y-px">
               Mon tableau de bord
               <ArrowRightIcon class="w-3.5 h-3.5" />
             </RouterLink>
@@ -358,7 +359,7 @@ onUnmounted(() => {
               'px-4 py-1.5 text-sm font-semibold rounded-xl transition-all duration-200',
               scrolled ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' : 'text-gray-700 hover:text-gray-900 hover:bg-white/60'
             ]">Se connecter</RouterLink>
-            <RouterLink to="/register" class="px-5 py-1.5 text-sm font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all duration-200 shadow-md shadow-gray-900/15 hover:shadow-lg hover:shadow-gray-900/20 hover:-translate-y-px">Démarrer</RouterLink>
+            <RouterLink to="/register" class="px-5 py-1.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-200 shadow-md shadow-primary-900/20 hover:shadow-lg hover:shadow-primary-900/25 hover:-translate-y-px">Démarrer</RouterLink>
           </template>
         </div>
 
@@ -380,11 +381,11 @@ onUnmounted(() => {
         <RouterLink @click="mobileMenuOpen = false" to="/contact" class="text-2xl font-bold text-gray-900">Contact</RouterLink>
         <div class="flex flex-col gap-3 mt-4 w-56">
           <template v-if="auth.isAuthenticated">
-            <RouterLink @click="mobileMenuOpen = false" to="/dashboard" class="py-3 text-center text-base font-bold text-white bg-gray-900 rounded-xl">Mon tableau de bord</RouterLink>
+            <RouterLink @click="mobileMenuOpen = false" to="/dashboard" class="py-3 text-center text-base font-bold text-white bg-primary-600 rounded-xl">Mon tableau de bord</RouterLink>
           </template>
           <template v-else>
             <RouterLink @click="mobileMenuOpen = false" to="/login" class="py-3 text-center text-base font-semibold text-gray-700 border-2 border-gray-200 rounded-xl">Se connecter</RouterLink>
-            <RouterLink @click="mobileMenuOpen = false" to="/register" class="py-3 text-center text-base font-bold text-white bg-gray-900 rounded-xl">Démarrer</RouterLink>
+            <RouterLink @click="mobileMenuOpen = false" to="/register" class="py-3 text-center text-base font-bold text-white bg-primary-600 rounded-xl">Démarrer</RouterLink>
           </template>
         </div>
       </div>
@@ -425,7 +426,7 @@ onUnmounted(() => {
           heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
         ]">
           <RouterLink to="/register"
-            class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-gray-900 hover:bg-gray-800 rounded-2xl transition-all duration-300 shadow-xl shadow-gray-900/20 hover:shadow-2xl hover:shadow-gray-900/30 hover:-translate-y-0.5">
+            class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl transition-all duration-300 shadow-xl shadow-primary-900/25 hover:shadow-2xl hover:shadow-primary-900/30 hover:-translate-y-0.5">
             Créer mon compte gratuit
             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
           </RouterLink>
@@ -694,65 +695,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- How it works -->
-    <div class="relative">
-      <!-- Wave top -->
-      <svg class="block w-full h-16 sm:h-24 -mb-px" viewBox="0 0 1440 100" preserveAspectRatio="none" fill="#030712">
-        <path d="M0,100 C360,0 720,80 1080,20 C1260,-10 1380,30 1440,10 L1440,100 Z" />
-      </svg>
-
-      <section class="px-4 sm:px-6 bg-gray-950 text-white relative overflow-hidden py-20 sm:py-28">
-        <!-- Polygon grid background -->
-        <svg class="absolute inset-0 w-full h-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="hiw-poly" width="80" height="92" patternUnits="userSpaceOnUse" patternTransform="scale(0.8)">
-              <path d="M40 0L80 23L80 69L40 92L0 69L0 23Z" fill="none" stroke="white" stroke-width="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hiw-poly)" />
-        </svg>
-        <!-- Glow -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary-600/8 rounded-full blur-[120px]" />
-
-        <div class="max-w-5xl mx-auto relative">
-          <div class="text-center mb-20">
-            <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-5">
-              Opérationnel en
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-violet-400">3 étapes</span>
-            </h2>
-            <p class="text-lg text-gray-400 max-w-lg mx-auto">Pas de formation, pas de consultant. Juste vous et 5 minutes.</p>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-6">
-            <div v-for="(s, i) in [
-              { n: '01', title: 'Créez votre compte', desc: 'Inscrivez-vous en 5 minutes. Ajoutez le nom de votre commerce, vos services et vos horaires d\'ouverture.', icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z' },
-              { n: '02', title: 'Partagez votre lien', desc: 'Vous recevez une URL unique (ex: nuvo.app/mon-salon). Partagez-la sur WhatsApp, Instagram ou Facebook.', icon: 'M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244' },
-              { n: '03', title: 'Recevez des réservations', desc: 'Recevez les réservations en temps réel. Confirmez, annulez ou reprogrammez en un clic depuis votre téléphone.', icon: 'M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0' },
-            ]" :key="i"
-              class="group relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-8 hover:bg-white/[0.08] hover:border-white/[0.15] transition-all duration-500">
-              <!-- Icon -->
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center mb-5 group-hover:from-primary-500/30 group-hover:to-violet-500/30 transition-all duration-500">
-                <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="s.icon"/></svg>
-              </div>
-              <!-- Step number -->
-              <span class="absolute top-6 right-7 text-4xl font-extrabold text-white/[0.04] group-hover:text-primary-500/10 transition-colors duration-500">{{ s.n }}</span>
-              <h3 class="font-bold text-white text-lg mb-3">{{ s.title }}</h3>
-              <p class="text-gray-400 text-sm leading-relaxed">{{ s.desc }}</p>
-
-              <!-- Connector arrow (not on last) -->
-              <div v-if="i < 2" class="hidden md:flex absolute top-1/2 -right-3.5 w-7 items-center justify-center -translate-y-1/2">
-                <svg class="w-4 h-4 text-white/15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Wave bottom -->
-      <svg class="block w-full h-16 sm:h-24 -mt-px" viewBox="0 0 1440 100" preserveAspectRatio="none" fill="#030712">
-        <path d="M0,0 C240,80 480,10 720,60 C960,110 1200,20 1440,50 L1440,0 Z" />
-      </svg>
-    </div>
+    <HowItWorks />
 
     <!-- Pricing -->
     <section id="pricing" class="py-28 px-4 sm:px-6">
@@ -892,72 +835,10 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- CTA final -->
-    <section class="relative py-32 px-4 sm:px-6 overflow-hidden">
-      <!-- Background gradient -->
-      <div class="absolute inset-0 bg-gradient-to-br from-gray-950 via-primary-950 to-gray-950" />
-
-      <!-- Polygon grid -->
-      <svg class="absolute inset-0 w-full h-full opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="cta-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-            <path d="M30 0L60 15L60 45L30 60L0 45L0 15Z" fill="none" stroke="white" stroke-width="0.5"/>
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#cta-grid)" />
-      </svg>
-
-      <!-- Glow orbs -->
-      <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-primary-600/20 rounded-full blur-[120px]" />
-      <div class="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-violet-600/15 rounded-full blur-[100px]" />
-
-      <!-- Floating polygons -->
-      <svg class="absolute top-10 left-10 w-24 h-24 text-white/[0.04] animate-spin" style="animation-duration: 30s" viewBox="0 0 100 100"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="currentColor"/></svg>
-      <svg class="absolute bottom-10 right-16 w-32 h-32 text-white/[0.03] animate-spin" style="animation-duration: 45s; animation-direction: reverse" viewBox="0 0 100 100"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="currentColor"/></svg>
-      <svg class="absolute top-1/4 right-1/3 w-16 h-16 text-primary-400/[0.08] animate-spin" style="animation-duration: 20s" viewBox="0 0 100 100"><polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-
-      <!-- Content -->
-      <div class="relative max-w-3xl mx-auto text-center">
-        <!-- Top decorative line -->
-        <div class="flex items-center justify-center gap-4 mb-10">
-          <div class="h-px w-16 bg-gradient-to-r from-transparent to-primary-400/50" />
-          <svg class="w-6 h-6 text-primary-400/60" viewBox="0 0 100 100"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="none" stroke="currentColor" stroke-width="4"/></svg>
-          <div class="h-px w-16 bg-gradient-to-l from-transparent to-primary-400/50" />
-        </div>
-
-        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-          Prêt à passer au
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-violet-400 to-primary-400">niveau supérieur</span> ?
-        </h2>
-        <p class="text-gray-400 text-lg sm:text-xl mb-12 max-w-xl mx-auto leading-relaxed">
-          Créez votre page de réservation en quelques minutes et laissez vos clients réserver, même quand vous êtes occupé.
-        </p>
-
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <RouterLink to="/register"
-            class="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-clay-50 text-gray-900 font-bold text-base rounded-xl hover:shadow-2xl hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300">
-            Créer mon compte gratuit
-            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-          </RouterLink>
-          <RouterLink to="/contact"
-            class="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-white/20 text-white font-bold text-base rounded-xl hover:bg-white/10 hover:border-white/30 transition-all duration-300">
-            Nous contacter
-          </RouterLink>
-        </div>
-
-        <p class="text-gray-500 text-sm mt-8">14 jours d'essai gratuit. Sans engagement. Sans carte bancaire.</p>
-
-        <!-- Bottom decorative line -->
-        <div class="flex items-center justify-center gap-4 mt-12">
-          <div class="h-px w-24 bg-gradient-to-r from-transparent to-white/10" />
-          <div class="w-1.5 h-1.5 rounded-full bg-primary-500/50" />
-          <div class="h-px w-24 bg-gradient-to-l from-transparent to-white/10" />
-        </div>
-      </div>
-    </section>
+    <FinalCta />
 
     <!-- ══════ REAL FOOTER ══════ -->
-    <footer class="bg-gray-900 text-gray-400">
+    <footer class="bg-primary-950 text-primary-200">
       <!-- Main footer -->
       <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-10">
@@ -1054,7 +935,16 @@ onUnmounted(() => {
 
 /* Hero gradient text */
 .hero-gradient-text {
-  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 25%, #a855f7 50%, #7e22ce 75%, #9333ea 100%);
+  /* Les jetons, pas des hex : ce dégradé était le dernier violet de
+     l'application, invisible au remappage parce qu'écrit en CSS brut. */
+  background: linear-gradient(
+    135deg,
+    var(--forest-600) 0%,
+    var(--forest-800) 25%,
+    var(--forest-500) 50%,
+    var(--forest-800) 75%,
+    var(--forest-600) 100%
+  );
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

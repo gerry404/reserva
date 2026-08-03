@@ -3,6 +3,9 @@ import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { dashboardApi, bookingsApi } from '@/api'
 import DurationBar from '@/components/time/DurationBar.vue'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
+import UserAvatar from '@/components/ui/UserAvatar.vue'
+import { describeStatus } from '@/constants/bookingStatus'
 import { RouterLink } from 'vue-router'
 import {
   CalendarDaysIcon,
@@ -168,19 +171,6 @@ function formatPrice(p) {
   return Number(p).toLocaleString('fr-FR') + ' F'
 }
 
-const statusClass = {
-  pending: 'badge-pending', confirmed: 'badge-confirmed',
-  cancelled: 'badge-cancelled', completed: 'badge-completed',
-  no_show: 'badge-cancelled',
-}
-const statusLabel = {
-  pending: 'En attente', confirmed: 'Confirmé',
-  cancelled: 'Annulé', completed: 'Terminé',
-  no_show: 'Non présenté',
-}
-const statusIcon = {
-  pending: '⏳', confirmed: '✅', cancelled: '❌', completed: '🏁', no_show: '🚫',
-}
 
 // Chart helpers
 const activeChartData = computed(() => {
@@ -221,18 +211,11 @@ const statusTotal = computed(() => {
 
 const statusSegments = computed(() => {
   if (!analytics.value?.status_distribution || statusTotal.value === 0) return []
-  const colors = {
-    confirmed: '#10b981', completed: '#3b82f6', pending: '#f59e0b',
-    cancelled: '#ef4444', no_show: '#6b7280',
-  }
-  const labels = {
-    confirmed: 'Confirmé', completed: 'Terminé', pending: 'En attente',
-    cancelled: 'Annulé', no_show: 'Non présenté',
-  }
   let offset = 0
   return Object.entries(analytics.value.status_distribution).map(([status, count]) => {
+    const { chart, label } = describeStatus(status)
     const pct = (count / statusTotal.value) * 100
-    const seg = { status, count, pct, color: colors[status] || '#9ca3af', label: labels[status] || status, offset }
+    const seg = { status, count, pct, color: chart, label, offset }
     offset += pct
     return seg
   })
@@ -613,10 +596,7 @@ const greeting = computed(() => {
             <div v-else class="space-y-1.5">
               <div v-for="b in upcoming.slice(0, 6)" :key="b.id"
                 class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm"
-                  :style="{ backgroundColor: b.service?.color ?? '#a855f7' }">
-                  {{ b.customer_name?.charAt(0)?.toUpperCase() }}
-                </div>
+                <UserAvatar :name="b.customer_name" :color="b.service?.color" />
                 <div class="flex-1 min-w-0">
                   <p class="font-semibold text-sm text-gray-900 truncate">{{ b.customer_name }}</p>
                   <p class="text-xs text-gray-400 truncate">
@@ -636,7 +616,7 @@ const greeting = computed(() => {
                   />
                 </div>
                 <div class="flex items-center gap-2">
-                  <span :class="['badge text-[10px]', statusClass[b.status]]">{{ statusLabel[b.status] }}</span>
+                  <StatusBadge :status="b.status" compact />
                   <div v-if="b.status === 'pending'" class="hidden group-hover:flex items-center gap-1">
                     <button @click.stop="confirmBooking(b.id)" :disabled="actionLoading === b.id"
                       class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 flex items-center justify-center transition-colors" title="Confirmer">
@@ -782,7 +762,7 @@ const greeting = computed(() => {
             <div v-if="analytics.recent_activity?.length" class="space-y-1">
               <div v-for="a in analytics.recent_activity.slice(0, 8)" :key="a.id"
                 class="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
-                <span class="text-base shrink-0">{{ statusIcon[a.status] }}</span>
+                <span class="text-base shrink-0" aria-hidden="true">{{ describeStatus(a.status).icon }}</span>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm text-gray-700">
                     <span class="font-semibold">{{ a.customer_name }}</span>
@@ -793,7 +773,7 @@ const greeting = computed(() => {
                     {{ a.reference }} · {{ a.updated_at }}
                   </p>
                 </div>
-                <span :class="['badge text-[10px]', statusClass[a.status]]">{{ statusLabel[a.status] }}</span>
+                <StatusBadge :status="a.status" compact />
               </div>
             </div>
 

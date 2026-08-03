@@ -3,6 +3,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { businessApi } from '@/api'
+import { defaultAccent, swatches } from '@/design/tokens'
 import { COUNTRIES } from '@/composables/usePhoneInput'
 import {
   LinkIcon,
@@ -64,7 +65,7 @@ const form = reactive({
   notifications_whatsapp: true,
   notifications_sms:   false,
   notifications_email: true,
-  accent_color:        '#6366f1',
+  accent_color:        defaultAccent,
   working_hours:       {},
 })
 
@@ -90,9 +91,7 @@ const noticeOptions = [
   { v: 1440, l: '24 heures avant' },
 ]
 
-const accentColors = [
-  '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#ef4444', '#06b6d4', '#f97316',
-]
+const accentColors = swatches
 
 /**
  * Fill the form from the store.
@@ -121,7 +120,7 @@ watch(
       notifications_whatsapp: business.notifications_whatsapp ?? true,
       notifications_sms:      business.notifications_sms ?? false,
       notifications_email:    business.notifications_email ?? true,
-      accent_color:           business.accent_color ?? '#6366f1',
+      accent_color:           business.accent_color ?? defaultAccent,
       working_hours:          business.working_hours ?? defaultWorkingHours(),
     })
 
