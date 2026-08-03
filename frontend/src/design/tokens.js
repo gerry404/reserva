@@ -167,6 +167,22 @@ export const colors = {
 }
 
 /**
+ * Rayons d'angle.
+ *
+ * `control` couvre tout ce sur quoi on clique — bouton, lien d'action, onglet,
+ * créneau réservable. Le rayon y était recopié une trentaine de fois en classe
+ * utilitaire et en CSS scoped, avec quatre valeurs différentes selon l'écran ;
+ * il vit désormais ici, et une seule ligne le change partout.
+ *
+ * `surface` reste distinct : une carte pleinement arrondie ne se lit plus comme
+ * une carte. Les deux ne doivent pas fusionner.
+ */
+export const radii = {
+  control: '999px',
+  surface: '18px',
+}
+
+/**
  * Les jetons sous forme de déclarations CSS, posées sur :root.
  *
  * Consommé par le plugin déclaré dans tailwind.config.js. Ce qui n'est pas
@@ -192,7 +208,10 @@ export function cssDeclarations() {
   vars['--whatsapp'] = external.whatsapp
   vars['--whatsapp-hover'] = external.whatsappHover
 
+  vars['--radius-control'] = radii.control
+  vars['--radius-surface'] = radii.surface
+
   return vars
 }
 
-export default { forest, clay, semantic, brand, external, swatches, defaultAccent, colors }
+export default { forest, clay, semantic, brand, external, swatches, defaultAccent, colors, radii }

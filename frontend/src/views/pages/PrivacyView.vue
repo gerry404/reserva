@@ -56,7 +56,7 @@
               'Cookies',
               'Modifications',
               'Contact',
-            ]" :key="i" :href="'#section-' + (i + 1)" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-clay-50 hover:text-gray-900 hover:shadow-sm transition-all duration-200 group">
+            ]" :key="i" :href="'#section-' + (i + 1)" class="flex items-center gap-2.5 px-3 py-2 rounded-control text-sm text-gray-600 hover:bg-clay-50 hover:text-gray-900 hover:shadow-sm transition-all duration-200 group">
               <span class="w-6 h-6 rounded-md bg-clay-50 group-hover:bg-violet-50 border border-gray-200 group-hover:border-violet-200 flex items-center justify-center text-[11px] font-bold text-gray-400 group-hover:text-violet-600 transition-colors">{{ i + 1 }}</span>
               {{ item }}
             </a>
@@ -178,7 +178,7 @@
         <!-- Bottom CTA -->
         <div class="mt-16 bg-gray-50 border border-gray-100 rounded-2xl p-8 text-center">
           <p class="text-gray-500 text-sm mb-4">Des questions sur la protection de vos donnees ?</p>
-          <RouterLink to="/contact" class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-gray-700 bg-clay-50 border border-gray-200 hover:border-gray-300 rounded-lg hover:shadow-sm transition-all duration-200">
+          <RouterLink to="/contact" class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-gray-700 bg-clay-50 border border-gray-200 hover:border-gray-300 rounded-control hover:shadow-sm transition-all duration-200">
             Contactez-nous
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
           </RouterLink>

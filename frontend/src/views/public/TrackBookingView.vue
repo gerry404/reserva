@@ -180,7 +180,7 @@ async function cancelBooking() {
             <button
               @click="cancelBooking"
               :disabled="cancelling"
-              class="w-full py-2.5 border-2 border-red-200 text-red-600 hover:bg-red-50 text-sm font-bold rounded-xl transition-colors"
+              class="w-full py-2.5 border-2 border-red-200 text-red-600 hover:bg-red-50 text-sm font-bold rounded-control transition-colors"
             >
               {{ cancelling ? 'Annulation…' : 'Annuler ma réservation' }}
             </button>

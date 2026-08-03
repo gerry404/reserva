@@ -27,6 +27,16 @@ export default {
        */
       colors: tokens.colors,
 
+      /*
+       * `rounded-control` sur tout ce qui se clique, `rounded-surface` sur les
+       * cartes. Les deux viennent des mêmes jetons, pour qu'un changement de
+       * rayon ne demande pas de repasser sur trente fichiers.
+       */
+      borderRadius: {
+        control: tokens.radii.control,
+        surface: tokens.radii.surface,
+      },
+
       animation: {
         'fade-in':   'fadeIn 0.3s ease-in-out',
         'slide-up':  'slideUp 0.3s ease-out',

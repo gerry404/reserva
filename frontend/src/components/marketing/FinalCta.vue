@@ -100,8 +100,6 @@ const ctaWeek = (() => {
       </div>
 
       <div class="cta__content">
-        <p class="cta__eyebrow">Votre page en 5 minutes</p>
-
         <h2 class="cta__title">
           Vos clients réservent.<br />
           <span class="cta__title-accent">Vous travaillez.</span>
@@ -240,20 +238,6 @@ const ctaWeek = (() => {
   text-align: center;
 }
 
-.cta__eyebrow {
-  display: inline-block;
-  margin: 0 0 22px;
-  padding: 5px 14px;
-  border-radius: 999px;
-  border: 1px solid rgb(255 255 255 / 0.14);
-  background: rgb(255 255 255 / 0.05);
-  backdrop-filter: blur(6px);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: rgb(255 255 255 / 0.72);
-}
-
 .cta__title {
   margin: 0 0 20px;
   font-size: clamp(29px, 6.4vw, 56px);
@@ -284,7 +268,7 @@ const ctaWeek = (() => {
   align-items: center;
   gap: 10px;
   padding: 17px 34px;
-  border-radius: 14px;
+  border-radius: var(--radius-control);
   background: var(--clay-50);
   color: var(--forest-900);
   font-weight: 700;

@@ -351,7 +351,7 @@ async function copyLink() {
           <div class="flex gap-2 flex-wrap">
             <button v-for="c in accentColors" :key="c" type="button"
               @click="form.accent_color = c"
-              class="w-8 h-8 rounded-lg transition-transform hover:scale-110 ring-offset-2"
+              class="w-8 h-8 rounded-control transition-transform hover:scale-110 ring-offset-2"
               :class="form.accent_color === c ? 'ring-2 ring-gray-900 scale-110' : ''"
               :style="{ backgroundColor: c }"
             />

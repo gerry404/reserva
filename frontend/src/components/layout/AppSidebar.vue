@@ -64,7 +64,7 @@ function onNav() {
           :key="item.to"
           :to="item.to"
           :class="[
-            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
+            'flex items-center gap-3 px-3 py-2.5 rounded-control text-sm font-medium transition-all duration-200',
             isActive(item.to)
               ? 'bg-primary-50 text-primary-700 font-semibold shadow-sm'
               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -80,7 +80,7 @@ function onNav() {
         <a
           :href="publicUrl"
           target="_blank"
-          class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-xl transition-colors"
+          class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-control transition-colors"
         >
           <ArrowTopRightOnSquareIcon class="w-4 h-4 shrink-0" />
           <span class="truncate">Ma page publique</span>
@@ -116,7 +116,7 @@ function onNav() {
           <img src="/logo.svg" alt="Nuvo" class="w-8 h-8" />
           <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Nuvo</span>
         </div>
-        <button @click="emit('close')" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+        <button @click="emit('close')" class="p-1.5 rounded-control text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
           <XMarkIcon class="w-5 h-5" />
         </button>
       </div>
@@ -128,7 +128,7 @@ function onNav() {
           :key="item.to"
           :to="item.to"
           :class="[
-            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
+            'flex items-center gap-3 px-3 py-2.5 rounded-control text-sm font-medium transition-all duration-200',
             isActive(item.to)
               ? 'bg-primary-50 text-primary-700 font-semibold'
               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -143,7 +143,7 @@ function onNav() {
       <!-- Public link (mobile) -->
       <div v-if="publicUrl" class="px-3 py-3 border-t border-gray-100">
         <a :href="publicUrl" target="_blank"
-          class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-xl transition-colors">
+          class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-control transition-colors">
           <ArrowTopRightOnSquareIcon class="w-4 h-4 shrink-0" />
           <span class="truncate">Ma page publique</span>
         </a>

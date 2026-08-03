@@ -48,7 +48,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
     <!-- Mobile menu toggle -->
     <button
       @click="emit('toggle-sidebar')"
-      class="p-2 -ml-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors lg:hidden"
+      class="p-2 -ml-2 rounded-control text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors lg:hidden"
       aria-label="Menu"
     >
       <Bars3Icon class="w-5 h-5" />

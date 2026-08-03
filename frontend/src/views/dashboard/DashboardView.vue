@@ -454,7 +454,7 @@ const greeting = computed(() => {
                 </p>
               </div>
             </div>
-            <RouterLink to="/dashboard/billing" class="bg-clay-50 text-amber-700 font-bold text-xs px-4 py-2 rounded-xl hover:bg-amber-50 transition-colors shrink-0">
+            <RouterLink to="/dashboard/billing" class="bg-clay-50 text-amber-700 font-bold text-xs px-4 py-2 rounded-control hover:bg-amber-50 transition-colors shrink-0">
               Voir les plans
             </RouterLink>
           </div>
@@ -495,10 +495,10 @@ const greeting = computed(() => {
             <div class="flex items-center justify-between mb-6">
               <h3 class="font-bold text-gray-900">Réservations</h3>
               <div class="flex items-center bg-gray-100 rounded-lg p-0.5">
-                <button @click="chartTab = 'daily'" :class="['text-xs font-semibold px-3 py-1.5 rounded-md transition-all', chartTab === 'daily' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
+                <button @click="chartTab = 'daily'" :class="['text-xs font-semibold px-3 py-1.5 rounded-control transition-all', chartTab === 'daily' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
                   7 jours
                 </button>
-                <button @click="chartTab = 'monthly'" :class="['text-xs font-semibold px-3 py-1.5 rounded-md transition-all', chartTab === 'monthly' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
+                <button @click="chartTab = 'monthly'" :class="['text-xs font-semibold px-3 py-1.5 rounded-control transition-all', chartTab === 'monthly' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
                   6 mois
                 </button>
               </div>
@@ -619,11 +619,11 @@ const greeting = computed(() => {
                   <StatusBadge :status="b.status" compact />
                   <div v-if="b.status === 'pending'" class="hidden group-hover:flex items-center gap-1">
                     <button @click.stop="confirmBooking(b.id)" :disabled="actionLoading === b.id"
-                      class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 flex items-center justify-center transition-colors" title="Confirmer">
+                      class="w-7 h-7 rounded-control bg-emerald-50 hover:bg-emerald-100 flex items-center justify-center transition-colors" title="Confirmer">
                       <CheckIcon class="w-3.5 h-3.5 text-emerald-600" />
                     </button>
                     <button @click.stop="cancelBooking(b.id)" :disabled="actionLoading === b.id"
-                      class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors" title="Annuler">
+                      class="w-7 h-7 rounded-control bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors" title="Annuler">
                       <XMarkIcon class="w-3.5 h-3.5 text-red-500" />
                     </button>
                   </div>

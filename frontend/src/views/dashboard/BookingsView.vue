@@ -172,13 +172,13 @@ const stats = computed(() => {
         <span class="text-gray-400">total</span>
       </div>
       <button @click="store.filters.status = 'pending'; store.fetchBookings()"
-        class="flex items-center gap-2 px-3.5 py-2 bg-amber-50 border border-amber-100 rounded-xl text-sm hover:bg-amber-100 transition-colors">
+        class="flex items-center gap-2 px-3.5 py-2 bg-amber-50 border border-amber-100 rounded-control text-sm hover:bg-amber-100 transition-colors">
         <span class="w-2 h-2 rounded-full bg-amber-400" />
         <span class="font-bold text-amber-700">{{ stats.pending }}</span>
         <span class="text-amber-600/70">en attente</span>
       </button>
       <button @click="store.filters.status = 'confirmed'; store.fetchBookings()"
-        class="flex items-center gap-2 px-3.5 py-2 bg-emerald-50 border border-emerald-100 rounded-xl text-sm hover:bg-emerald-100 transition-colors">
+        class="flex items-center gap-2 px-3.5 py-2 bg-emerald-50 border border-emerald-100 rounded-control text-sm hover:bg-emerald-100 transition-colors">
         <span class="w-2 h-2 rounded-full bg-emerald-400" />
         <span class="font-bold text-emerald-700">{{ stats.confirmed }}</span>
         <span class="text-emerald-600/70">confirmés</span>
@@ -273,7 +273,7 @@ const stats = computed(() => {
 
           <!-- Action button -->
           <div data-menu-trigger>
-            <button @click.stop="toggleMenu(b.id, $event)" class="p-2 rounded-xl text-gray-300 hover:text-gray-600 hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100">
+            <button @click.stop="toggleMenu(b.id, $event)" class="p-2 rounded-control text-gray-300 hover:text-gray-600 hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100">
               <EllipsisHorizontalIcon class="w-5 h-5" />
             </button>
           </div>

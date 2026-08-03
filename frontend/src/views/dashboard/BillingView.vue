@@ -221,10 +221,10 @@ async function verifyPayment(txRef) {
 
       <!-- Billing cycle toggle -->
       <div class="flex items-center justify-center gap-3">
-        <button @click="cycle = 'monthly'" :class="['text-sm font-semibold px-4 py-2 rounded-xl transition-all', cycle === 'monthly' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-700']">
+        <button @click="cycle = 'monthly'" :class="['text-sm font-semibold px-4 py-2 rounded-control transition-all', cycle === 'monthly' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-700']">
           Mensuel
         </button>
-        <button @click="cycle = 'yearly'" :class="['text-sm font-semibold px-4 py-2 rounded-xl transition-all', cycle === 'yearly' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-700']">
+        <button @click="cycle = 'yearly'" :class="['text-sm font-semibold px-4 py-2 rounded-control transition-all', cycle === 'yearly' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-700']">
           Annuel
           <span class="ml-1 text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Économisez</span>
         </button>
@@ -250,7 +250,7 @@ async function verifyPayment(txRef) {
             </li>
           </ul>
 
-          <button disabled class="w-full py-3 rounded-xl border-2 border-gray-200 text-sm font-bold text-gray-400 cursor-not-allowed">
+          <button disabled class="w-full py-3 rounded-control border-2 border-gray-200 text-sm font-bold text-gray-400 cursor-not-allowed">
             {{ subscription?.plan === 'free' ? 'Plan actuel' : 'Plan de base' }}
           </button>
         </div>
@@ -287,7 +287,7 @@ async function verifyPayment(txRef) {
           <button
             v-if="subscription?.plan === plan.id && subscription?.is_active"
             disabled
-            class="w-full py-3 rounded-xl border-2 border-primary-200 text-sm font-bold text-primary-400 cursor-not-allowed"
+            class="w-full py-3 rounded-control border-2 border-primary-200 text-sm font-bold text-primary-400 cursor-not-allowed"
           >
             <CheckCircleIcon class="w-4 h-4 inline -mt-0.5" /> Plan actuel
           </button>
@@ -295,7 +295,7 @@ async function verifyPayment(txRef) {
             v-else
             @click="initPayment(plan.id)"
             :disabled="initiating === plan.id"
-            :class="['w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-60 bg-gradient-to-r', plan.color]"
+            :class="['w-full py-3 rounded-control text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-60 bg-gradient-to-r', plan.color]"
           >
             <span v-if="initiating === plan.id" class="flex items-center justify-center gap-2">
               <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

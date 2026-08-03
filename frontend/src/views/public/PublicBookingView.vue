@@ -654,7 +654,7 @@ loadBusiness()
             <input id="website" v-model="form.website" type="text" tabindex="-1" autocomplete="off" />
           </div>
 
-          <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-base accent-bg disabled:opacity-60"
+          <button type="submit" class="w-full py-3.5 rounded-control font-bold text-base accent-bg disabled:opacity-60"
             :disabled="submitting">
             <span v-if="submitting" class="flex items-center justify-center gap-2">
               <span class="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
@@ -779,7 +779,7 @@ loadBusiness()
 
 .day-cell {
   aspect-ratio: 1;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-control);
   font-size: 0.875rem;
   font-weight: 500;
   transition: background-color 0.15s, color 0.15s, transform 0.15s;
@@ -839,7 +839,7 @@ loadBusiness()
 
 .slot-button {
   padding: 0.625rem 0;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-control);
   border: 2px solid #e5e7eb;
   font-size: 0.875rem;
   font-weight: 600;
