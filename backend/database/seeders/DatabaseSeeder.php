@@ -32,6 +32,11 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Données de démonstration créées.');
         $this->command->info('  Connexion : demo@nuvo.app / password');
         $this->command->info('  Page publique : ' . $business->public_url);
+
+        // Un compte par état que le produit sait produire : sans eux, le quota
+        // du plan gratuit, la bannière d'essai et la bascule à l'expiration ne
+        // se testent qu'en modifiant la base à la main.
+        $this->call(TestAccountsSeeder::class);
     }
 
     private function createMerchant(): User
@@ -76,7 +81,7 @@ class DatabaseSeeder extends Seeder
             'notifications_email'    => true,
             'notifications_sms'      => false,
             'is_active'              => true,
-            'accent_color'           => '#8b5cf6',
+            'accent_color'           => '#14603C',
         ]);
     }
 
@@ -84,12 +89,12 @@ class DatabaseSeeder extends Seeder
     private function createServices(Business $business): array
     {
         $catalogue = [
-            ['name' => 'Coiffure naturelle', 'duration' => 60,  'price' => 5000,  'color' => '#8b5cf6'],
-            ['name' => 'Tresses',            'duration' => 180, 'price' => 15000, 'color' => '#ec4899'],
-            ['name' => 'Défrisage',          'duration' => 90,  'price' => 8000,  'color' => '#f59e0b'],
-            ['name' => 'Soin capillaire',    'duration' => 45,  'price' => 4000,  'color' => '#10b981'],
-            ['name' => 'Maquillage',         'duration' => 60,  'price' => 10000, 'color' => '#ef4444'],
-            ['name' => 'Manucure',           'duration' => 30,  'price' => 3000,  'color' => '#06b6d4'],
+            ['name' => 'Coiffure naturelle', 'duration' => 60,  'price' => 5000,  'color' => '#14603C'],
+            ['name' => 'Tresses',            'duration' => 180, 'price' => 15000, 'color' => '#EC4899'],
+            ['name' => 'Défrisage',          'duration' => 90,  'price' => 8000,  'color' => '#F59E0B'],
+            ['name' => 'Soin capillaire',    'duration' => 45,  'price' => 4000,  'color' => '#06B6D4'],
+            ['name' => 'Maquillage',         'duration' => 60,  'price' => 10000, 'color' => '#F97316'],
+            ['name' => 'Manucure',           'duration' => 30,  'price' => 3000,  'color' => '#0EA5E9'],
         ];
 
         return array_map(
