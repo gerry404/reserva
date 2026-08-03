@@ -22,6 +22,7 @@ class ServiceResource extends JsonResource
             'formatted_price'    => $this->formatted_price,
             'formatted_duration' => $this->formatted_duration,
             'color'              => $this->color,
+            'icon'               => $this->icon,
             'category'           => $this->category,
             'is_active'          => $this->is_active,
             /*

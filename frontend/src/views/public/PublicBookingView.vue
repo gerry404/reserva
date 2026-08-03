@@ -1,4 +1,5 @@
 <script setup>
+import { iconForService } from '@/constants/serviceIcons'
 import { computed, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { publicApi } from '@/api'
@@ -384,9 +385,9 @@ loadBusiness()
           />
           <span
             v-else
-            class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shrink-0"
+            class="w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0"
             :style="{ backgroundColor: service.color }"
-          >✦</span>
+          ><component :is="iconForService(service)" :size="22" /></span>
 
           <span class="flex-1 min-w-0">
             <span class="flex items-baseline justify-between gap-3">
@@ -435,7 +436,7 @@ loadBusiness()
           <span
             class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
             :style="{ backgroundColor: selected.service?.color }"
-          >✦</span>
+          ><component :is="iconForService(selected.service)" :size="19" /></span>
           <span>
             <span class="block font-semibold text-gray-900 text-sm">{{ selected.service?.name }}</span>
             <span class="block text-xs text-gray-500 numeric-inline">

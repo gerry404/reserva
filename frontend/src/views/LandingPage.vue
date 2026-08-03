@@ -1,4 +1,5 @@
 <script setup>
+import { iconForService } from '@/constants/serviceIcons'
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import FinalCta from '@/components/marketing/FinalCta.vue'
@@ -459,9 +460,9 @@ onUnmounted(() => {
                       'bg-clay-50 rounded-xl p-2.5 flex items-center gap-2.5 border transition-all duration-300 cursor-pointer',
                       mockupSelectedService?.name === svc.name ? 'border-primary-400 shadow-md ring-2 ring-primary-100 scale-[1.02]' : 'border-gray-100 shadow-sm'
                     ]">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs shrink-0"
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0"
                       :style="{ backgroundColor: svc.color }">
-                      ✦
+                      <component :is="iconForService(svc)" :size="15" />
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="text-[11px] font-bold text-gray-900">{{ svc.name }}</p>
@@ -479,8 +480,10 @@ onUnmounted(() => {
               <div v-else-if="mockupStep === 2" key="ms2" class="px-5 pb-5">
                 <p class="text-[11px] font-extrabold text-gray-800 mb-2">Choisissez une date</p>
                 <!-- Selected service pill -->
-                <div class="flex items-center gap-2 p-2 rounded-lg mb-3" style="background-color: #ec489915">
-                  <div class="w-7 h-7 rounded-lg bg-pink-500 flex items-center justify-center text-white text-[10px]">✦</div>
+                <div class="flex items-center gap-2 p-2 rounded-lg mb-3 bg-primary-50">
+                  <div class="w-7 h-7 rounded-lg bg-primary-600 flex items-center justify-center text-white">
+                    <component :is="iconForService({ name: 'Tresses africaines' })" :size="13" />
+                  </div>
                   <div>
                     <p class="text-[10px] font-bold text-gray-900">Tresses africaines</p>
                     <p class="text-[9px] text-gray-400">2h30 · 12 000 F</p>

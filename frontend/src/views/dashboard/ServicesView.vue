@@ -1,4 +1,6 @@
 <script setup>
+import { SERVICE_ICONS, guessIconKey, iconForService } from '@/constants/serviceIcons'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 import { ref, onMounted, onUnmounted, reactive, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { servicesApi } from '@/api'
@@ -51,7 +53,18 @@ function onGalleryKey(e) {
 
 const form = reactive({
   name: '', description: '', duration: 30, price: 0, category: '', color: defaultAccent,
+  icon: null,
 })
+
+/**
+ * L'icône suggérée d'après le nom, tant que le commerçant n'en a pas choisi.
+ *
+ * `form.icon` reste à null jusqu'au premier clic : c'est ce qui distingue
+ * « pas encore décidé » de « a choisi la sonnette ». Le premier suit le nom au
+ * fil de la frappe, le second ne bouge plus.
+ */
+const iconeSuggeree = computed(() => guessIconKey(form.name, form.category))
+const iconeActive = computed(() => form.icon ?? iconeSuggeree.value)
 
 // Images state
 const newImages = ref([])        // File objects to upload
@@ -101,7 +114,7 @@ function resetImageState() {
 
 function openCreate() {
   editing.value = null
-  Object.assign(form, { name: '', description: '', duration: 30, price: 0, category: '', color: defaultAccent })
+  Object.assign(form, { name: '', description: '', duration: 30, price: 0, category: '', color: defaultAccent, icon: null })
   errors.value = {}
   resetImageState()
   modal.value  = true
@@ -112,6 +125,7 @@ function openEdit(svc) {
   Object.assign(form, {
     name: svc.name, description: svc.description ?? '', duration: svc.duration,
     price: svc.price, category: svc.category ?? '', color: svc.color ?? defaultAccent,
+    icon: svc.icon ?? null,
   })
   errors.value = {}
   resetImageState()
@@ -155,6 +169,9 @@ function buildFormData() {
   fd.append('price', form.price)
   fd.append('category', form.category || '')
   fd.append('color', form.color)
+  // Seul un choix explicite part au serveur : sans cela la suggestion serait
+  // figée en base et ne suivrait plus un renommage du service.
+  if (form.icon) fd.append('icon', form.icon)
 
   for (const file of newImages.value) {
     fd.append('images[]', file)
@@ -276,9 +293,9 @@ function formatDuration(min) {
         <div class="p-5 flex flex-col gap-4 flex-1">
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shrink-0"
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
                 :style="{ backgroundColor: svc.color ?? defaultAccent }">
-                ✦
+                <component :is="iconForService(svc)" :size="19" />
               </div>
               <div>
                 <h3 class="font-bold text-gray-900 text-sm">{{ svc.name }}</h3>
@@ -345,9 +362,7 @@ function formatDuration(min) {
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1.5">Durée *</label>
-                <select v-model="form.duration" class="input-field">
-                  <option v-for="d in durations" :key="d.v" :value="d.v">{{ d.l }}</option>
-                </select>
+                <BaseSelect v-model="form.duration" :options="durations" value-key="v" label-key="l" />
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1.5">Prix (F CFA)</label>
@@ -359,6 +374,31 @@ function formatDuration(min) {
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1.5">Catégorie</label>
               <input v-model="form.category" type="text" class="input-field" placeholder="ex: Soin capillaire" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Icône</label>
+              <div class="flex gap-2 flex-wrap">
+                <button
+                  v-for="ic in SERVICE_ICONS"
+                  :key="ic.key"
+                  type="button"
+                  :title="ic.label"
+                  :aria-label="ic.label"
+                  :aria-pressed="iconeActive === ic.key"
+                  @click="form.icon = ic.key"
+                  :class="['w-10 h-10 rounded-control border flex items-center justify-center transition-all',
+                           iconeActive === ic.key
+                             ? 'border-transparent text-white scale-105'
+                             : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-800']"
+                  :style="iconeActive === ic.key ? { backgroundColor: form.color } : null"
+                >
+                  <component :is="ic.component" :size="18" />
+                </button>
+              </div>
+              <p v-if="!form.icon" class="text-xs text-gray-400 mt-2">
+                Suggérée d'après le nom. Cliquez pour en imposer une autre.
+              </p>
             </div>
 
             <div>
