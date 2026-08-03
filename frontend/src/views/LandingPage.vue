@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import FinalCta from '@/components/marketing/FinalCta.vue'
 import HowItWorks from '@/components/marketing/HowItWorks.vue'
+import TradeShowcase from '@/components/marketing/TradeShowcase.vue'
 import { useAuthStore } from '@/stores/auth'
 import {
   ArrowRight,
@@ -126,55 +127,10 @@ const plans = computed(() => [
  * hard numbers ("+60% de réservations", "-80% de no-shows"). None of them
  * existed and none of those figures were measured. Invented social proof is
  * both a legal exposure and the fastest way to lose a merchant's trust the day
- * they look closely — so the section now describes what the product does for a
+ * they look closely, so the section now describes what the product does for a
  * kind of business, and claims nothing on anybody's behalf.
  */
-const useCases = [
-  {
-    trade: 'Salon de coiffure',
-    city: 'Douala',
-    text: "Publiez vos prestations avec leur durée réelle. Une pose de tresses de trois heures bloque trois heures — impossible de vous retrouver avec deux clientes sur le même fauteuil.",
-    icon: '💇',
-    color: 'from-pink-500 to-rose-500',
-  },
-  {
-    trade: 'Barbier',
-    city: 'Yaoundé',
-    text: "Votre lien se partage sur WhatsApp et Instagram. Vos clients réservent la nuit, le dimanche, pendant que vous coupez — vous recevez la demande sur votre téléphone.",
-    icon: '💈',
-    color: 'from-blue-500 to-cyan-500',
-  },
-  {
-    trade: 'Institut de beauté',
-    city: 'Abidjan',
-    text: "Chaque réservation confirmée déclenche un email au client et un rappel la veille, pour réduire les rendez-vous manqués sans passer un seul appel.",
-    icon: '💅',
-    color: 'from-violet-500 to-purple-500',
-  },
-  {
-    trade: 'Spa & massage',
-    city: 'Dakar',
-    text: "Vos horaires d'ouverture, vos délais de réservation et vos jours de fermeture sont respectés automatiquement. Personne ne peut réserver quand vous êtes fermé.",
-    icon: '💆',
-    color: 'from-amber-500 to-orange-500',
-  },
-]
 
-
-// ── Testimonials carousel ──
-const carouselIndex = ref(0)
-const carouselAutoplay = ref(null)
-const trackEl = ref(null)
-const containerWidth = ref(0)
-const visibleCount = computed(() => typeof window !== 'undefined' && window.innerWidth >= 768 ? 3 : 1)
-const maxIndex = computed(() => Math.max(0, useCases.length - visibleCount.value))
-const cardWidth = computed(() => containerWidth.value / visibleCount.value)
-function nextTestimonial() { carouselIndex.value = carouselIndex.value >= maxIndex.value ? 0 : carouselIndex.value + 1 }
-function prevTestimonial() { carouselIndex.value = carouselIndex.value <= 0 ? maxIndex.value : carouselIndex.value - 1 }
-function resetAutoplay() {
-  clearInterval(carouselAutoplay.value)
-  carouselAutoplay.value = setInterval(nextTestimonial, 4000)
-}
 
 // ── Navbar scroll ──
 const scrolled = ref(false)
@@ -289,19 +245,12 @@ function onScroll() {
   navHidden.value = y > 300 && y > lastScrollY.value
   lastScrollY.value = y
 }
-function measureCarousel() {
-  if (trackEl.value) containerWidth.value = trackEl.value.offsetWidth
-}
-
 onMounted(() => {
   startAnimation()
   cursorTimer = setInterval(() => {
     mockupShowCursor.value = !mockupShowCursor.value
   }, 530)
-  resetAutoplay()
   window.addEventListener('scroll', onScroll, { passive: true })
-  window.addEventListener('resize', measureCarousel, { passive: true })
-  setTimeout(measureCarousel, 100)
   nextTick(() => { setTimeout(() => { heroVisible.value = true }, 100) })
 })
 
@@ -309,9 +258,7 @@ onUnmounted(() => {
   clearTimeout(animTimer)
   clearInterval(typeTimer)
   clearInterval(cursorTimer)
-  clearInterval(carouselAutoplay.value)
   window.removeEventListener('scroll', onScroll)
-  window.removeEventListener('resize', measureCarousel)
 })
 </script>
 
@@ -453,7 +400,7 @@ onUnmounted(() => {
           -->
           <p class="text-sm text-gray-500">
             <span class="font-semibold text-gray-700">14 jours d'essai Pro</span>
-            — sans carte bancaire, sans engagement.
+            · sans carte bancaire, sans engagement.
           </p>
         </div>
       </div>
@@ -786,59 +733,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Use cases carousel -->
-    <section class="py-28 px-4 sm:px-6 bg-gray-50 relative overflow-hidden">
-      <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100/30 rounded-full blur-3xl -z-0" />
-      <div class="absolute bottom-0 left-0 w-80 h-80 bg-violet-100/30 rounded-full blur-3xl -z-0" />
-
-      <div class="max-w-6xl mx-auto relative">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14 gap-6">
-          <div>
-            <h2 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-              Pensé pour<br />votre métier
-            </h2>
-          </div>
-          <!-- Carousel controls -->
-          <div class="flex items-center gap-3">
-            <button @click="prevTestimonial(); resetAutoplay()"
-              class="w-11 h-11 rounded-full border-2 border-gray-200 hover:border-primary-500 hover:bg-primary-50 flex items-center justify-center transition-all duration-200 group">
-              <ChevronLeft class="w-5 h-5 text-gray-400 group-hover:text-primary-600" />
-            </button>
-            <button @click="nextTestimonial(); resetAutoplay()"
-              class="w-11 h-11 rounded-full border-2 border-gray-200 hover:border-primary-500 hover:bg-primary-50 flex items-center justify-center transition-all duration-200 group">
-              <ChevronRight class="w-5 h-5 text-gray-400 group-hover:text-primary-600" />
-            </button>
-          </div>
-        </div>
-
-        <!-- Carousel track -->
-        <div ref="trackEl" class="overflow-hidden -mx-3">
-          <div class="flex transition-transform duration-500 ease-out px-3"
-            :style="{ transform: `translateX(-${carouselIndex * cardWidth}px)` }">
-            <div v-for="c in useCases" :key="c.trade"
-              class="flex-shrink-0 w-full md:w-1/3 px-3">
-              <div class="bg-clay-50 rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-black/5 transition-all duration-300 h-full flex flex-col">
-                <div :class="['w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-2xl shadow-lg mb-5', c.color]">
-                  {{ c.icon }}
-                </div>
-                <p class="text-gray-600 leading-relaxed flex-1 mb-7">{{ c.text }}</p>
-                <div class="pt-5 border-t border-gray-100">
-                  <p class="font-bold text-gray-900 text-sm">{{ c.trade }}</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Exemple d'usage · {{ c.city }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dots -->
-        <div class="flex items-center justify-center gap-2 mt-10">
-          <button v-for="i in (maxIndex + 1)" :key="i"
-            @click="carouselIndex = i - 1; resetAutoplay()"
-            :class="['h-2 rounded-full transition-all duration-300', carouselIndex === i - 1 ? 'w-8 bg-primary-500' : 'w-2 bg-gray-300 hover:bg-gray-400']" />
-        </div>
-      </div>
-    </section>
+    <TradeShowcase />
 
     <FinalCta />
 

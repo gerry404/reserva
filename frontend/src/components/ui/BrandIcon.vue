@@ -4,13 +4,13 @@
  *
  * Les jeux d'icônes modernes ont retiré les logos tiers de leur catalogue : ce
  * sont des marques déposées, dont le tracé ne s'harmonise pas et ne se
- * redessine pas. Ils vivent donc ici, dessinés une fois — le tracé WhatsApp
+ * redessine pas. Ils vivent donc ici, dessinés une fois : le tracé WhatsApp
  * était recopié à six endroits, les trois autres à deux chacun.
  *
  * Deux familles cohabitent :
- *   — monochromes (WhatsApp, Facebook, Instagram, X), qui suivent la couleur
+ *   · monochromes (WhatsApp, Facebook, Instagram, X), qui suivent la couleur
  *     du texte et se colorent par `class` comme n'importe quelle icône ;
- *   — Google, dont les quatre couleurs font partie de la marque et que ses
+ *   · Google, dont les quatre couleurs font partie de la marque et que ses
  *     conditions d'usage interdisent de teinter.
  */
 const props = defineProps({

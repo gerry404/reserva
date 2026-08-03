@@ -118,7 +118,7 @@ async function submit() {
 
         <template v-else>
           <p class="text-sm text-gray-500 mt-2 leading-relaxed">
-            Ce lien est incomplet ou a expiré. Demandez-en un nouveau — les liens
+            Ce lien est incomplet ou a expiré. Demandez-en un nouveau : les liens
             de réinitialisation ne restent valables qu'une heure.
           </p>
           <RouterLink :to="{ name: 'forgot-password' }" class="btn-primary w-full py-3 mt-6 inline-block text-center">

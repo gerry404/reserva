@@ -22,7 +22,7 @@ const linkCopied = ref(false)
 const errors     = ref({})
 const saveError  = ref('')
 
-// `window` is not exposed to templates — reading it there threw before the page
+// `window` is not exposed to templates, so reading it there threw before the page
 // could render. Resolve it once, here.
 const origin = window.location.origin
 

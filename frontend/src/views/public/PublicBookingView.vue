@@ -164,7 +164,7 @@ const freeBlocks = computed(() => {
 /**
  * Le complément : tout ce que la journée d'ouverture ne laisse pas libre.
  *
- * Déduit plutôt que demandé au serveur — l'API ne divulgue pas les rendez-vous
+ * Déduit plutôt que demandé au serveur : l'API ne divulgue pas les rendez-vous
  * d'autrui, et elle a raison. Ce qui n'est pas proposé est occupé ou fermé, et
  * dans les deux cas le client n'a rien à y faire.
  */
@@ -318,7 +318,7 @@ loadBusiness()
       Le motif de fond est calculé depuis les horaires réels du commerce : une
       bande par jour ouvert, dont la hauteur est l'amplitude d'ouverture. Deux
       établissements n'ont donc jamais le même en-tête, et le dessin dit quelque
-      chose de vrai — un salon ouvert 6 jours de 8h à 19h ne ressemble pas à un
+      chose de vrai : un salon ouvert 6 jours de 8h à 19h ne ressemble pas à un
       cabinet ouvert 4 jours de 9h à 17h.
 
       Confiné à l'en-tête : le corps de page reste neutre pour que le ruban et
@@ -361,7 +361,7 @@ loadBusiness()
         </template>
       </ol>
 
-      <!-- STEP 1 — service -->
+      <!-- STEP 1 : service -->
       <section v-if="step === STEPS.SERVICE" class="space-y-3">
         <h2 class="text-lg font-black text-gray-900 mb-4">Quel service souhaitez-vous réserver ?</h2>
 
@@ -422,7 +422,7 @@ loadBusiness()
         </button>
       </section>
 
-      <!-- STEP 2 — date -->
+      <!-- STEP 2 : date -->
       <section v-else-if="step === STEPS.DATE" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.SERVICE">
@@ -499,7 +499,7 @@ loadBusiness()
         </div>
       </section>
 
-      <!-- STEP 3 — time -->
+      <!-- STEP 3 : time -->
       <section v-else-if="step === STEPS.TIME" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.DATE">
@@ -543,7 +543,7 @@ loadBusiness()
           <Clock class="w-12 h-12 text-gray-200 mx-auto mb-3" />
           <p class="text-gray-500 font-medium">Aucun créneau disponible</p>
           <p class="text-gray-400 text-sm mt-1">
-            Ce service dure {{ selected.service?.formatted_duration }} — essayez une autre date.
+            Ce service dure {{ selected.service?.formatted_duration }}. Essayez une autre date.
           </p>
           <button type="button" class="btn-secondary mt-4 mx-auto text-sm" @click="step = STEPS.DATE">
             ← Changer de date
@@ -576,7 +576,7 @@ loadBusiness()
         </template>
       </section>
 
-      <!-- STEP 4 — details -->
+      <!-- STEP 4 : details -->
       <section v-else-if="step === STEPS.DETAILS" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.TIME">
@@ -671,7 +671,7 @@ loadBusiness()
         </form>
       </section>
 
-      <!-- STEP 5 — done -->
+      <!-- STEP 5 : done -->
       <section v-else-if="booking" class="text-center py-8 space-y-6">
         <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto">
           <CircleCheck class="w-10 h-10 text-emerald-500" />
@@ -732,8 +732,8 @@ loadBusiness()
  * Interaction states are CSS, not inline mouse handlers.
  *
  * The previous version bound :onmouseover/:onmouseleave on every calendar cell
- * and time button. Those never fire on a touchscreen — which is where nearly
- * every customer opens this page — so the whole grid felt dead on mobile.
+ * and time button. Those never fire on a touchscreen, which is where nearly
+ * every customer opens this page, so the whole grid felt dead on mobile.
  */
 .accent-gradient {
   background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));
@@ -743,7 +743,7 @@ loadBusiness()
 /*
  * Le motif se superpose au dégradé sans toucher au contenu : il vit dans un
  * pseudo-élément, donc le texte conserve exactement le contraste calculé par
- * useAccent. Opacité basse et masque en fondu — une signature se remarque, elle
+ * useAccent. Opacité basse et masque en fondu : une signature se remarque, elle
  * ne se lit pas.
  */
 .signature {
@@ -765,7 +765,7 @@ loadBusiness()
   /*
    * Masque radial plutôt que fondu vertical.
    *
-   * Un fondu de haut en bas effaçait le bas des bandes — précisément là où
+   * Un fondu de haut en bas effaçait le bas des bandes, précisément là où
    * l'amplitude d'ouverture se lit : toutes commencent en haut, seule leur
    * longueur varie. En dégageant le centre, on protège le logo et le nom tout
    * en laissant les bandes entières visibles sur les côtés.

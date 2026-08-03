@@ -71,8 +71,8 @@ const router = createRouter({
 })
 
 /**
- * One guard, three questions: signed in, business configured, and — for the
- * marketing and auth pages — not signed in already.
+ * One guard, three questions: signed in, business configured, and, for the
+ * marketing and auth pages, not signed in already.
  *
  * It awaits auth.init() so a page opened directly by URL is judged on a loaded
  * session rather than on the mere presence of a token in storage.
@@ -84,7 +84,7 @@ router.beforeEach(async (to) => {
    * stores/auth importe ce routeur pour naviguer après connexion, et ce
    * fichier importait le store : un cycle. Selon l'ordre d'évaluation retenu
    * par le bundler, le garde s'exécutait avant que Pinia ne soit installé et
-   * l'application ne montait pas du tout — « getActivePinia() was called but
+   * l'application ne montait pas du tout : « getActivePinia() was called but
    * there was no active Pinia ». L'import différé rompt le cycle et garantit
    * que Pinia est prêt, puisque le garde ne s'exécute qu'à la navigation.
    */
@@ -100,7 +100,7 @@ router.beforeEach(async (to) => {
   }
 
   // A signed-in merchant who has not finished setup gets sent to it, from
-  // anywhere — otherwise every dashboard request comes back 409.
+  // anywhere, otherwise every dashboard request comes back 409.
   if (to.meta.requiresBusiness && auth.needsSetup) {
     return { name: 'onboarding' }
   }
@@ -109,7 +109,7 @@ router.beforeEach(async (to) => {
     return { name: 'dashboard' }
   }
 
-  // The landing page stays readable while signed in — it is the marketing site.
+  // The landing page stays readable while signed in: it is the marketing site.
   if (to.meta.guestOnly && auth.isAuthenticated && to.name !== 'landing') {
     return { name: 'dashboard' }
   }

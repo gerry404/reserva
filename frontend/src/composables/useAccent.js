@@ -23,18 +23,18 @@ function luminance(hex) {
  *
  * Merchants pick the colour, and some of them pick amber. White text on amber
  * is unreadable, so the foreground is computed from the accent's luminance
- * rather than assumed to be white — the contrast threshold below is where
+ * rather than assumed to be white. The contrast threshold below is where
  * black overtakes white against a mid-tone.
  *
  * Returns CSS custom properties to bind on a container, so hover and focus can
- * be plain CSS instead of inline mouse handlers — which never fired on touch
+ * be plain CSS instead of inline mouse handlers, which never fired on touch
  * devices, i.e. on almost every real visitor.
  */
 export function useAccent(source) {
   const accent = computed(() => {
     // unref ne déballe pas une fonction, seulement une ref. Appelé avec
-    // « () => business.value?.accent_color » — la forme idiomatique pour
-    // rester réactif sur une valeur asynchrone — il renvoyait la fonction
+    // « () => business.value?.accent_color » (la forme idiomatique pour
+    // rester réactif sur une valeur asynchrone) il renvoyait la fonction
     // elle-même, qui échouait au test et retombait sur la couleur par défaut.
     // La teinte choisie par le commerçant n'était donc jamais appliquée.
     const value = typeof source === 'function' ? source() : unref(source)

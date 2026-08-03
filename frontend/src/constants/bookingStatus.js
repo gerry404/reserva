@@ -1,13 +1,13 @@
 import { semantic } from '@/design/tokens'
 
 /**
- * Les statuts de réservation — la source unique.
+ * Les statuts de réservation : la source unique.
  * ─────────────────────────────────────────────────────────────────────────
  *
  * Ce vocabulaire était défini quatre fois : DashboardView (en trois objets
  * séparés), BookingsView, TrackBookingView et BillingView. Ajouter le statut
  * `no_show` a donc demandé d'éditer plusieurs fichiers, et il en manquait
- * encore dans les filtres — exactement le genre d'oubli que la duplication
+ * encore dans les filtres, exactement le genre d'oubli que la duplication
  * garantit.
  *
  * Toute vue qui affiche un statut lit désormais ici. Ajouter un statut
@@ -27,7 +27,7 @@ export const BookingStatus = {
 /**
  * @typedef {object} StatusDescriptor
  * @property {string} label     libellé côté commerçant
- * @property {string} customer  libellé côté client — au féminin, « votre
+ * @property {string} customer  libellé côté client, au féminin, « votre
  *                              réservation », et plus explicite : le client a
  *                              besoin de savoir ce qu'il attend
  * @property {string} short     variante compacte, pour les filtres et puces
@@ -89,16 +89,16 @@ export const STATUSES = {
 /**
  * Descripteur d'un statut, avec repli sûr.
  *
- * Un statut inconnu — ajouté côté serveur avant de l'être ici — s'affiche
+ * Un statut inconnu (ajouté côté serveur avant de l'être ici) s'affiche
  * lisiblement plutôt que de laisser passer un `snake_case` brut dans
  * l'interface, ce qui est exactement ce qui s'était produit avec `no_show`.
  */
 export function describeStatus(status) {
   return (
     STATUSES[status] ?? {
-      customer: String(status ?? '—'),
-      label: String(status ?? '—'),
-      short: String(status ?? '—'),
+      customer: String(status ?? 'Inconnu'),
+      label: String(status ?? 'Inconnu'),
+      short: String(status ?? '?'),
       icon: '•',
       tone: semantic.noShow,
       chart: semantic.noShow.solid,

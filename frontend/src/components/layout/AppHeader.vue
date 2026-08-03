@@ -78,7 +78,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
         class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-full transition-colors"
       >
         <Sparkles class="w-3.5 h-3.5" />
-        Essai Pro — {{ auth.trialDaysLeft }} j
+        Essai Pro · {{ auth.trialDaysLeft }} j
       </RouterLink>
       <RouterLink
         v-else-if="!auth.isPro"

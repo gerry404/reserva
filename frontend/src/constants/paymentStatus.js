@@ -1,7 +1,7 @@
 import { semantic } from '@/design/tokens'
 
 /**
- * Les statuts de paiement — source unique.
+ * Les statuts de paiement : source unique.
  *
  * Domaine distinct de celui des réservations : un paiement et un rendez-vous
  * ne partagent ni leur vocabulaire ni leur cycle de vie. Les mélanger dans une
@@ -43,7 +43,7 @@ export const PAYMENT_STATUSES = {
 export function describePayment(status) {
   return (
     PAYMENT_STATUSES[status] ?? {
-      label: String(status ?? '—'),
+      label: String(status ?? 'Inconnu'),
       tone: semantic.noShow,
     }
   )

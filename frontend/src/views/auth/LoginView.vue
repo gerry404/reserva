@@ -113,7 +113,7 @@ onMounted(() => {
         <!--
           Ici s'affichaient « +500 commerces actifs » et « 98 % de satisfaction ».
           Aucun des deux n'était mesuré. Remplacés par ce que le produit fait
-          réellement — vérifiable, et au moins aussi convaincant pour quelqu'un
+          réellement : vérifiable, et au moins aussi convaincant pour quelqu'un
           qui est déjà en train de se connecter.
         -->
         <div class="grid grid-cols-2 gap-4">

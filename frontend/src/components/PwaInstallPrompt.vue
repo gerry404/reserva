@@ -23,7 +23,7 @@ function shouldShow() {
 function handleBeforeInstall(e) {
   e.preventDefault()
   deferredPrompt = e
-  // Délai de 4 secondes avant d'afficher — laisse l'app se charger
+  // Délai de 4 secondes avant d'afficher, laisse l'app se charger
   setTimeout(() => {
     if (!installed.value && shouldShow()) {
       visible.value = true
@@ -63,7 +63,7 @@ onMounted(() => {
 
   if (isInStandalone.value) return
 
-  // iOS (Safari) — pas de beforeinstallprompt, guide manuel
+  // iOS (Safari) : pas de beforeinstallprompt, guide manuel
   const ua = window.navigator.userAgent
   isIos.value = /iphone|ipad|ipod/i.test(ua) && !/(chrome|crios|fxios)/i.test(ua)
 

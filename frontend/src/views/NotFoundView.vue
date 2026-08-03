@@ -2,8 +2,8 @@
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-// Silently redirecting every unknown URL to the homepage — the previous
-// behaviour — hides typos in a shared booking link, which is exactly the case
+// Silently redirecting every unknown URL to the homepage (the previous
+// behaviour) hides typos in a shared booking link, which is exactly the case
 // where the visitor needs to know something went wrong.
 const auth = useAuthStore()
 </script>

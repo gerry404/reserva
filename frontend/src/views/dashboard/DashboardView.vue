@@ -92,7 +92,7 @@ async function loadDashboard() {
   try {
     // allSettled, not all: analytics is Pro-only and answers 402 on a free
     // plan. With Promise.all that single rejection blanked the whole dashboard
-    // — the free tier saw an error page instead of their bookings.
+    // the free tier saw an error page instead of their bookings.
     const [statsResult, upcomingResult, chartResult, analyticsResult] = await Promise.allSettled([
       dashboardApi.stats(),
       dashboardApi.upcoming(),
@@ -479,7 +479,7 @@ const greeting = computed(() => {
                 />
               </div>
               <p v-if="quotaIsTight" class="text-xs text-amber-600 mt-1.5 font-medium">
-                ⚠ Bientôt à la limite — au-delà, vos clients ne pourront plus réserver ce mois-ci.
+                ⚠ Bientôt à la limite : au-delà, vos clients ne pourront plus réserver ce mois-ci.
               </p>
             </div>
             <RouterLink to="/dashboard/billing" class="btn-primary text-xs px-4 py-2 whitespace-nowrap shrink-0">

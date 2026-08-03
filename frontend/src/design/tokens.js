@@ -1,5 +1,5 @@
 /**
- * Les jetons de design — la source unique de la palette.
+ * Les jetons de design : la source unique de la palette.
  * ─────────────────────────────────────────────────────────────────────────
  *
  * CE FICHIER EST LE SEUL ENDROIT OÙ UNE COULEUR EST DÉFINIE.
@@ -17,11 +17,11 @@
  * vient de la base de données et transite par useAccent().
  *
  * Les contrastes annotés ci-dessous sont mesurés, pas estimés. Toute
- * modification doit être revalidée — voir scripts/check-contrast.mjs.
+ * modification doit être revalidée, voir scripts/check-contrast.mjs.
  */
 
 /**
- * Forêt — l'action et la confirmation.
+ * Forêt : l'action et la confirmation.
  *
  * C'est le « oui, c'est réservé » du produit : boutons, liens, états confirmés,
  * éléments actifs de la navigation.
@@ -33,7 +33,7 @@ export const forest = {
   300: '#74BC9B',
   400: '#419C76',
   500: '#1F7D57',
-  600: '#14603C', // action par défaut — 6,2:1 sur le fond de page
+  600: '#14603C', // action par défaut, 6,2:1 sur le fond de page
   700: '#114D31',
   800: '#0E3E28',
   900: '#0B3120',
@@ -41,7 +41,7 @@ export const forest = {
 }
 
 /**
- * Argile — les surfaces et le texte.
+ * Argile : les surfaces et le texte.
  *
  * Remplace le blanc et les gris. Le blanc ne dit rien et fatigue l'œil en
  * plein soleil, cas courant chez les utilisateurs de ce produit.
@@ -56,17 +56,17 @@ export const clay = {
   100: '#F0E8DA', // fond de page
   200: '#E2D6C4', // bordures et séparateurs
   300: '#CBBBA2',
-  400: '#836F52', // texte discret — 4,2:1 sur le fond de page
+  400: '#836F52', // texte discret, 4,2:1 sur le fond de page
   500: '#7E6A4E',
-  600: '#665640', // texte secondaire — 5,1:1
+  600: '#665640', // texte secondaire, 5,1:1
   700: '#4F4333',
   800: '#3A3128',
   900: '#2A241E',
-  950: '#1F1B16', // texte principal — 14,1:1
+  950: '#1F1B16', // texte principal, 14,1:1
 }
 
 /**
- * Couleurs de sens — elles disent un état, jamais une décoration.
+ * Couleurs de sens : elles disent un état, jamais une décoration.
  *
  * Chacune existe en teinte de fond, de bordure et de texte, pour que les
  * badges et les alertes se composent sans inventer de nuance au cas par cas.
@@ -77,11 +77,11 @@ export const semantic = {
   pending: { bg: '#FEF6E7', border: '#F7DCA8', text: '#8A5A08', solid: '#C2820C' },
 
   /**
-   * Confirmé — dérivé de l'échelle forêt, pas recopié.
+   * Confirmé, dérivé de l'échelle forêt, pas recopié.
    *
    * C'est le même geste que l'action : changer le vert du produit doit changer
    * la pastille « Confirmé ». Écrites en dur, ces valeurs restaient figées
-   * pendant que le reste basculait — la duplication que ce fichier existe pour
+   * pendant que le reste basculait, la duplication que ce fichier existe pour
    * supprimer, à l'intérieur de ce fichier.
    */
   confirmed: { bg: forest[50], border: forest[200], text: forest[800], solid: forest[600] },
@@ -89,10 +89,10 @@ export const semantic = {
   /** Annulé. Rouge propre, hors échelles. */
   cancelled: { bg: '#FDF0EE', border: '#F5C4BC', text: '#8C2A18', solid: '#BE3A22' },
 
-  /** Terminé — froid et neutre : c'est du passé, pas une alerte. */
+  /** Terminé, froid et neutre : c'est du passé, pas une alerte. */
   completed: { bg: '#EEF3F8', border: '#C3D5E6', text: '#1F4260', solid: '#2E6394' },
 
-  /** Non présenté — dérivé de l'argile, sans dramatisation. */
+  /** Non présenté, dérivé de l'argile, sans dramatisation. */
   noShow: { bg: clay[100], border: clay[300], text: clay[700], solid: clay[500] },
 }
 
@@ -130,7 +130,7 @@ export const swatches = [
 /** Couleur d'un commerce ou d'un service tant qu'il n'en a pas choisi. */
 export const defaultAccent = forest[600]
 
-/** Couleurs imposées de l'extérieur — jamais choisies, jamais modifiables. */
+/** Couleurs imposées de l'extérieur : jamais choisies, jamais modifiables. */
 export const external = {
   whatsapp: '#25D366',
   whatsappHover: '#1FB855',
@@ -140,8 +140,8 @@ export const external = {
  * L'échelle `gray` de Tailwind est remappée sur l'argile.
  *
  * Les templates portent des centaines de classes text-gray-*, bg-gray-* et
- * border-gray-*. Plutôt que de les réécrire — un diff illisible pour un
- * résultat identique — le remappage les teinte toutes d'un coup, et reste
+ * border-gray-*. Plutôt que de les réécrire (un diff illisible pour un
+ * résultat identique) le remappage les teinte toutes d'un coup, et reste
  * réversible.
  */
 export const colors = {
@@ -153,7 +153,7 @@ export const colors = {
   /*
    * violet, purple et indigo pointent aussi sur l'échelle forêt.
    *
-   * L'ancienne identité les employait dans près de quatre-vingts dégradés —
+   * L'ancienne identité les employait dans près de quatre-vingts dégradés,
    * from-primary-600 to-violet-600 et ses variantes. Les réécrire un par un
    * aurait laissé passer des oublis ; les rediriger garantit qu'aucun violet
    * ne peut subsister, y compris dans une classe ajoutée par distraction.
@@ -169,7 +169,7 @@ export const colors = {
 /**
  * Rayons d'angle.
  *
- * `control` couvre tout ce sur quoi on clique — bouton, lien d'action, onglet,
+ * `control` couvre tout ce sur quoi on clique : bouton, lien d'action, onglet,
  * créneau réservable. Le rayon y était recopié une trentaine de fois en classe
  * utilitaire et en CSS scoped, avec quatre valeurs différentes selon l'écran ;
  * il vit désormais ici, et une seule ligne le change partout.
@@ -186,8 +186,8 @@ export const radii = {
  * Les jetons sous forme de déclarations CSS, posées sur :root.
  *
  * Consommé par le plugin déclaré dans tailwind.config.js. Ce qui n'est pas
- * exprimable en classe utilitaire — un dégradé, une teinte lue par color-mix,
- * la couleur d'un bloc du ruban — lit ces variables plutôt que de recopier une
+ * exprimable en classe utilitaire (un dégradé, une teinte lue par color-mix,
+ * la couleur d'un bloc du ruban) lit ces variables plutôt que de recopier une
  * valeur. Le fichier reste la source unique quelle que soit la manière dont la
  * couleur est consommée.
  */

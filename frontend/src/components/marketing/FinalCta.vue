@@ -11,11 +11,11 @@ import { ArrowRight } from 'lucide-vue-next'
  * Le temps court à l'horizontale, comme dans le ruban de la page de
  * réservation et comme dans les barres de durée : une prestation longue est
  * un bloc long. En colonnes, les blocs devenaient des carrés et se lisaient
- * comme des cartes — la durée ne se voyait plus, et le langage du produit
+ * comme des cartes : la durée ne se voyait plus, et le langage du produit
  * était contredit à l'endroit même où il devrait convaincre.
  *
  * Les positions sont fixes plutôt que tirées au sort : un tirage donnerait un
- * agenda différent — parfois incohérent — à chaque visite, là où ce dessin
+ * agenda différent (parfois incohérent) à chaque visite, là où ce dessin
  * ressemble à une vraie semaine, avec des matinées denses, un creux à midi et
  * un dimanche fermé.
  */
@@ -54,8 +54,8 @@ const ctaWeek = (() => {
       Refonte complète. L'ancienne version cumulait ce que les pages qui
       convertissent évitent : deux boutons qui se disputent l'attention, une
       accroche interchangeable (« passer au niveau supérieur » ne veut rien
-      dire), et une décoration abondante — trois polygones en rotation, deux
-      halos, une trame hexagonale — sans rapport avec le produit.
+      dire), et une décoration abondante (trois polygones en rotation, deux
+      halos, une trame hexagonale) sans rapport avec le produit.
 
       Trois partis pris :
 
@@ -77,7 +77,7 @@ const ctaWeek = (() => {
           La semaine du commerce, qui se remplit.
 
           Les créneaux apparaissent en cascade, décalés par un délai calculé
-          depuis leur position — l'effet est celui d'un agenda qui prend, pas
+          depuis leur position : l'effet est celui d'un agenda qui prend, pas
           d'une animation décorative. Purement CSS : rien à charger, rien à
           exécuter en JavaScript sur un téléphone d'entrée de gamme.
         -->
@@ -306,7 +306,7 @@ const ctaWeek = (() => {
  *
  * Deux boutons de même poids se disputaient l'attention ; une page qui ne
  * propose qu'une action convertit nettement mieux. Le contact reste accessible
- * — il cesse simplement de concurrencer l'inscription.
+ * il cesse simplement de concurrencer l'inscription.
  */
 .cta__secondary {
   margin: 34px 0 0;

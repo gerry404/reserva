@@ -6,7 +6,7 @@ import { Link2, UserRound, BellRing } from 'lucide-vue-next'
  *
  * L'ancienne version posait deux SVG figés en haut et en bas de la section :
  * une courbe unique, immobile, remplie d'une couleur écrite en dur qui ne
- * correspondait même plus au fond depuis le changement de palette — un liseré
+ * correspondait même plus au fond depuis le changement de palette : un liseré
  * noir apparaissait sur les bords.
  *
  * Ici la vague est faite de trois couches qui dérivent à des vitesses
@@ -29,7 +29,7 @@ const steps = [
   {
     n: '02',
     title: 'Partagez votre lien',
-    desc: 'Vous recevez une adresse unique — nuvo.app/mon-salon. Partagez-la sur WhatsApp, Instagram ou Facebook.',
+    desc: 'Vous recevez une adresse unique : nuvo.app/mon-salon. Partagez-la sur WhatsApp, Instagram ou Facebook.',
     icon: Link2,
   },
   {
@@ -59,7 +59,7 @@ const steps = [
     <section class="hiw__body">
       <!--
         Le fond hérite du motif de rythme employé sur les pages publiques :
-        une trame de blocs de temps, très effacée. Rien d'abstrait — c'est
+        une trame de blocs de temps, très effacée. Rien d'abstrait : c'est
         toujours la même idée qui circule d'un bout à l'autre du produit.
       -->
       <div class="hiw__texture" aria-hidden="true" />
@@ -171,7 +171,7 @@ const steps = [
  * Elle est portée par la transformation, pas par le tracé : une pente écrite
  * dans le chemin s'accumulerait d'une copie à l'autre et la boucle
  * deviendrait visible. Elle n'est pas non plus déclarée en propriété `rotate`
- * séparée — celle-ci s'applique après la translation, si bien que la vague
+ * séparée, celle-ci s'applique après la translation, si bien que la vague
  * dériverait en diagonale au lieu de glisser le long de sa propre crête.
  *
  * L'ordre compte : la translation agit dans le repère du calque, puis
@@ -339,7 +339,7 @@ const steps = [
 }
 
 /*
- * Sans mouvement, les vagues se figent — elles gardent tout leur relief, seul
+ * Sans mouvement, les vagues se figent, elles gardent tout leur relief, seul
  * le glissement disparaît.
  */
 @media (prefers-reduced-motion: reduce) {

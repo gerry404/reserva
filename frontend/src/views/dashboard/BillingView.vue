@@ -105,7 +105,7 @@ onMounted(async () => {
 
   // Returning from Flutterwave. Keyed on tx_ref alone: the gateway appends its
   // own `status` to the redirect URL, so the previous check against
-  // `status === 'callback'` saw an array and never fired — the customer paid
+  // `status === 'callback'` saw an array and never fired, and the customer paid
   // and nothing happened.
   if (typeof route.query.tx_ref === 'string') {
     verifyPayment(route.query.tx_ref)
@@ -205,7 +205,7 @@ async function verifyPayment(txRef) {
                   Plan {{ subscription?.plan_label }}
                 </h3>
                 <p :class="['text-sm', subscription?.plan === 'free' ? 'text-gray-500' : 'text-white/70']">
-                  <template v-if="subscription?.plan === 'free'">30 réservations / mois — Passez à Pro pour déverrouiller tout</template>
+                  <template v-if="subscription?.plan === 'free'">30 réservations / mois. Passez à Pro pour déverrouiller tout</template>
                   <template v-else-if="subscription?.plan_expires_at">Actif jusqu'au {{ formatDate(subscription.plan_expires_at) }}</template>
                   <template v-else>Abonnement actif</template>
                 </p>
@@ -354,7 +354,7 @@ async function verifyPayment(txRef) {
               aria-hidden="true"
             />
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-gray-900">{{ p.plan }} — {{ p.billing_cycle }}</p>
+              <p class="text-sm font-semibold text-gray-900">{{ p.plan }} · {{ p.billing_cycle }}</p>
               <p class="text-xs text-gray-400">{{ formatDate(p.created_at) }}{{ p.payment_method ? ' · ' + p.payment_method : '' }}</p>
             </div>
             <span class="text-sm font-bold text-gray-900 numeric">{{ p.formatted_amount }}</span>

@@ -5,13 +5,13 @@ import { computed } from 'vue'
  * L'initiale d'une personne ou d'un commerce.
  *
  * Cinq implémentations coexistaient, chacune avec sa taille, son dégradé et sa
- * gestion — ou son absence de gestion — des noms vides.
+ * gestion, ou son absence de gestion, des noms vides.
  */
 const props = defineProps({
   name: { type: String, default: '' },
   /** Photo, si elle existe : elle prime toujours sur l'initiale. */
   src: { type: String, default: null },
-  /** Teinte imposée — celle d'un service, par exemple. */
+  /** Teinte imposée : celle d'un service, par exemple. */
   color: { type: String, default: null },
   size: { type: String, default: 'md' },
 })
@@ -22,8 +22,8 @@ const fontSizes = { xs: '11px', sm: '13px', md: '15px', lg: '17px', xl: '30px' }
 /**
  * L'initiale.
  *
- * `trim` d'abord : un nom saisi avec une espace initiale — cas courant sur un
- * clavier tactile — produisait une pastille vide.
+ * `trim` d'abord : un nom saisi avec une espace initiale (cas courant sur un
+ * clavier tactile) produisait une pastille vide.
  */
 const initial = computed(() => {
   const clean = String(props.name ?? '').trim()
