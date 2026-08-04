@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
  *
  * Every provider here is optional. A merchant on the free plan with no gateway
  * configured still gets their booking by email and in the dashboard, so an
- * unconfigured or failing provider is logged and shrugged off — never thrown.
+ * unconfigured or failing provider is logged and shrugged off, never thrown.
  * The caller is a queued job whose only other job is not to lose the booking.
  */
 class MessagingService

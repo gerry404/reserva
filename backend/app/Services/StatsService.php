@@ -216,7 +216,7 @@ class StatsService
     }
 
     /**
-     * One query for the whole range, bucketed by Y-m in PHP — the previous
+     * One query for the whole range, bucketed by Y-m in PHP; the previous
      * version fired a COUNT per month inside a loop.
      */
     private function monthlySeries(Business $business, Carbon $now, int $months): array
@@ -290,7 +290,7 @@ class StatsService
             ->all();
     }
 
-    /** Monday first, Sunday last — how a merchant reads a week. */
+    /** Monday first, Sunday last: how a merchant reads a week. */
     private function peakDays(Business $business): array
     {
         $counts = $this->scope($business)

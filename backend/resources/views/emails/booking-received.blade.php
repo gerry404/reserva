@@ -24,7 +24,7 @@
                             <p style="margin:0 0 20px;color:#374151;font-size:15px;line-height:1.5;">
                                 Bonjour <strong>{{ $booking->customer_name }}</strong>,<br>
                                 Nous avons transmis votre demande à <strong>{{ $business->name }}</strong>.
-                                Elle sera confirmée sous peu — vous recevrez un second email à ce moment-là.
+                                Elle sera confirmée sous peu, et vous recevrez un second email à ce moment-là.
                             </p>
 
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#eef2ff;border-radius:12px;border:1px solid #c7d2fe;margin-bottom:24px;">
@@ -33,7 +33,7 @@
                                         <table width="100%" cellpadding="0" cellspacing="0">
                                             <tr>
                                                 <td style="padding:6px 0;color:#6b7280;font-size:13px;width:110px;">Service</td>
-                                                <td style="padding:6px 0;color:#111827;font-size:14px;font-weight:600;">{{ $booking->service->name ?? '—' }}</td>
+                                                <td style="padding:6px 0;color:#111827;font-size:14px;font-weight:600;">{{ $booking->service->name ?? 'Service supprimé' }}</td>
                                             </tr>
                                             <tr>
                                                 <td style="padding:6px 0;color:#6b7280;font-size:13px;">Date</td>

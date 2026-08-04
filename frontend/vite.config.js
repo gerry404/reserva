@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from 'node:url'
 /**
  * Substitutes __SITE_URL__ in index.html.
  *
- * Open Graph images must be absolute — WhatsApp and Facebook do not resolve
+ * Open Graph images must be absolute: WhatsApp and Facebook do not resolve
  * relative paths, and a blank preview on WhatsApp is a real cost for a product
  * whose links are shared there. Falls back to a sane origin so an unset env var
  * leaves a working URL rather than a literal placeholder in the markup.
@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
 
       // Manifest de l'application
       manifest: {
-        name: 'Nuvo — Réservations en ligne',
+        name: 'Nuvo · Réservations en ligne',
         short_name: 'Nuvo',
         description: 'Gérez vos réservations sans stress. Notifications WhatsApp, calendrier et tableau de bord pour commerçants et entreprises.',
         theme_color: '#14603C',
@@ -99,7 +99,7 @@ export default defineConfig(({ mode }) => {
         skipWaiting: true,
         clientsClaim: true,
         runtimeCaching: [
-          // Google Fonts — cache 1 an
+          // Google Fonts : cache 1 an
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -116,7 +116,7 @@ export default defineConfig(({ mode }) => {
               expiration: { maxEntries: 20, maxAgeSeconds: 365 * 24 * 60 * 60 },
             },
           },
-          // API — Network First (données fraîches), fallback cache 5 min
+          // API : Network First (données fraîches), fallback cache 5 min
           {
             urlPattern: /\/api\/(dashboard|bookings|services|business).*/i,
             handler: 'NetworkFirst',
@@ -127,7 +127,7 @@ export default defineConfig(({ mode }) => {
               cacheableResponse: { statuses: [0, 200] },
             },
           },
-          // Page publique de réservation — Network First
+          // Page publique de réservation : Network First
           {
             urlPattern: /\/api\/b\/.*/i,
             handler: 'NetworkFirst',
@@ -138,7 +138,7 @@ export default defineConfig(({ mode }) => {
               cacheableResponse: { statuses: [0, 200] },
             },
           },
-          // Images/storage — Cache First
+          // Images/storage : Cache First
           {
             urlPattern: /\/storage\/.*/i,
             handler: 'CacheFirst',

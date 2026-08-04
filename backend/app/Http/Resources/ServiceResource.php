@@ -28,7 +28,7 @@ class ServiceResource extends JsonResource
             /*
              * Both halves, deliberately.
              *
-             * `url` is what an <img> needs and only the server can build it —
+             * `url` is what an <img> needs and only the server can build it,
              * it depends on whether uploads sit on a local disk or in a bucket.
              * `path` is the identifier the edit form sends back in
              * `existing_images` to say which pictures to keep. Returning URLs

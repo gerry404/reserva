@@ -71,7 +71,7 @@ class AvailabilityTest extends TestCase
             $this->assertNotContains($taken, $slots, "{$taken} overlaps a 3h booking and must not be offered");
         }
 
-        // The slot the booking ends on is free again — intervals are half-open.
+        // The slot the booking ends on is free again: intervals are half-open.
         $this->assertContains('13:00', $slots);
 
         // And nothing earlier fits: a three-hour service starting anywhere from

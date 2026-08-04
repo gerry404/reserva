@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 /**
  * The single source of truth for "can this be booked?".
  *
- * Every rule about opening hours, lead time and collisions lives here — the
+ * Every rule about opening hours, lead time and collisions lives here: the
  * controllers only ask questions. A slot is offered only when all four hold:
  *
  *   1. the business is open that weekday;
@@ -68,17 +68,17 @@ class AvailabilityService
             $end   = $start->copy()->addMinutes($duration);
             $cursor->addMinutes($step);
 
-            // Rule 2 — the service must finish before the shutters come down.
+            // Rule 2: the service must finish before the shutters come down.
             if ($end->greaterThan($closesAt)) {
                 continue;
             }
 
-            // Rule 3 — respect the merchant's lead time.
+            // Rule 3: respect the merchant's lead time.
             if ($start->lessThan($earliestStart)) {
                 continue;
             }
 
-            // Rule 4 — no collision with anything already on the books.
+            // Rule 4: no collision with anything already on the books.
             if ($this->collides($start, $end, $taken)) {
                 continue;
             }
@@ -91,7 +91,7 @@ class AvailabilityService
 
     /**
      * Whether one precise start is bookable. Same rules as slotsFor(), asked
-     * about a single candidate — used to re-check at submission time.
+     * about a single candidate, used to re-check at submission time.
      */
     public function isBookable(Business $business, Service $service, string $date, string $time): bool
     {
@@ -209,7 +209,7 @@ class AvailabilityService
      * but Eloquent hands them back tagged with the app timezone. Comparing those
      * directly against slots built in the business timezone would silently shift
      * every business outside Africa/Douala by its UTC offset, so we re-anchor the
-     * wall time into the business timezone here — one place, once.
+     * wall time into the business timezone here: one place, once.
      *
      * The window is widened by a day on each side so a booking that started late
      * the previous evening and runs past midnight is still seen.

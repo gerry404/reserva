@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
  * Everything that talks to Flutterwave, in one place.
  *
  * Isolating the HTTP calls keeps SubscriptionService free of transport concerns
- * and makes the gateway trivially fakeable in tests — which matters, because
+ * and makes the gateway trivially fakeable in tests, which matters, because
  * these are the code paths where money and entitlements meet.
  */
 class FlutterwaveGateway
@@ -51,7 +51,7 @@ class FlutterwaveGateway
             ],
             'customizations' => [
                 'title'       => 'Nuvo ' . Payment::labelFor($payment->plan),
-                'description' => 'Abonnement ' . Payment::labelFor($payment->plan) . ' — ' . $payment->cycleLabel(),
+                'description' => 'Abonnement ' . Payment::labelFor($payment->plan) . ' · ' . $payment->cycleLabel(),
                 'logo'        => config('app.frontend_url') . '/icons/icon-192.png',
             ],
             'payment_options' => self::PAYMENT_OPTIONS,

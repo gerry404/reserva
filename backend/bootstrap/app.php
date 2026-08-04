@@ -25,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         /*
          * Caddy terminates TLS and forwards to this container over the Docker
-         * network. Without trusting it, every client looks like the proxy —
+         * network. Without trusting it, every client looks like the proxy,
          * which breaks HTTPS URL generation and collapses per-IP rate limiting
          * into a single shared bucket.
          *
@@ -52,7 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         /*
          * This is a pure JSON API: every failure leaves through here with a
-         * shape the SPA can rely on — a `message` it can show a merchant, and
+         * shape the SPA can rely on: a `message` it can show a merchant, and
          * `errors` when the problem is per-field.
          */
 

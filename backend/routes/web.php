@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 | the same origin, so anything that is not /api or /storage is handled by the
 | SPA and never reaches PHP.
 |
-| /up is registered by bootstrap/app.php (`health: '/up'`) — it is what the
+| /up is registered by bootstrap/app.php (`health: '/up'`), and it is what the
 | container healthcheck and the deploy script poll, and redefining it here
 | would shadow Laravel's own implementation.
 |

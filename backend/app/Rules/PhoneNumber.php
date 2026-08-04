@@ -8,8 +8,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 /**
  * A phone number we can actually reach.
  *
- * Everything downstream — the wa.me deep link the merchant taps, the Twilio
- * call, the SMS — needs digits in international form. Accepting "appelez-moi"
+ * Everything downstream (the wa.me deep link the merchant taps, the Twilio
+ * call, the SMS) needs digits in international form. Accepting "appelez-moi"
  * as a 20-character string produced dead links and unreachable customers, so
  * the shape is enforced at the edge.
  *
@@ -65,7 +65,7 @@ class PhoneNumber implements ValidationRule
      * tomorrow, so exact string equality would lock customers out of their own
      * booking. Comparing the last {@see SIGNIFICANT_DIGITS} digits absorbs the
      * country code and trunk prefix while still being far too specific to
-     * guess — and it is never the only credential: a reference is required too.
+     * guess, and it is never the only credential: a reference is required too.
      */
     public static function matches(?string $a, ?string $b): bool
     {

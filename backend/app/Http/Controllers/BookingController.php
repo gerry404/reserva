@@ -115,7 +115,7 @@ class BookingController extends Controller
         $payload = ['booking' => new BookingResource($booking)];
 
         if ($validated['status'] === Booking::STATUS_CONFIRMED) {
-            // Only on the transition into confirmed — re-saving a confirmed
+            // Only on the transition into confirmed; re-saving a confirmed
             // booking must not email the customer a second time.
             if (! $wasConfirmed) {
                 $this->emailCustomer($booking);

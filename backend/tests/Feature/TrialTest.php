@@ -10,9 +10,9 @@ use Tests\TestCase;
 /**
  * Ce qui compte comme un essai.
  *
- * Le libellé « Essai Pro — N j » de l'en-tête se lit directement de là. Sans la
- * borne sur la durée, un compte Pro offert pour un an — démonstration,
- * partenariat — affichait « Essai Pro — 365 j », ce qui est faux et laisse
+ * Le libellé « Essai Pro · N j » de l'en-tête se lit directement de là. Sans la
+ * borne sur la durée, un compte Pro offert pour un an (démonstration,
+ * partenariat) affichait « Essai Pro · 365 j », ce qui est faux et laisse
  * croire à une échéance imminente.
  */
 class TrialTest extends TestCase

@@ -38,7 +38,7 @@ class PublicBookingController extends Controller
         $business = $this->resolveBusiness($slug)->load('services');
 
         // Prices are rendered in the business currency, so each service needs
-        // its parent. We already hold it — handing it back beats one query per
+        // its parent. We already hold it, and handing it back beats one query per
         // service, and beats eager-loading the same row N times.
         $business->services->each->setRelation('business', $business);
 

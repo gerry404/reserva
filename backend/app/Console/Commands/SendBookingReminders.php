@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 /**
  * Remind customers about tomorrow's appointments.
  *
- * Reminders used to go out by email only — on a product whose customers give a
+ * Reminders used to go out by email only, on a product whose customers give a
  * phone number and leave the optional email blank, so most of them reached
  * nobody. WhatsApp is the primary channel now, with email as a supplement.
  *
@@ -66,7 +66,7 @@ class SendBookingReminders extends Command
 
     /**
      * Candidates: confirmed, not yet reminded, starting within the next two
-     * days. The window is deliberately wide — the exact, timezone-aware
+     * days. The window is deliberately wide: the exact, timezone-aware
      * "tomorrow" test happens per booking.
      */
     private function dueTomorrow()

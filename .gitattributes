@@ -7,7 +7,7 @@
 
 * text=auto eol=lf
 
-# Executed on Linux — LF is not a preference here, it is a requirement.
+# Executed on Linux: LF is not a preference here, it is a requirement.
 *.sh              text eol=lf
 Dockerfile        text eol=lf
 *.Dockerfile      text eol=lf
@@ -33,6 +33,6 @@ docker-entrypoint.sh text eol=lf
 *.eot             binary
 *.pdf             binary
 
-# Generated — collapse them in pull request diffs.
+# Generated files: collapse them in pull request diffs.
 package-lock.json  linguist-generated=true -diff
 composer.lock      linguist-generated=true -diff

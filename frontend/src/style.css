@@ -1,4 +1,4 @@
-/* Polices auto-hébergées — voir assets/fonts/fonts.css pour le rôle de chacune. */
+/* Polices auto-hébergées, voir assets/fonts/fonts.css pour le rôle de chacune. */
 @import './assets/fonts/fonts.css';
 
 @tailwind base;
@@ -92,7 +92,7 @@
    *
    * Yuzo a un dessin de chiffres nettement plus caractériel que Bricolage,
    * ce qui donne un point d'accroche visuel exactement là où l'œil d'un
-   * commerçant se pose en premier — l'heure du prochain rendez-vous et le
+   * commerçant se pose en premier : l'heure du prochain rendez-vous et le
    * montant. Elle n'est jamais employée ailleurs : il lui manque trop
    * d'accents pour porter du texte français.
    *

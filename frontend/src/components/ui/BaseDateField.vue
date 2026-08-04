@@ -13,7 +13,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
  * `<input type="date">` est dessiné par le navigateur : sur Chrome un champ
  * gris avec une icône bleue, sur Firefox un autre, sur Safari iOS une roulette
  * plein écran. Aucun de ces trois ne suit la palette, et le format affiché
- * dépend de la langue du système — un commerçant camerounais pouvait voir
+ * dépend de la langue du système : un commerçant camerounais pouvait voir
  * mm/dd/yyyy dans une interface entièrement en français.
  *
  * Le calendrier est écrit ici pour trois raisons qu'aucune feuille de style ne

@@ -128,7 +128,7 @@ class DatabaseSeeder extends Seeder
             $service = $services[$index % count($services)];
 
             // The engine only offers *future* slots, by design. Past history is
-            // therefore placed by hand — one booking per day, so it cannot
+            // therefore placed by hand, one booking per day, so it cannot
             // overlap whatever else lands on that date.
             $slots = $date->isFuture()
                 ? $availability->slotsFor($business, $service, $date->toDateString())

@@ -96,7 +96,7 @@ class BookingService
     }
 
     /**
-     * Tell both sides. Notification failures never fail the booking — the slot
+     * Tell both sides. Notification failures never fail the booking: the slot
      * is already reserved, and a merchant who missed the alert still sees it in
      * the dashboard.
      */

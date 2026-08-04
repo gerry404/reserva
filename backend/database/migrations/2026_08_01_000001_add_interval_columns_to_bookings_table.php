@@ -21,9 +21,9 @@ return new class extends Migration
     {
         Schema::table('bookings', function (Blueprint $table) {
             $table->unsignedSmallInteger('duration')->default(30)->after('time_slot')
-                ->comment('minutes — snapshot of the service duration');
+                ->comment('minutes, snapshot of the service duration');
             $table->decimal('price', 10, 0)->default(0)->after('duration')
-                ->comment('F CFA — snapshot of the service price');
+                ->comment('F CFA, snapshot of the service price');
             $table->dateTime('starts_at')->nullable()->after('price');
             $table->dateTime('ends_at')->nullable()->after('starts_at');
 
@@ -53,7 +53,7 @@ return new class extends Migration
     /**
      * Rebuild the interval columns for rows that pre-date them.
      *
-     * Legacy data may already contain overlapping bookings — that was the bug.
+     * Legacy data may already contain overlapping bookings, and that was the bug.
      * We keep those rows untouched but leave their slot_key null so the new
      * unique index can still be created; only bookings made from now on are
      * protected by it.

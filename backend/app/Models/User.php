@@ -107,8 +107,8 @@ class User extends Authenticatable
      * trial window.
      *
      * The window check matters. Without it, any unpaid Pro account counted as a
-     * trial — including one granted a year by hand for a demo or a partnership,
-     * which then displayed "Essai Pro — 365 j" in the header. A trial cannot
+     * trial, including one granted a year by hand for a demo or a partnership,
+     * which then displayed "Essai Pro · 365 j" in the header. A trial cannot
      * outlast TRIAL_DAYS by definition.
      */
     public function onTrial(): bool

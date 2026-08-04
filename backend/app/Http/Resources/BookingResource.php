@@ -9,7 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * A booking as the owning merchant sees it.
  *
- * Never expose this to the public endpoints — it carries the customer's full
+ * Never expose this to the public endpoints: it carries the customer's full
  * contact details. Those get PublicBookingResource instead.
  *
  * @mixin \App\Models\Booking

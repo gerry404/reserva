@@ -16,7 +16,7 @@ use Illuminate\Queue\SerializesModels;
  * Distinct from BookingConfirmedNotification, which goes out when the merchant
  * accepts. Until now nothing at all reached the customer at this point: they
  * pressed "confirm" and left with a reference on a screen they were about to
- * close. This is the written trace of what they asked for — and the link they
+ * close. This is the written trace of what they asked for, and the link they
  * need to check or cancel it.
  */
 class BookingReceivedNotification extends Mailable

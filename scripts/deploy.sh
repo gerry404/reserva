@@ -5,7 +5,7 @@
 #   ./scripts/deploy.sh
 #
 # Takes a database snapshot first, then rebuilds and rolls the containers. If
-# anything fails the script stops immediately — a half-finished deploy that
+# anything fails the script stops immediately: a half-finished deploy that
 # reports success is worse than one that stops loudly.
 set -euo pipefail
 
@@ -18,7 +18,7 @@ fail()  { printf '\033[0;31m✗ %s\033[0m\n' "$1" >&2; exit 1; }
 [ -f .env ] || fail "No .env file. Copy .env.example and fill it in."
 
 # A blank APP_KEY produces a container that boots and then fails on the first
-# encrypted value — catch it here instead.
+# encrypted value; catch it here instead.
 grep -q '^APP_KEY=.\+' .env || fail "APP_KEY is empty. Run: docker compose run --rm app php artisan key:generate --show"
 grep -q '^DB_PASSWORD=.\+' .env || fail "DB_PASSWORD is empty."
 
@@ -28,7 +28,7 @@ if docker compose ps --status running --quiet postgres 2>/dev/null | grep -q .; 
     info "Backing up the database before touching anything"
     ./scripts/backup-db.sh
 else
-    info "First deploy — no database to back up yet"
+    info "First deploy, no database to back up yet"
 fi
 
 # ─── Code ────────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ for attempt in $(seq 1 60); do
     fi
     if [ "$attempt" -eq 60 ]; then
         docker compose logs --tail=50 app
-        fail "API never became healthy — see the logs above. Previous data is intact; roll back with: docker compose down && git checkout <previous-commit> && ./scripts/deploy.sh"
+        fail "API never became healthy. See the logs above. Previous data is intact; roll back with: docker compose down && git checkout <previous-commit> && ./scripts/deploy.sh"
     fi
     sleep 2
 done

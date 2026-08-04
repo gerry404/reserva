@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
  *
  * Every logo, cover and service photo goes through here so the storage backend
  * is a single configuration change (filesystems.uploads) rather than a dozen
- * hardcoded `Storage::disk('public')` calls — which is what made the switch to
+ * hardcoded `Storage::disk('public')` calls, which is what made the switch to
  * durable object storage a rewrite instead of an env var.
  */
 final class Uploads

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
  * This is the only place a plan is ever granted, and it is deliberately
  * paranoid. The previous flow re-verified whatever transaction id the caller
  * put in the webhook body and extended the plan whenever that came back
- * successful — so one real payment, replayed, bought a subscription forever.
+ * successful, so one real payment, replayed, bought a subscription forever.
  *
  * Four things must all hold before a plan is granted:
  *
@@ -46,7 +46,7 @@ class SubscriptionService
         $transaction = $this->gateway->findByReference($payment->tx_ref);
 
         if ($transaction === null) {
-            // Gateway unreachable — say nothing, change nothing, let the caller
+            // Gateway unreachable: say nothing, change nothing, let the caller
             // report "still checking". Marking it failed here would strand a
             // payment the customer really made.
             return false;
@@ -68,7 +68,7 @@ class SubscriptionService
      */
     private function describesPayment(array $transaction, Payment $payment): bool
     {
-        // Rule 1 — the one check whose absence made replay possible.
+        // Rule 1: the one check whose absence made replay possible.
         if (($transaction['tx_ref'] ?? null) !== $payment->tx_ref) {
             Log::warning('Flutterwave transaction does not match the payment it was offered for', [
                 'expected' => $payment->tx_ref,
@@ -82,7 +82,7 @@ class SubscriptionService
             return false;
         }
 
-        // Rule 3 — underpayment buys nothing; overpayment is the customer's call.
+        // Rule 3: underpayment buys nothing; overpayment is the customer's call.
         $paid = (float) ($transaction['amount'] ?? 0);
         if ($paid < (float) $payment->amount) {
             Log::warning('Flutterwave transaction underpaid', [
@@ -113,7 +113,7 @@ class SubscriptionService
 
             $transactionId = (string) ($transaction['id'] ?? '');
 
-            // Rule 4 — this gateway transaction may settle exactly one payment.
+            // Rule 4: this gateway transaction may settle exactly one payment.
             if ($transactionId !== '' && Payment::where('flw_transaction_id', $transactionId)->exists()) {
                 Log::warning('Flutterwave transaction already settled another payment', [
                     'transaction_id' => $transactionId,
