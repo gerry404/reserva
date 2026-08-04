@@ -12,7 +12,7 @@
           Document juridique
         </div>
         <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">Conditions d'utilisation</h1>
-        <p class="text-lg text-gray-500">Les regles qui encadrent l'utilisation de la plateforme Reserva.</p>
+        <p class="text-lg text-gray-500">Les regles qui encadrent l'utilisation de la plateforme Nuvo.</p>
         <div class="flex items-center gap-4 mt-6 text-sm text-gray-400">
           <span>Derniere mise a jour : 1er janvier 2026</span>
           <span class="w-1 h-1 rounded-full bg-gray-300" />
@@ -59,7 +59,7 @@
               <span class="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">1</span>
               <h2 class="text-xl font-bold text-gray-900">Acceptation des conditions</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">En accedant et en utilisant la plateforme Reserva ("le Service"), vous acceptez d'etre lie par les presentes conditions d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser le Service.</p>
+            <p class="text-gray-600 leading-relaxed pl-11">En accedant et en utilisant la plateforme Nuvo ("le Service"), vous acceptez d'etre lie par les presentes conditions d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser le Service.</p>
           </article>
 
           <article id="article-2">
@@ -67,7 +67,7 @@
               <span class="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">2</span>
               <h2 class="text-xl font-bold text-gray-900">Description du service</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">Reserva est une plateforme de gestion de reservations en ligne permettant aux commercants de creer une page de reservation publique, de gerer leurs rendez-vous et de recevoir des notifications.</p>
+            <p class="text-gray-600 leading-relaxed pl-11">Nuvo est une plateforme de gestion de reservations en ligne permettant aux commercants de creer une page de reservation publique, de gerer leurs rendez-vous et de recevoir des notifications.</p>
           </article>
 
           <article id="article-3">
@@ -83,7 +83,7 @@
               <span class="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">4</span>
               <h2 class="text-xl font-bold text-gray-900">Plans et facturation</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">Reserva propose plusieurs plans d'abonnement. Les tarifs sont indiques en Francs CFA (XAF). Les abonnements sont renouveles automatiquement sauf annulation prealable. Les paiements sont non remboursables, sauf dans les cas prevus par la loi.</p>
+            <p class="text-gray-600 leading-relaxed pl-11">Nuvo propose plusieurs plans d'abonnement. Les tarifs sont indiques en Francs CFA (XAF). Les abonnements sont renouveles automatiquement sauf annulation prealable. Les paiements sont non remboursables, sauf dans les cas prevus par la loi.</p>
           </article>
 
           <article id="article-5">
@@ -115,7 +115,7 @@
               <span class="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">8</span>
               <h2 class="text-xl font-bold text-gray-900">Limitation de responsabilite</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">Reserva s'efforce d'assurer la disponibilite et la fiabilite du Service, mais ne peut garantir un fonctionnement ininterrompu. Reserva ne saurait etre tenu responsable des pertes indirectes liees a l'utilisation du Service.</p>
+            <p class="text-gray-600 leading-relaxed pl-11">Nuvo s'efforce d'assurer la disponibilite et la fiabilite du Service, mais ne peut garantir un fonctionnement ininterrompu. Nuvo ne saurait etre tenu responsable des pertes indirectes liees a l'utilisation du Service.</p>
           </article>
 
           <article id="article-9">
@@ -123,7 +123,7 @@
               <span class="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">9</span>
               <h2 class="text-xl font-bold text-gray-900">Resiliation</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">Vous pouvez resilier votre compte a tout moment depuis vos parametres. Reserva se reserve le droit de suspendre ou resilier votre compte en cas de violation des presentes conditions.</p>
+            <p class="text-gray-600 leading-relaxed pl-11">Vous pouvez resilier votre compte a tout moment depuis vos parametres. Nuvo se reserve le droit de suspendre ou resilier votre compte en cas de violation des presentes conditions.</p>
           </article>
 
           <article id="article-10">
@@ -131,7 +131,7 @@
               <span class="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">10</span>
               <h2 class="text-xl font-bold text-gray-900">Modifications</h2>
             </div>
-            <p class="text-gray-600 leading-relaxed pl-11">Reserva se reserve le droit de modifier les presentes conditions a tout moment. Les modifications prennent effet des leur publication. Votre utilisation continue du Service constitue une acceptation des conditions modifiees.</p>
+            <p class="text-gray-600 leading-relaxed pl-11">Nuvo se reserve le droit de modifier les presentes conditions a tout moment. Les modifications prennent effet des leur publication. Votre utilisation continue du Service constitue une acceptation des conditions modifiees.</p>
           </article>
 
           <article id="article-11">
