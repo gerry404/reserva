@@ -345,7 +345,7 @@ class AuthController extends Controller
         try {
             Mail::to($user->email)->queue(new WelcomeNotification($user));
         } catch (\Throwable $e) {
-            // Never block a signup because the mail transport is down.
+            
             Log::error('Welcome email could not be queued', [
                 'user'  => $user->id,
                 'error' => $e->getMessage(),
