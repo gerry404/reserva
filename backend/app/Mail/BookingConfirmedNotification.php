@@ -22,7 +22,7 @@ class BookingConfirmedNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '✅ Réservation confirmée — ' . $this->business->name,
+            subject: '✅ Réservation confirmée · ' . $this->business->name,
         );
     }
 

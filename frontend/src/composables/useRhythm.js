@@ -11,7 +11,7 @@ import { DAY_END, DAY_START, DAY_SPAN } from '@/composables/useDuration'
  *
  * Le choix de dériver le motif des horaires plutôt que d'un hash aléatoire est
  * délibéré. Un motif tiré au sort serait de la décoration : unique, mais sans
- * rapport avec ce que le commerce est. Ici la signature *dit* quelque chose —
+ * rapport avec ce que le commerce est. Ici la signature *dit* quelque chose,
  * elle prolonge le langage du temps établi ailleurs dans le produit au lieu de
  * le concurrencer, et elle reste stable : les mêmes horaires donnent toujours
  * le même dessin.
@@ -66,7 +66,7 @@ export function rhythmBands(workingHours) {
  * Le motif complet, en SVG inline.
  *
  * Inline plutôt que fichier : le dessin dépend de données que seul le client
- * connaît au moment du rendu, et le SVG pèse moins d'un kilooctet — une requête
+ * connaît au moment du rendu, et le SVG pèse moins d'un kilooctet, une requête
  * supplémentaire coûterait davantage que le balisage lui-même, surtout en 3G.
  *
  * Le motif se répète horizontalement : la semaine devient une trame continue,

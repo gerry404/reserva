@@ -1,10 +1,12 @@
 <script setup>
+import { Link2, UserRound, BellRing } from 'lucide-vue-next'
+
 /**
  * « Opérationnel en 3 étapes », et ses transitions de vague.
  *
  * L'ancienne version posait deux SVG figés en haut et en bas de la section :
  * une courbe unique, immobile, remplie d'une couleur écrite en dur qui ne
- * correspondait même plus au fond depuis le changement de palette — un liseré
+ * correspondait même plus au fond depuis le changement de palette : un liseré
  * noir apparaissait sur les bords.
  *
  * Ici la vague est faite de trois couches qui dérivent à des vitesses
@@ -22,19 +24,19 @@ const steps = [
     n: '01',
     title: 'Créez votre compte',
     desc: "Inscrivez-vous en 5 minutes. Ajoutez le nom de votre commerce, vos services et vos horaires d'ouverture.",
-    icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z',
+    icon: UserRound,
   },
   {
     n: '02',
     title: 'Partagez votre lien',
-    desc: 'Vous recevez une adresse unique — nuvo.app/mon-salon. Partagez-la sur WhatsApp, Instagram ou Facebook.',
-    icon: 'M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244',
+    desc: 'Vous recevez une adresse unique : nuvo.app/mon-salon. Partagez-la sur WhatsApp, Instagram ou Facebook.',
+    icon: Link2,
   },
   {
     n: '03',
     title: 'Recevez des réservations',
     desc: 'Les demandes arrivent en temps réel. Confirmez, annulez ou reprogrammez en un geste, depuis votre téléphone.',
-    icon: 'M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0',
+    icon: BellRing,
   },
 ]
 </script>
@@ -57,7 +59,7 @@ const steps = [
     <section class="hiw__body">
       <!--
         Le fond hérite du motif de rythme employé sur les pages publiques :
-        une trame de blocs de temps, très effacée. Rien d'abstrait — c'est
+        une trame de blocs de temps, très effacée. Rien d'abstrait : c'est
         toujours la même idée qui circule d'un bout à l'autre du produit.
       -->
       <div class="hiw__texture" aria-hidden="true" />
@@ -79,9 +81,7 @@ const steps = [
             <span class="hiw__number numeric">{{ step.n }}</span>
 
             <span class="hiw__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                <path :d="step.icon" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
+              <component :is="step.icon" :size="22" :stroke-width="1.6" />
             </span>
 
             <h3 class="hiw__step-title">{{ step.title }}</h3>
@@ -171,7 +171,7 @@ const steps = [
  * Elle est portée par la transformation, pas par le tracé : une pente écrite
  * dans le chemin s'accumulerait d'une copie à l'autre et la boucle
  * deviendrait visible. Elle n'est pas non plus déclarée en propriété `rotate`
- * séparée — celle-ci s'applique après la translation, si bien que la vague
+ * séparée, celle-ci s'applique après la translation, si bien que la vague
  * dériverait en diagonale au lieu de glisser le long de sa propre crête.
  *
  * L'ordre compte : la translation agit dans le repère du calque, puis
@@ -339,7 +339,7 @@ const steps = [
 }
 
 /*
- * Sans mouvement, les vagues se figent — elles gardent tout leur relief, seul
+ * Sans mouvement, les vagues se figent, elles gardent tout leur relief, seul
  * le glissement disparaît.
  */
 @media (prefers-reduced-motion: reduce) {

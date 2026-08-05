@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * Reachable with only a reference plus a phone number, so it deliberately
  * repeats back nothing the holder did not already supply: no email, no notes,
- * no internal id — just enough to recognise the appointment.
+ * no internal id, just enough to recognise the appointment.
  *
  * @mixin \App\Models\Booking
  */

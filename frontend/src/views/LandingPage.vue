@@ -1,46 +1,53 @@
 <script setup>
+import { iconForService } from '@/constants/serviceIcons'
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import FinalCta from '@/components/marketing/FinalCta.vue'
 import HowItWorks from '@/components/marketing/HowItWorks.vue'
+import TradeShowcase from '@/components/marketing/TradeShowcase.vue'
 import { useAuthStore } from '@/stores/auth'
 import {
-  DevicePhoneMobileIcon,
-  BoltIcon,
-  ChartBarIcon,
-  GlobeAltIcon,
-  CheckCircleIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ArrowRightIcon,
-} from '@heroicons/vue/24/outline'
+  ArrowRight,
+  Calendar,
+  ChartColumn,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheck,
+  Globe,
+  Lock,
+  Smartphone,
+  X,
+  Zap,
+} from 'lucide-vue-next'
+import BrandIcon from '@/components/ui/BrandIcon.vue'
 
 const auth = useAuthStore()
 
 const features = [
   {
-    icon: DevicePhoneMobileIcon,
+    icon: Smartphone,
     title: 'WhatsApp & SMS',
     desc: 'Recevez chaque réservation en temps réel sur WhatsApp ou par SMS. Pas besoin de rester collé à votre téléphone.',
     gradient: 'from-emerald-500 to-teal-400',
     bg: 'bg-emerald-500/10',
   },
   {
-    icon: BoltIcon,
+    icon: Zap,
     title: 'Configuration en 5 min',
     desc: "Créez votre compte, configurez vos services et partagez votre lien. C'est tout. Aucune compétence technique requise.",
     gradient: 'from-amber-500 to-orange-400',
     bg: 'bg-amber-500/10',
   },
   {
-    icon: ChartBarIcon,
+    icon: ChartColumn,
     title: 'Statistiques claires',
     desc: 'Visualisez vos revenus, le taux de remplissage et les services les plus demandés depuis votre tableau de bord.',
     gradient: 'from-blue-500 to-cyan-400',
     bg: 'bg-blue-500/10',
   },
   {
-    icon: GlobeAltIcon,
+    icon: Globe,
     title: 'Pensé pour tous',
     desc: 'Interface en français et anglais, connexion lente tolérée, paiements MTN/Orange Money. Nuvo comprend votre réalité.',
     gradient: 'from-violet-500 to-purple-400',
@@ -121,55 +128,10 @@ const plans = computed(() => [
  * hard numbers ("+60% de réservations", "-80% de no-shows"). None of them
  * existed and none of those figures were measured. Invented social proof is
  * both a legal exposure and the fastest way to lose a merchant's trust the day
- * they look closely — so the section now describes what the product does for a
+ * they look closely, so the section now describes what the product does for a
  * kind of business, and claims nothing on anybody's behalf.
  */
-const useCases = [
-  {
-    trade: 'Salon de coiffure',
-    city: 'Douala',
-    text: "Publiez vos prestations avec leur durée réelle. Une pose de tresses de trois heures bloque trois heures — impossible de vous retrouver avec deux clientes sur le même fauteuil.",
-    icon: '💇',
-    color: 'from-pink-500 to-rose-500',
-  },
-  {
-    trade: 'Barbier',
-    city: 'Yaoundé',
-    text: "Votre lien se partage sur WhatsApp et Instagram. Vos clients réservent la nuit, le dimanche, pendant que vous coupez — vous recevez la demande sur votre téléphone.",
-    icon: '💈',
-    color: 'from-blue-500 to-cyan-500',
-  },
-  {
-    trade: 'Institut de beauté',
-    city: 'Abidjan',
-    text: "Chaque réservation confirmée déclenche un email au client et un rappel la veille, pour réduire les rendez-vous manqués sans passer un seul appel.",
-    icon: '💅',
-    color: 'from-violet-500 to-purple-500',
-  },
-  {
-    trade: 'Spa & massage',
-    city: 'Dakar',
-    text: "Vos horaires d'ouverture, vos délais de réservation et vos jours de fermeture sont respectés automatiquement. Personne ne peut réserver quand vous êtes fermé.",
-    icon: '💆',
-    color: 'from-amber-500 to-orange-500',
-  },
-]
 
-
-// ── Testimonials carousel ──
-const carouselIndex = ref(0)
-const carouselAutoplay = ref(null)
-const trackEl = ref(null)
-const containerWidth = ref(0)
-const visibleCount = computed(() => typeof window !== 'undefined' && window.innerWidth >= 768 ? 3 : 1)
-const maxIndex = computed(() => Math.max(0, useCases.length - visibleCount.value))
-const cardWidth = computed(() => containerWidth.value / visibleCount.value)
-function nextTestimonial() { carouselIndex.value = carouselIndex.value >= maxIndex.value ? 0 : carouselIndex.value + 1 }
-function prevTestimonial() { carouselIndex.value = carouselIndex.value <= 0 ? maxIndex.value : carouselIndex.value - 1 }
-function resetAutoplay() {
-  clearInterval(carouselAutoplay.value)
-  carouselAutoplay.value = setInterval(nextTestimonial, 4000)
-}
 
 // ── Navbar scroll ──
 const scrolled = ref(false)
@@ -284,19 +246,12 @@ function onScroll() {
   navHidden.value = y > 300 && y > lastScrollY.value
   lastScrollY.value = y
 }
-function measureCarousel() {
-  if (trackEl.value) containerWidth.value = trackEl.value.offsetWidth
-}
-
 onMounted(() => {
   startAnimation()
   cursorTimer = setInterval(() => {
     mockupShowCursor.value = !mockupShowCursor.value
   }, 530)
-  resetAutoplay()
   window.addEventListener('scroll', onScroll, { passive: true })
-  window.addEventListener('resize', measureCarousel, { passive: true })
-  setTimeout(measureCarousel, 100)
   nextTick(() => { setTimeout(() => { heroVisible.value = true }, 100) })
 })
 
@@ -304,9 +259,7 @@ onUnmounted(() => {
   clearTimeout(animTimer)
   clearInterval(typeTimer)
   clearInterval(cursorTimer)
-  clearInterval(carouselAutoplay.value)
   window.removeEventListener('scroll', onScroll)
-  window.removeEventListener('resize', measureCarousel)
 })
 </script>
 
@@ -349,17 +302,17 @@ onUnmounted(() => {
         <!-- Right actions -->
         <div class="hidden sm:flex items-center gap-1.5">
           <template v-if="auth.isAuthenticated">
-            <RouterLink to="/dashboard" class="inline-flex items-center gap-2 px-5 py-1.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-200 shadow-md shadow-primary-900/20 hover:shadow-lg hover:shadow-primary-900/25 hover:-translate-y-px">
+            <RouterLink to="/dashboard" class="inline-flex items-center gap-2 px-5 py-1.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-control transition-all duration-200 shadow-md shadow-primary-900/20 hover:shadow-lg hover:shadow-primary-900/25 hover:-translate-y-px">
               Mon tableau de bord
-              <ArrowRightIcon class="w-3.5 h-3.5" />
+              <ArrowRight class="w-3.5 h-3.5" />
             </RouterLink>
           </template>
           <template v-else>
             <RouterLink to="/login" :class="[
-              'px-4 py-1.5 text-sm font-semibold rounded-xl transition-all duration-200',
+              'px-4 py-1.5 text-sm font-semibold rounded-control transition-all duration-200',
               scrolled ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' : 'text-gray-700 hover:text-gray-900 hover:bg-white/60'
             ]">Se connecter</RouterLink>
-            <RouterLink to="/register" class="px-5 py-1.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-200 shadow-md shadow-primary-900/20 hover:shadow-lg hover:shadow-primary-900/25 hover:-translate-y-px">Démarrer</RouterLink>
+            <RouterLink to="/register" class="px-5 py-1.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-control transition-all duration-200 shadow-md shadow-primary-900/20 hover:shadow-lg hover:shadow-primary-900/25 hover:-translate-y-px">Démarrer</RouterLink>
           </template>
         </div>
 
@@ -381,11 +334,11 @@ onUnmounted(() => {
         <RouterLink @click="mobileMenuOpen = false" to="/contact" class="text-2xl font-bold text-gray-900">Contact</RouterLink>
         <div class="flex flex-col gap-3 mt-4 w-56">
           <template v-if="auth.isAuthenticated">
-            <RouterLink @click="mobileMenuOpen = false" to="/dashboard" class="py-3 text-center text-base font-bold text-white bg-primary-600 rounded-xl">Mon tableau de bord</RouterLink>
+            <RouterLink @click="mobileMenuOpen = false" to="/dashboard" class="py-3 text-center text-base font-bold text-white bg-primary-600 rounded-control">Mon tableau de bord</RouterLink>
           </template>
           <template v-else>
-            <RouterLink @click="mobileMenuOpen = false" to="/login" class="py-3 text-center text-base font-semibold text-gray-700 border-2 border-gray-200 rounded-xl">Se connecter</RouterLink>
-            <RouterLink @click="mobileMenuOpen = false" to="/register" class="py-3 text-center text-base font-bold text-white bg-primary-600 rounded-xl">Démarrer</RouterLink>
+            <RouterLink @click="mobileMenuOpen = false" to="/login" class="py-3 text-center text-base font-semibold text-gray-700 border-2 border-gray-200 rounded-control">Se connecter</RouterLink>
+            <RouterLink @click="mobileMenuOpen = false" to="/register" class="py-3 text-center text-base font-bold text-white bg-primary-600 rounded-control">Démarrer</RouterLink>
           </template>
         </div>
       </div>
@@ -426,12 +379,12 @@ onUnmounted(() => {
           heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
         ]">
           <RouterLink to="/register"
-            class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl transition-all duration-300 shadow-xl shadow-primary-900/25 hover:shadow-2xl hover:shadow-primary-900/30 hover:-translate-y-0.5">
+            class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-control transition-all duration-300 shadow-xl shadow-primary-900/25 hover:shadow-2xl hover:shadow-primary-900/30 hover:-translate-y-0.5">
             Créer mon compte gratuit
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            <ArrowRight class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
           </RouterLink>
           <a href="#features"
-            class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-gray-700 bg-white/80 backdrop-blur-sm border border-gray-200 hover:border-gray-300 hover:bg-clay-50 rounded-2xl transition-all duration-300 hover:-translate-y-0.5">
+            class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-gray-700 bg-white/80 backdrop-blur-sm border border-gray-200 hover:border-gray-300 hover:bg-clay-50 rounded-control transition-all duration-300 hover:-translate-y-0.5">
             Voir les fonctionnalités
           </a>
         </div>
@@ -448,7 +401,7 @@ onUnmounted(() => {
           -->
           <p class="text-sm text-gray-500">
             <span class="font-semibold text-gray-700">14 jours d'essai Pro</span>
-            — sans carte bancaire, sans engagement.
+            · sans carte bancaire, sans engagement.
           </p>
         </div>
       </div>
@@ -467,7 +420,7 @@ onUnmounted(() => {
               <div class="w-3 h-3 rounded-full bg-green-400" />
             </div>
             <div class="flex-1 bg-gray-700 rounded-lg px-3 py-1 text-xs text-gray-300 text-center max-w-xs mx-auto flex items-center justify-center gap-1.5">
-              <svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+              <Lock class="w-3 h-3 text-green-400" />
               nuvo.app/salon-elegance-douala
             </div>
           </div>
@@ -490,7 +443,7 @@ onUnmounted(() => {
                   'w-5 h-5 rounded-full text-[9px] font-bold flex items-center justify-center transition-all duration-500',
                   mockupStep > i ? 'bg-emerald-500 text-white' : mockupStep === i ? 'bg-primary-500 text-white scale-110' : 'bg-gray-200 text-gray-400'
                 ]">
-                  <svg v-if="mockupStep > i" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                  <Check v-if="mockupStep > i" class="w-3 h-3" :stroke-width="3" />
                   <span v-else>{{ i }}</span>
                 </div>
                 <div v-if="i < 4" :class="['w-5 h-0.5 transition-all duration-500', mockupStep > i ? 'bg-emerald-400' : 'bg-gray-200']" />
@@ -507,9 +460,9 @@ onUnmounted(() => {
                       'bg-clay-50 rounded-xl p-2.5 flex items-center gap-2.5 border transition-all duration-300 cursor-pointer',
                       mockupSelectedService?.name === svc.name ? 'border-primary-400 shadow-md ring-2 ring-primary-100 scale-[1.02]' : 'border-gray-100 shadow-sm'
                     ]">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs shrink-0"
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0"
                       :style="{ backgroundColor: svc.color }">
-                      ✦
+                      <component :is="iconForService(svc)" :size="15" />
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="text-[11px] font-bold text-gray-900">{{ svc.name }}</p>
@@ -518,7 +471,7 @@ onUnmounted(() => {
                         <span class="text-[9px] font-semibold" :style="{ color: svc.color }">{{ svc.price }}</span>
                       </div>
                     </div>
-                    <svg class="w-3.5 h-3.5 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <ChevronRight class="w-3.5 h-3.5 text-gray-300 shrink-0" />
                   </div>
                 </div>
               </div>
@@ -527,8 +480,10 @@ onUnmounted(() => {
               <div v-else-if="mockupStep === 2" key="ms2" class="px-5 pb-5">
                 <p class="text-[11px] font-extrabold text-gray-800 mb-2">Choisissez une date</p>
                 <!-- Selected service pill -->
-                <div class="flex items-center gap-2 p-2 rounded-lg mb-3" style="background-color: #ec489915">
-                  <div class="w-7 h-7 rounded-lg bg-pink-500 flex items-center justify-center text-white text-[10px]">✦</div>
+                <div class="flex items-center gap-2 p-2 rounded-lg mb-3 bg-primary-50">
+                  <div class="w-7 h-7 rounded-lg bg-primary-600 flex items-center justify-center text-white">
+                    <component :is="iconForService({ name: 'Tresses africaines' })" :size="13" />
+                  </div>
                   <div>
                     <p class="text-[10px] font-bold text-gray-900">Tresses africaines</p>
                     <p class="text-[9px] text-gray-400">2h30 · 12 000 F</p>
@@ -537,9 +492,9 @@ onUnmounted(() => {
                 <!-- Mini calendar -->
                 <div class="bg-clay-50 rounded-xl p-3 shadow-sm border border-gray-100">
                   <div class="flex items-center justify-between mb-2">
-                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    <ChevronLeft class="w-3.5 h-3.5 text-gray-400" />
                     <span class="text-[11px] font-bold text-gray-800">Mars 2026</span>
-                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <ChevronRight class="w-3.5 h-3.5 text-gray-400" />
                   </div>
                   <div class="grid grid-cols-7 gap-0.5 mb-1">
                     <div v-for="d in ['Lu','Ma','Me','Je','Ve','Sa','Di']" :key="d" class="text-center text-[8px] font-semibold text-gray-400 py-0.5">{{ d }}</div>
@@ -562,7 +517,7 @@ onUnmounted(() => {
               <div v-else-if="mockupStep === 3" key="ms3" class="px-5 pb-5">
                 <p class="text-[11px] font-extrabold text-gray-800 mb-1">Choisissez un horaire</p>
                 <p class="text-[9px] text-gray-400 mb-3 flex items-center gap-1">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  <Calendar class="w-3 h-3" />
                   Samedi 28 mars 2026
                 </p>
                 <div class="grid grid-cols-5 gap-1.5">
@@ -616,7 +571,7 @@ onUnmounted(() => {
                       <span v-if="!mockupTypedPhone" class="text-gray-300">+237 6XX XXX XXX</span>
                     </div>
                   </div>
-                  <button class="w-full py-2 rounded-lg text-white font-bold text-[10px] bg-primary-500 mt-1 transition-all"
+                  <button class="w-full py-2 rounded-control text-white font-bold text-[10px] bg-primary-500 mt-1 transition-all"
                     :class="{ 'opacity-50': !mockupTypedPhone, 'hover:opacity-90 shadow-md': mockupTypedPhone }">
                     Confirmer ma réservation
                   </button>
@@ -626,7 +581,7 @@ onUnmounted(() => {
               <!-- ── STEP 5: Success ── -->
               <div v-else-if="mockupStep === 5" key="ms5" class="px-5 pb-5 text-center">
                 <div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3 mockup-pop">
-                  <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                  <Check class="w-7 h-7 text-emerald-500" />
                 </div>
                 <h4 class="text-sm font-extrabold text-gray-900 mb-1">Réservation confirmée !</h4>
                 <p class="text-[10px] text-gray-400 mb-3">Salon Élégance Douala vous confirme sous peu.</p>
@@ -649,7 +604,7 @@ onUnmounted(() => {
                   </div>
                 </div>
                 <div class="inline-flex items-center gap-1.5 py-1.5 px-4 bg-green-500 text-white text-[10px] font-semibold rounded-lg">
-                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                  <BrandIcon name="whatsapp" class="w-3 h-3" />
                   Contacter sur WhatsApp
                 </div>
               </div>
@@ -757,7 +712,7 @@ onUnmounted(() => {
             <!-- Features -->
             <ul class="space-y-3 flex-1 mb-6">
               <li v-for="f in plan.features" :key="f" class="flex items-start gap-2.5 text-sm text-gray-600">
-                <CheckCircleIcon class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                <CircleCheck class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                 {{ f }}
               </li>
             </ul>
@@ -765,7 +720,7 @@ onUnmounted(() => {
             <!-- Limitations (free plan) -->
             <ul v-if="plan.limitations" class="space-y-2.5 mb-6 pt-4 border-t border-gray-100">
               <li v-for="l in plan.limitations" :key="l" class="flex items-start gap-2.5 text-sm text-gray-400">
-                <svg class="w-5 h-5 text-gray-300 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <X class="w-5 h-5 text-gray-300 shrink-0 mt-0.5" />
                 {{ l }}
               </li>
             </ul>
@@ -781,59 +736,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Use cases carousel -->
-    <section class="py-28 px-4 sm:px-6 bg-gray-50 relative overflow-hidden">
-      <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100/30 rounded-full blur-3xl -z-0" />
-      <div class="absolute bottom-0 left-0 w-80 h-80 bg-violet-100/30 rounded-full blur-3xl -z-0" />
-
-      <div class="max-w-6xl mx-auto relative">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14 gap-6">
-          <div>
-            <h2 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-              Pensé pour<br />votre métier
-            </h2>
-          </div>
-          <!-- Carousel controls -->
-          <div class="flex items-center gap-3">
-            <button @click="prevTestimonial(); resetAutoplay()"
-              class="w-11 h-11 rounded-full border-2 border-gray-200 hover:border-primary-500 hover:bg-primary-50 flex items-center justify-center transition-all duration-200 group">
-              <ChevronLeftIcon class="w-5 h-5 text-gray-400 group-hover:text-primary-600" />
-            </button>
-            <button @click="nextTestimonial(); resetAutoplay()"
-              class="w-11 h-11 rounded-full border-2 border-gray-200 hover:border-primary-500 hover:bg-primary-50 flex items-center justify-center transition-all duration-200 group">
-              <ChevronRightIcon class="w-5 h-5 text-gray-400 group-hover:text-primary-600" />
-            </button>
-          </div>
-        </div>
-
-        <!-- Carousel track -->
-        <div ref="trackEl" class="overflow-hidden -mx-3">
-          <div class="flex transition-transform duration-500 ease-out px-3"
-            :style="{ transform: `translateX(-${carouselIndex * cardWidth}px)` }">
-            <div v-for="c in useCases" :key="c.trade"
-              class="flex-shrink-0 w-full md:w-1/3 px-3">
-              <div class="bg-clay-50 rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-black/5 transition-all duration-300 h-full flex flex-col">
-                <div :class="['w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-2xl shadow-lg mb-5', c.color]">
-                  {{ c.icon }}
-                </div>
-                <p class="text-gray-600 leading-relaxed flex-1 mb-7">{{ c.text }}</p>
-                <div class="pt-5 border-t border-gray-100">
-                  <p class="font-bold text-gray-900 text-sm">{{ c.trade }}</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Exemple d'usage · {{ c.city }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dots -->
-        <div class="flex items-center justify-center gap-2 mt-10">
-          <button v-for="i in (maxIndex + 1)" :key="i"
-            @click="carouselIndex = i - 1; resetAutoplay()"
-            :class="['h-2 rounded-full transition-all duration-300', carouselIndex === i - 1 ? 'w-8 bg-primary-500' : 'w-2 bg-gray-300 hover:bg-gray-400']" />
-        </div>
-      </div>
-    </section>
+    <TradeShowcase />
 
     <FinalCta />
 
@@ -851,17 +754,17 @@ onUnmounted(() => {
             <p class="text-sm leading-relaxed mb-6">La plateforme de réservation en ligne pensée pour les commerçants ambitieux.</p>
             <!-- Social links -->
             <div class="flex items-center gap-3">
-              <a href="#" class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors" aria-label="Facebook">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <a href="#" class="w-9 h-9 rounded-control bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors" aria-label="Facebook">
+                <BrandIcon name="facebook" class="w-4 h-4" />
               </a>
-              <a href="#" class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors" aria-label="Instagram">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              <a href="#" class="w-9 h-9 rounded-control bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors" aria-label="Instagram">
+                <BrandIcon name="instagram" class="w-4 h-4" />
               </a>
-              <a href="#" class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors" aria-label="Twitter">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <a href="#" class="w-9 h-9 rounded-control bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors" aria-label="Twitter">
+                <BrandIcon name="x" class="w-4 h-4" />
               </a>
-              <a href="#" class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors" aria-label="WhatsApp">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+              <a href="#" class="w-9 h-9 rounded-control bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors" aria-label="WhatsApp">
+                <BrandIcon name="whatsapp" class="w-4 h-4" />
               </a>
             </div>
           </div>

@@ -1,10 +1,10 @@
 /*
- * Nuvo — typographie
+ * Nuvo : typographie
  * ─────────────────────────────────────────────────────────────────────────
  *
  *   Dekatron SemiBold   titres et marque
  *   Roboto              texte courant, sous-titres, formulaires
- *   Yuzo                chiffres en vedette — heures, prix, compteurs
+ *   Yuzo                chiffres en vedette : heures, prix, compteurs
  *
  * Dekatron donne le caractère là où il se voit, Roboto porte tout ce qui se
  * lit par phrases, Yuzo signe les chiffres. Toutes auto-hébergées : aucune
@@ -16,7 +16,7 @@
  * production.
  */
 
-/* Roboto — variable 300→700, romain et italique, latin + latin-ext. */
+/* Roboto : variable 300→700, romain et italique, latin + latin-ext. */
 @import './_roboto.css';
 
 /*
@@ -24,7 +24,7 @@
  *
  * Sans cela, les titres en font-black (900) sortaient de la plage et le
  * navigateur appliquait un gras synthétique qui épaissit les contours au point
- * d'effacer les formes carrées de Dekatron — elle en devenait indiscernable de
+ * d'effacer les formes carrées de Dekatron, elle en devenait indiscernable de
  * Roboto. En couvrant toute la plage, ce sont toujours les vrais tracés qui
  * sont rendus.
  */
@@ -46,7 +46,7 @@
 
 /*
  * Yuzo n'intervient que sur les chiffres (classe .numeric). Elle ne dessine ni
- * é, ni è, ni ç, ni œ, ni € — sur du texte, les mots casseraient en plein
+ * é, ni è, ni ç, ni œ, ni € ; sur du texte, les mots casseraient en plein
  * milieu. Sa pile de repli commence donc par Roboto.
  */
 @font-face {

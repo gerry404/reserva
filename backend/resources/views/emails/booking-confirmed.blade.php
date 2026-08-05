@@ -33,7 +33,7 @@
                                         <table width="100%" cellpadding="0" cellspacing="0">
                                             <tr>
                                                 <td style="padding:6px 0;color:#6b7280;font-size:13px;width:110px;">Service</td>
-                                                <td style="padding:6px 0;color:#111827;font-size:14px;font-weight:600;">{{ $booking->service->name ?? '—' }}</td>
+                                                <td style="padding:6px 0;color:#111827;font-size:14px;font-weight:600;">{{ $booking->service->name ?? 'Service supprimé' }}</td>
                                             </tr>
                                             <tr>
                                                 <td style="padding:6px 0;color:#6b7280;font-size:13px;">Date</td>

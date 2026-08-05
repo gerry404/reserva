@@ -29,13 +29,12 @@ class BookingController extends Controller
             'per_page' => ['nullable', 'integer', 'min:5', 'max:100'],
         ]);
 
-        $bookings = Booking::query()
+        // Tout sauf le statut. Les compteurs par statut se lisent sur cette
+        // base : filtrer sur « confirmé » ne doit pas faire tomber à zéro le
+        // nombre de réservations en attente, qui est précisément ce que le
+        // commerçant regarde pour décider de changer de filtre.
+        $base = Booking::query()
             ->forBusiness($request->user()->business->id)
-            // Prices are printed in the business currency, at both levels of
-            // the payload — so the service's own parent has to come along too,
-            // or it is one extra query per row.
-            ->with('service.business', 'business')
-            ->when($validated['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
             ->when($validated['date'] ?? null, fn ($q, $date) => $q->whereDate('date', $date))
             ->when($validated['from'] ?? null, fn ($q, $from) => $q->whereDate('date', '>=', $from))
             ->when($validated['to'] ?? null, fn ($q, $to) => $q->whereDate('date', '<=', $to))
@@ -46,12 +45,44 @@ class BookingController extends Controller
                 $q->where('customer_name', 'like', $like)
                   ->orWhere('customer_phone', 'like', $like)
                   ->orWhere('reference', 'like', $like);
-            }))
+            }));
+
+        $bookings = $base->clone()
+            // Prices are printed in the business currency, at both levels of
+            // the payload, so the service's own parent has to come along too,
+            // or it is one extra query per row.
+            ->with('service.business', 'business')
+            ->when($validated['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
             ->orderByDesc('starts_at')
             ->paginate($validated['per_page'] ?? 20)
             ->withQueryString();
 
-        return BookingResource::collection($bookings)->response();
+        return BookingResource::collection($bookings)
+            ->additional(['meta' => ['counts' => $this->countsByStatus($base)]])
+            ->response();
+    }
+
+    /**
+     * Le nombre de réservations par statut, tous statuts présents.
+     *
+     * Une seule requête agrégée plutôt qu'un compte par statut, et les statuts
+     * absents sont ramenés à zéro : sans cela l'interface reçoit une clé
+     * manquante là où elle attend un nombre, et affiche du vide au lieu d'un 0.
+     *
+     * @return array<string, int>
+     */
+    private function countsByStatus(\Illuminate\Database\Eloquent\Builder $base): array
+    {
+        $comptes = $base->clone()
+            ->reorder()
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->all();
+
+        $tous = array_fill_keys(Booking::STATUSES, 0);
+
+        return ['all' => array_sum($comptes)] + array_map('intval', array_merge($tous, $comptes));
     }
 
     public function show(Request $request, Booking $booking): BookingResource
@@ -84,7 +115,7 @@ class BookingController extends Controller
         $payload = ['booking' => new BookingResource($booking)];
 
         if ($validated['status'] === Booking::STATUS_CONFIRMED) {
-            // Only on the transition into confirmed — re-saving a confirmed
+            // Only on the transition into confirmed; re-saving a confirmed
             // booking must not email the customer a second time.
             if (! $wasConfirmed) {
                 $this->emailCustomer($booking);

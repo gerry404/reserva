@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API — Nuvo
+| API : Nuvo
 |--------------------------------------------------------------------------
 |
 | Three tiers:
 |
-|   · public       — no credentials, tight rate limits, minimal payloads
-|   · authenticated— merchant's own data, guarded by policies
-|   · paid         — the same, plus `plan:pro`
+|   · public        : no credentials, tight rate limits, minimal payloads
+|   · authenticated : merchant's own data, guarded by policies
+|   · paid          : the same, plus `plan:pro`
 |
 | Rate limiters live in AppServiceProvider so the budgets are legible in one
 | place rather than scattered across route definitions.
@@ -71,7 +71,7 @@ Route::post('/webhooks/flutterwave', [PaymentController::class, 'webhook']);
 // ─── Merchant area ───────────────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Reachable before a business exists — this is how a Google signup finishes.
+    // Reachable before a business exists; this is how a Google signup finishes.
     Route::post('/business/setup', [BusinessController::class, 'setup']);
 
     Route::prefix('payments')->group(function () {

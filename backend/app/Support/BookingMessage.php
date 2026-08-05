@@ -7,7 +7,7 @@ use App\Models\Booking;
 /**
  * The plain-text bodies sent over WhatsApp and SMS.
  *
- * Previously a Notification class whose via() returned 'database' — a channel
+ * Previously a Notification class whose via() returned 'database', a channel
  * with no table behind it, so calling notify() would have thrown; only its
  * message builder was ever used. It is a formatter, so it is one now.
  *
@@ -23,7 +23,7 @@ final class BookingMessage
             '',
             "Client : {$booking->customer_name}",
             "Tél : {$booking->customer_phone}",
-            'Service : ' . ($booking->service?->name ?? '—'),
+            'Service : ' . ($booking->service?->name ?? 'Service supprimé'),
             'Date : ' . self::when($booking),
             "Réf : {$booking->reference}",
             '',
@@ -35,7 +35,7 @@ final class BookingMessage
     public static function forMerchantSms(Booking $booking): string
     {
         return sprintf(
-            'Reserva — Nouvelle reservation : %s, %s, %s. Ref %s.',
+            'Nuvo. Nouvelle reservation : %s, %s, %s. Ref %s.',
             $booking->customer_name,
             $booking->service?->name ?? 'service',
             self::when($booking),
@@ -47,11 +47,11 @@ final class BookingMessage
     public static function reminderForCustomer(Booking $booking): string
     {
         return implode("\n", [
-            "⏰ *Rappel — {$booking->business->name}*",
+            "⏰ *Rappel : {$booking->business->name}*",
             '',
             "Bonjour {$booking->customer_name},",
             "Vous avez rendez-vous demain à {$booking->time_slot}.",
-            'Service : ' . ($booking->service?->name ?? '—'),
+            'Service : ' . ($booking->service?->name ?? 'Service supprimé'),
             "Réf : {$booking->reference}",
         ]);
     }

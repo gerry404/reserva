@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * `date` and `time_slot` are what the customer picked and what we display;
  * `starts_at`/`ends_at` are derived from them plus `duration` on save, and are
  * the only thing availability logic ever looks at. Keep writing to date /
- * time_slot / duration — never to the derived columns directly.
+ * time_slot / duration, never to the derived columns directly.
  */
 class Booking extends Model
 {
@@ -104,7 +104,7 @@ class Booking extends Model
      *
      * slot_key is null for cancelled bookings, so the unique index on it stops
      * two live bookings from claiming the same start while ignoring cancelled
-     * ones — NULLs are excluded from unique indexes on MySQL and PostgreSQL
+     * ones: NULLs are excluded from unique indexes on MySQL and PostgreSQL
      * alike.
      */
     public function syncInterval(): void
@@ -148,7 +148,7 @@ class Booking extends Model
 
     /**
      * The column is a TIME, so drivers hand back "14:00:00" while everything
-     * else — slot generation, comparisons, display — speaks "14:00".
+     * else (slot generation, comparisons, display) speaks "14:00".
      */
     protected function timeSlot(): Attribute
     {

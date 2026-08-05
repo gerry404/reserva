@@ -8,7 +8,7 @@ return [
      *
      * Named separately from `default` because it is the one disk whose contents
      * must outlive a container. On Render the filesystem is ephemeral, so a
-     * local disk quietly loses every image on the next deploy — set
+     * local disk quietly loses every image on the next deploy; set
      * UPLOAD_DISK=s3 (S3, Cloudflare R2, any S3-compatible bucket) in
      * production. Code should reach for it through App\Support\Uploads.
      */

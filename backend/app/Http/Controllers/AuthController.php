@@ -183,7 +183,7 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             // Google-only accounts have no password yet, so there is nothing to
-            // confirm — they are setting one for the first time.
+            // confirm; they are setting one for the first time.
             'current_password' => [$user->password ? 'required' : 'nullable', 'string'],
             'password'         => ['required', 'confirmed', PasswordRule::defaults()],
         ]);
@@ -208,7 +208,7 @@ class AuthController extends Controller
     /**
      * Ask for a reset link.
      *
-     * The response never varies with whether the address is registered — that
+     * The response never varies with whether the address is registered, and that
      * would turn this endpoint into a membership oracle.
      */
     public function forgotPassword(Request $request): JsonResponse
@@ -345,7 +345,7 @@ class AuthController extends Controller
         try {
             Mail::to($user->email)->queue(new WelcomeNotification($user));
         } catch (\Throwable $e) {
-            // Never block a signup because the mail transport is down.
+            
             Log::error('Welcome email could not be queued', [
                 'user'  => $user->id,
                 'error' => $e->getMessage(),

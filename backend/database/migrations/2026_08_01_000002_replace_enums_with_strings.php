@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
  *
  * ENUMs are spelled differently by every driver (MySQL has a real type,
  * PostgreSQL emits a CHECK constraint) and adding a value means an ALTER that
- * behaves differently on each — which is exactly what we hit when adding the
+ * behaves differently on each, which is exactly what we hit when adding the
  * `no_show` booking status. The allowed values now live in one place:
  * Booking::STATUSES and User::PLANS.
  *

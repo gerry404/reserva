@@ -34,7 +34,7 @@ until php -r '
     }
 ' 2>/dev/null; do
     if [ "$attempt" -ge 30 ]; then
-        echo "✗ Database unreachable after 30 attempts — aborting."
+        echo "✗ Database unreachable after 30 attempts, aborting."
         exit 1
     fi
     echo "  waiting for database (${attempt}/30)…"

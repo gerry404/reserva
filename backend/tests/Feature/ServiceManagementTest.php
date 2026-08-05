@@ -74,7 +74,7 @@ class ServiceManagementTest extends TestCase
 
     /**
      * existing_images names paths on a shared disk, so an unfiltered value
-     * would let one merchant delete — or adopt — another's pictures.
+     * would let one merchant delete, or adopt, another's pictures.
      */
     public function test_a_foreign_image_path_cannot_be_adopted(): void
     {

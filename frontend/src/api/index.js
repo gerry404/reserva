@@ -96,7 +96,7 @@ export const businessApi = {
   update: (data) => api.put('/business', data).then((r) => r.data),
 
   /**
-   * Images cannot travel as JSON, and PUT cannot carry multipart in PHP — hence
+   * Images cannot travel as JSON, and PUT cannot carry multipart in PHP, hence
    * POST with a _method override, which Laravel unpacks back into a PUT.
    */
   updateWithFiles: (formData) => {

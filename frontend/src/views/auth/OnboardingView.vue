@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { businessApi } from '@/api'
 import { useAuthStore } from '@/stores/auth'
 import { COUNTRIES } from '@/composables/usePhoneInput'
-import { BuildingStorefrontIcon } from '@heroicons/vue/24/outline'
+import { Store } from 'lucide-vue-next'
 
 /**
  * Finishes signup for accounts created through Google, which arrive with no
@@ -53,7 +53,7 @@ async function submit() {
     <div class="max-w-lg mx-auto">
       <div class="text-center mb-8">
         <div class="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-4">
-          <BuildingStorefrontIcon class="w-7 h-7 text-primary-600" />
+          <Store class="w-7 h-7 text-primary-600" />
         </div>
         <h1 class="text-2xl font-black text-gray-900">Bienvenue{{ auth.user?.name ? `, ${auth.user.name.split(' ')[0]}` : '' }} !</h1>
         <p class="text-sm text-gray-500 mt-1.5">

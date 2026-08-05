@@ -13,6 +13,13 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class ServiceRequest extends FormRequest
 {
+    /** Les clés d'icône acceptées, en miroir de src/constants/serviceIcons.js. */
+    private const ICONS = [
+        'scissors', 'razor', 'braid', 'color', 'blowdry', 'care', 'face',
+        'makeup', 'brows', 'nails', 'feet', 'massage', 'spa', 'bath',
+        'wax', 'tan', 'natural', 'premium', 'default',
+    ];
+
     public function authorize(): bool
     {
         return $this->user()?->business !== null;
@@ -29,6 +36,11 @@ class ServiceRequest extends FormRequest
             'description' => ['sometimes', 'nullable', 'string', 'max:500'],
             'category'    => ['sometimes', 'nullable', 'string', 'max:100'],
             'color'       => ['sometimes', 'nullable', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+
+            // La liste vit dans src/constants/serviceIcons.js et est recopiée
+            // ici : le client peut proposer ce qu'il veut, le serveur n'accepte
+            // que ce qu'il connaît.
+            'icon'        => ['sometimes', 'nullable', 'string', 'in:' . implode(',', self::ICONS)],
             'is_active'   => ['sometimes', 'boolean'],
 
             'images'   => ['sometimes', 'array', 'max:' . Service::MAX_IMAGES],
@@ -47,6 +59,7 @@ class ServiceRequest extends FormRequest
             'duration.max' => 'Un service ne peut pas dépasser ' . (Service::MAX_DURATION / 60) . ' heures.',
             'images.max'   => 'Vous pouvez ajouter au maximum ' . Service::MAX_IMAGES . ' photos.',
             'color.regex'  => 'La couleur doit être au format hexadécimal, ex : #6366f1.',
+            'icon.in'      => "Cette icône n'existe pas.",
         ];
     }
 

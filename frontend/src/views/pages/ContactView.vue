@@ -9,7 +9,7 @@ const form = reactive({ name: '', email: '', subject: '', message: '' })
  * Opens the visitor's mail client with the message pre-written.
  *
  * This form used to flip a flag and say "message envoyé" while sending
- * absolutely nothing — every prospect who wrote in was silently dropped. A
+ * absolutely nothing: every prospect who wrote in was silently dropped. A
  * mailto: hand-off is unglamorous, but it actually delivers, and it needs no
  * inbox infrastructure to stand behind it.
  */

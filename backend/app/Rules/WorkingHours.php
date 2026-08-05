@@ -10,7 +10,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  * Validates the opening-hours JSON.
  *
  * This blob drives every slot the booking page offers, so a malformed entry
- * used to mean a business silently showed no availability at all — or, worse,
+ * used to mean a business silently showed no availability at all, or worse,
  * an inverted range that generated slots until the loop gave up. Rejecting bad
  * shapes at the door keeps AvailabilityService free of defensive noise.
  *

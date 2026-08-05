@@ -6,7 +6,7 @@ import { onBeforeUnmount, watch } from 'vue'
  *
  * Aucune des implémentations existantes ne fermait sur Échap, ne bloquait le
  * défilement de la page derrière, ni ne portait de rôle ARIA. Sur mobile, la
- * page continuait de défiler sous la modale — un défaut visible.
+ * page continuait de défiler sous la modale, un défaut visible.
  */
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -29,7 +29,7 @@ function onKeydown(event) {
 
 /**
  * Bloque le défilement de l'arrière-plan tant que la modale est ouverte, et le
- * restaure ensuite — y compris si le composant est démonté pendant qu'elle est
+ * restaure ensuite, y compris si le composant est démonté pendant qu'elle est
  * ouverte, cas où le blocage resterait sinon actif pour toujours.
  */
 watch(

@@ -1,11 +1,11 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Nuvo — production stack for a self-hosted VPS
+# Nuvo : production stack for a self-hosted VPS
 #
 #   caddy      TLS (Let's Encrypt), serves the Vue build, proxies /api
 #   app        Laravel on FrankenPHP
-#   worker     queue:work — notifications must never run inside a customer's
+#   worker     queue:work, notifications must never run inside a customer's
 #              booking request
-#   scheduler  schedule:run every minute — without it no reminder ever fires
+#   scheduler  schedule:run every minute; without it no reminder ever fires
 #   postgres   the database, on a named volume
 #
 # Everything sits behind one domain, so the browser sees a single origin and
@@ -37,7 +37,7 @@ services:
       DOMAIN: ${DOMAIN}
       TLS_EMAIL: ${TLS_EMAIL}
     volumes:
-      - caddy_data:/data          # certificates — losing this re-issues them
+      - caddy_data:/data          # certificates, losing this re-issues them
       - caddy_config:/config
       # Uploads are served straight off disk rather than proxied through PHP.
       - uploads:/srv/uploads:ro

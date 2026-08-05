@@ -22,7 +22,7 @@ class NewBookingNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '📅 Nouvelle réservation — ' . $this->booking->customer_name,
+            subject: '📅 Nouvelle réservation : ' . $this->booking->customer_name,
         );
     }
 

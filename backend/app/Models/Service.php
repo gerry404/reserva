@@ -19,6 +19,7 @@ class Service extends Model
         'price',
         'category',
         'color',
+        'icon',
         'images',
         'is_active',
     ];

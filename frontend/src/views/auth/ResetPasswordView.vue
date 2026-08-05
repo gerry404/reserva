@@ -2,7 +2,7 @@
 import { computed, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { authApi } from '@/api'
-import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
+import { Eye, EyeOff } from 'lucide-vue-next'
 
 const route  = useRoute()
 const router = useRouter()
@@ -80,8 +80,8 @@ async function submit() {
                   :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                   @click="showPassword = !showPassword"
                 >
-                  <EyeSlashIcon v-if="showPassword" class="w-5 h-5" />
-                  <EyeIcon v-else class="w-5 h-5" />
+                  <EyeOff v-if="showPassword" class="w-5 h-5" />
+                  <Eye v-else class="w-5 h-5" />
                 </button>
               </div>
               <p v-if="fieldErrors.password" class="text-red-500 text-xs mt-1">
@@ -118,7 +118,7 @@ async function submit() {
 
         <template v-else>
           <p class="text-sm text-gray-500 mt-2 leading-relaxed">
-            Ce lien est incomplet ou a expiré. Demandez-en un nouveau — les liens
+            Ce lien est incomplet ou a expiré. Demandez-en un nouveau : les liens
             de réinitialisation ne restent valables qu'une heure.
           </p>
           <RouterLink :to="{ name: 'forgot-password' }" class="btn-primary w-full py-3 mt-6 inline-block text-center">

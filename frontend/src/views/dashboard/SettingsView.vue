@@ -1,4 +1,5 @@
 <script setup>
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 import { computed, reactive, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -6,14 +7,14 @@ import { businessApi } from '@/api'
 import { defaultAccent, swatches } from '@/design/tokens'
 import { COUNTRIES } from '@/composables/usePhoneInput'
 import {
-  LinkIcon,
-  CheckCircleIcon,
-  DevicePhoneMobileIcon,
-  ClockIcon,
-  GlobeAltIcon,
-  CameraIcon,
-  PhotoIcon,
-} from '@heroicons/vue/24/outline'
+  Link,
+  CircleCheck,
+  Smartphone,
+  Clock,
+  Globe,
+  Camera,
+  Image,
+} from 'lucide-vue-next'
 
 const auth       = useAuthStore()
 const saving     = ref(false)
@@ -22,7 +23,7 @@ const linkCopied = ref(false)
 const errors     = ref({})
 const saveError  = ref('')
 
-// `window` is not exposed to templates — reading it there threw before the page
+// `window` is not exposed to templates, so reading it there threw before the page
 // could render. Resolve it once, here.
 const origin = window.location.origin
 
@@ -68,6 +69,9 @@ const form = reactive({
   accent_color:        defaultAccent,
   working_hours:       {},
 })
+
+/** Drapeau et nom réunis : la liste déroulante affiche un libellé, pas deux champs. */
+const paysOptions = COUNTRIES.map((c) => ({ value: c.code, label: `${c.flag} ${c.name}` }))
 
 const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']
 const timeOptions = []
@@ -201,7 +205,7 @@ async function copyLink() {
     <!-- Public URL -->
     <div class="card p-5">
       <h3 class="font-bold text-gray-900 mb-1 flex items-center gap-2">
-        <LinkIcon class="w-5 h-5 text-primary-500" />
+        <Link class="w-5 h-5 text-primary-500" />
         Votre lien de réservation
       </h3>
       <p class="text-sm text-gray-500 mb-3">Partagez ce lien sur WhatsApp, Instagram, Facebook…</p>
@@ -224,12 +228,12 @@ async function copyLink() {
           <img v-if="coverPreview" :src="coverPreview" class="w-full h-full object-cover" alt="Cover" />
           <div v-else class="w-full h-full border-2 border-dashed border-gray-300 flex items-center justify-center">
             <div class="text-center text-gray-400">
-              <PhotoIcon class="w-10 h-10 mx-auto mb-1" />
+              <Image class="w-10 h-10 mx-auto mb-1" />
               <span class="text-sm">Ajouter une bannière</span>
             </div>
           </div>
           <label class="absolute bottom-3 right-3 bg-white/90 backdrop-blur rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 cursor-pointer hover:bg-clay-50 transition shadow-sm flex items-center gap-1.5">
-            <CameraIcon class="w-4 h-4" />
+            <Camera class="w-4 h-4" />
             Changer la bannière
             <input type="file" accept="image/*" class="hidden" @change="onCoverChange" />
           </label>
@@ -243,7 +247,7 @@ async function copyLink() {
               <span v-else class="text-2xl font-bold text-gray-400">{{ form.name?.charAt(0)?.toUpperCase() || '?' }}</span>
             </div>
             <div class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-              <CameraIcon class="w-5 h-5 text-white" />
+              <Camera class="w-5 h-5 text-white" />
             </div>
             <input type="file" accept="image/*" class="hidden" @change="onLogoChange" />
           </label>
@@ -257,7 +261,7 @@ async function copyLink() {
       <!-- Commerce info -->
       <div class="card p-6 space-y-5">
         <h3 class="font-bold text-gray-900 flex items-center gap-2">
-          <GlobeAltIcon class="w-5 h-5 text-gray-400" />
+          <Globe class="w-5 h-5 text-gray-400" />
           Informations du commerce
         </h3>
 
@@ -317,11 +321,7 @@ async function copyLink() {
 
           <div class="sm:col-span-2">
             <label for="country" class="block text-sm font-semibold text-gray-700 mb-1.5">Pays</label>
-            <select id="country" v-model="form.country" class="input-field">
-              <option v-for="c in COUNTRIES" :key="c.code" :value="c.code">
-                {{ c.flag }} {{ c.name }}
-              </option>
-            </select>
+            <BaseSelect id="country" v-model="form.country" :options="paysOptions" />
             <!-- Not cosmetic: the country sets the clock your opening hours are
                  read against, and the currency your prices are shown in. -->
             <p class="text-[11px] text-gray-400 mt-1">
@@ -351,7 +351,7 @@ async function copyLink() {
           <div class="flex gap-2 flex-wrap">
             <button v-for="c in accentColors" :key="c" type="button"
               @click="form.accent_color = c"
-              class="w-8 h-8 rounded-lg transition-transform hover:scale-110 ring-offset-2"
+              class="w-8 h-8 rounded-control transition-transform hover:scale-110 ring-offset-2"
               :class="form.accent_color === c ? 'ring-2 ring-gray-900 scale-110' : ''"
               :style="{ backgroundColor: c }"
             />
@@ -362,22 +362,18 @@ async function copyLink() {
       <!-- Booking settings -->
       <div class="card p-6 space-y-5">
         <h3 class="font-bold text-gray-900 flex items-center gap-2">
-          <ClockIcon class="w-5 h-5 text-gray-400" />
+          <Clock class="w-5 h-5 text-gray-400" />
           Paramètres de réservation
         </h3>
 
         <div class="grid sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Durée des créneaux</label>
-            <select v-model="form.slot_duration" class="input-field">
-              <option v-for="o in slotOptions" :key="o.v" :value="o.v">{{ o.l }}</option>
-            </select>
+            <BaseSelect v-model="form.slot_duration" :options="slotOptions" value-key="v" label-key="l" />
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Délai minimum de réservation</label>
-            <select v-model="form.booking_notice" class="input-field">
-              <option v-for="o in noticeOptions" :key="o.v" :value="o.v">{{ o.l }}</option>
-            </select>
+            <BaseSelect v-model="form.booking_notice" :options="noticeOptions" value-key="v" label-key="l" />
           </div>
         </div>
       </div>
@@ -385,7 +381,7 @@ async function copyLink() {
       <!-- Working hours -->
       <div class="card p-6 space-y-4">
         <h3 class="font-bold text-gray-900 flex items-center gap-2">
-          <ClockIcon class="w-5 h-5 text-gray-400" />
+          <Clock class="w-5 h-5 text-gray-400" />
           Horaires d'ouverture
         </h3>
 
@@ -403,13 +399,15 @@ async function copyLink() {
             <span class="w-20 text-sm font-medium text-gray-700 capitalize">{{ day }}</span>
 
             <template v-if="form.working_hours[day]?.is_open">
-              <select v-model="form.working_hours[day].open" class="input-field py-1.5 text-xs flex-1 max-w-[90px]">
-                <option v-for="t in timeOptions" :key="t" :value="t">{{ t }}</option>
-              </select>
-              <span class="text-gray-400 text-sm">–</span>
-              <select v-model="form.working_hours[day].close" class="input-field py-1.5 text-xs flex-1 max-w-[90px]">
-                <option v-for="t in timeOptions" :key="t" :value="t">{{ t }}</option>
-              </select>
+              <div class="flex-1 max-w-[100px]">
+                <BaseSelect v-model="form.working_hours[day].open" :options="timeOptions" size="sm"
+                  :aria-label="`Heure d'ouverture, ${day}`" />
+              </div>
+              <span class="text-gray-400 text-sm">à</span>
+              <div class="flex-1 max-w-[100px]">
+                <BaseSelect v-model="form.working_hours[day].close" :options="timeOptions" size="sm"
+                  :aria-label="`Heure de fermeture, ${day}`" />
+              </div>
             </template>
             <span v-else class="text-sm text-gray-400 italic">Fermé</span>
           </div>
@@ -419,7 +417,7 @@ async function copyLink() {
       <!-- Notifications -->
       <div class="card p-6 space-y-4">
         <h3 class="font-bold text-gray-900 flex items-center gap-2">
-          <DevicePhoneMobileIcon class="w-5 h-5 text-gray-400" />
+          <Smartphone class="w-5 h-5 text-gray-400" />
           Notifications
         </h3>
 
@@ -476,7 +474,7 @@ async function copyLink() {
         </button>
         <Transition name="fade">
           <div v-if="saved" class="flex items-center gap-1.5 text-emerald-600 text-sm font-semibold">
-            <CheckCircleIcon class="w-5 h-5" /> Enregistré !
+            <CircleCheck class="w-5 h-5" /> Enregistré !
           </div>
         </Transition>
       </div>

@@ -10,7 +10,7 @@ use App\Rules\PhoneNumber;
  *
  * Most merchants on Nuvo do not have (and cannot afford) the WhatsApp
  * Business API. The fallback that actually works is a deep link they tap, which
- * opens WhatsApp with the message already written — so these strings are a real
+ * opens WhatsApp with the message already written, so these strings are a real
  * product surface, not a convenience.
  */
 final class WhatsAppLink
@@ -37,7 +37,7 @@ final class WhatsAppLink
             "✅ Votre réservation chez *{$business->name}* est confirmée !",
             '',
             '📋 *Détails*',
-            "• Service : " . ($booking->service?->name ?? '—'),
+            "• Service : " . ($booking->service?->name ?? 'Service supprimé'),
             "• Date : " . $booking->date->locale('fr')->isoFormat('dddd D MMMM YYYY'),
             "• Heure : {$booking->time_slot}",
             "• Référence : {$booking->reference}",
@@ -58,7 +58,7 @@ final class WhatsAppLink
             '',
             "⏰ Petit rappel : vous avez rendez-vous demain chez *{$business->name}*.",
             '',
-            "• Service : " . ($booking->service?->name ?? '—'),
+            "• Service : " . ($booking->service?->name ?? 'Service supprimé'),
             "• Heure : {$booking->time_slot}",
             "• Référence : {$booking->reference}",
             '',

@@ -1,20 +1,22 @@
 <script setup>
+import { SERVICE_ICONS, guessIconKey, iconForService } from '@/constants/serviceIcons'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 import { ref, onMounted, onUnmounted, reactive, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { servicesApi } from '@/api'
 import { defaultAccent, swatches } from '@/design/tokens'
 import {
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
-  Squares2X2Icon,
-  ClockIcon,
-  BanknotesIcon,
-  PhotoIcon,
-  XMarkIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from '@heroicons/vue/24/outline'
+  Plus,
+  Pencil,
+  Trash2,
+  LayoutGrid,
+  Clock,
+  Banknote,
+  Image,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-vue-next'
 
 const auth    = useAuthStore()
 const services = ref([])
@@ -51,7 +53,18 @@ function onGalleryKey(e) {
 
 const form = reactive({
   name: '', description: '', duration: 30, price: 0, category: '', color: defaultAccent,
+  icon: null,
 })
+
+/**
+ * L'icône suggérée d'après le nom, tant que le commerçant n'en a pas choisi.
+ *
+ * `form.icon` reste à null jusqu'au premier clic : c'est ce qui distingue
+ * « pas encore décidé » de « a choisi la sonnette ». Le premier suit le nom au
+ * fil de la frappe, le second ne bouge plus.
+ */
+const iconeSuggeree = computed(() => guessIconKey(form.name, form.category))
+const iconeActive = computed(() => form.icon ?? iconeSuggeree.value)
 
 // Images state
 const newImages = ref([])        // File objects to upload
@@ -101,7 +114,7 @@ function resetImageState() {
 
 function openCreate() {
   editing.value = null
-  Object.assign(form, { name: '', description: '', duration: 30, price: 0, category: '', color: defaultAccent })
+  Object.assign(form, { name: '', description: '', duration: 30, price: 0, category: '', color: defaultAccent, icon: null })
   errors.value = {}
   resetImageState()
   modal.value  = true
@@ -112,6 +125,7 @@ function openEdit(svc) {
   Object.assign(form, {
     name: svc.name, description: svc.description ?? '', duration: svc.duration,
     price: svc.price, category: svc.category ?? '', color: svc.color ?? defaultAccent,
+    icon: svc.icon ?? null,
   })
   errors.value = {}
   resetImageState()
@@ -155,6 +169,9 @@ function buildFormData() {
   fd.append('price', form.price)
   fd.append('category', form.category || '')
   fd.append('color', form.color)
+  // Seul un choix explicite part au serveur : sans cela la suggestion serait
+  // figée en base et ne suivrait plus un renommage du service.
+  if (form.icon) fd.append('icon', form.icon)
 
   for (const file of newImages.value) {
     fd.append('images[]', file)
@@ -231,7 +248,7 @@ function formatDuration(min) {
         <p class="text-sm text-gray-500 mt-0.5">{{ services.length }} service(s) configuré(s)</p>
       </div>
       <button @click="openCreate" class="btn-primary">
-        <PlusIcon class="w-4 h-4" />
+        <Plus class="w-4 h-4" />
         Nouveau service
       </button>
     </div>
@@ -247,11 +264,11 @@ function formatDuration(min) {
 
     <!-- Empty state -->
     <div v-else-if="services.length === 0" class="card p-16 text-center">
-      <Squares2X2Icon class="w-16 h-16 text-gray-200 mx-auto mb-4" />
+      <LayoutGrid class="w-16 h-16 text-gray-200 mx-auto mb-4" />
       <h3 class="font-bold text-gray-900 mb-2">Aucun service encore</h3>
       <p class="text-gray-400 text-sm mb-6">Ajoutez vos services pour que vos clients puissent réserver.</p>
       <button @click="openCreate" class="btn-primary mx-auto">
-        <PlusIcon class="w-4 h-4" /> Créer mon premier service
+        <Plus class="w-4 h-4" /> Créer mon premier service
       </button>
     </div>
 
@@ -266,7 +283,7 @@ function formatDuration(min) {
         <div v-if="svc.images && svc.images.length" class="relative h-36 overflow-hidden bg-gray-100 cursor-pointer group/img" @click.stop="openGallery(svc)">
           <img :src="svc.images[0].url" :alt="svc.name" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
           <div class="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors flex items-center justify-center">
-            <PhotoIcon class="w-6 h-6 text-white opacity-0 group-hover/img:opacity-100 transition-opacity drop-shadow-lg" />
+            <Image class="w-6 h-6 text-white opacity-0 group-hover/img:opacity-100 transition-opacity drop-shadow-lg" />
           </div>
           <span v-if="svc.images.length > 1" class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
             +{{ svc.images.length - 1 }}
@@ -276,9 +293,9 @@ function formatDuration(min) {
         <div class="p-5 flex flex-col gap-4 flex-1">
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shrink-0"
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
                 :style="{ backgroundColor: svc.color ?? defaultAccent }">
-                ✦
+                <component :is="iconForService(svc)" :size="19" />
               </div>
               <div>
                 <h3 class="font-bold text-gray-900 text-sm">{{ svc.name }}</h3>
@@ -298,21 +315,21 @@ function formatDuration(min) {
 
           <div class="flex items-center gap-4 text-sm">
             <div class="flex items-center gap-1.5 text-gray-600">
-              <ClockIcon class="w-4 h-4 text-gray-400" />
+              <Clock class="w-4 h-4 text-gray-400" />
               {{ formatDuration(svc.duration) }}
             </div>
             <div class="flex items-center gap-1.5 font-semibold text-gray-900">
-              <BanknotesIcon class="w-4 h-4 text-gray-400" />
+              <Banknote class="w-4 h-4 text-gray-400" />
               {{ formatPrice(svc.price) }}
             </div>
           </div>
 
           <div class="flex gap-2 pt-1 border-t border-gray-50 mt-auto">
             <button @click="openEdit(svc)" class="btn-ghost text-xs flex-1 py-1.5">
-              <PencilIcon class="w-3.5 h-3.5" /> Modifier
+              <Pencil class="w-3.5 h-3.5" /> Modifier
             </button>
             <button @click="deleting = svc.id" class="btn-ghost text-xs text-red-500 hover:text-red-700 hover:bg-red-50 flex-1 py-1.5">
-              <TrashIcon class="w-3.5 h-3.5" /> Supprimer
+              <Trash2 class="w-3.5 h-3.5" /> Supprimer
             </button>
           </div>
         </div>
@@ -345,9 +362,7 @@ function formatDuration(min) {
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1.5">Durée *</label>
-                <select v-model="form.duration" class="input-field">
-                  <option v-for="d in durations" :key="d.v" :value="d.v">{{ d.l }}</option>
-                </select>
+                <BaseSelect v-model="form.duration" :options="durations" value-key="v" label-key="l" />
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1.5">Prix (F CFA)</label>
@@ -362,6 +377,31 @@ function formatDuration(min) {
             </div>
 
             <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Icône</label>
+              <div class="flex gap-2 flex-wrap">
+                <button
+                  v-for="ic in SERVICE_ICONS"
+                  :key="ic.key"
+                  type="button"
+                  :title="ic.label"
+                  :aria-label="ic.label"
+                  :aria-pressed="iconeActive === ic.key"
+                  @click="form.icon = ic.key"
+                  :class="['w-10 h-10 rounded-control border flex items-center justify-center transition-all',
+                           iconeActive === ic.key
+                             ? 'border-transparent text-white scale-105'
+                             : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-800']"
+                  :style="iconeActive === ic.key ? { backgroundColor: form.color } : null"
+                >
+                  <component :is="ic.component" :size="18" />
+                </button>
+              </div>
+              <p v-if="!form.icon" class="text-xs text-gray-400 mt-2">
+                Suggérée d'après le nom. Cliquez pour en imposer une autre.
+              </p>
+            </div>
+
+            <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">Couleur</label>
               <div class="flex gap-2 flex-wrap">
                 <button
@@ -369,7 +409,7 @@ function formatDuration(min) {
                   :key="c"
                   type="button"
                   @click="form.color = c"
-                  class="w-8 h-8 rounded-lg transition-transform hover:scale-110 ring-offset-2"
+                  class="w-8 h-8 rounded-control transition-transform hover:scale-110 ring-offset-2"
                   :class="form.color === c ? 'ring-2 ring-gray-900 scale-110' : ''"
                   :style="{ backgroundColor: c }"
                 />
@@ -391,14 +431,14 @@ function formatDuration(min) {
                     @click="removeImage(idx)"
                     class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                   >
-                    <XMarkIcon class="w-5 h-5 text-white" />
+                    <X class="w-5 h-5 text-white" />
                   </button>
                 </div>
 
                 <!-- Add button -->
                 <label v-if="canAddMore"
                   class="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-primary-400 hover:bg-primary-50/50 flex flex-col items-center justify-center cursor-pointer transition-colors">
-                  <PhotoIcon class="w-5 h-5 text-gray-300" />
+                  <Image class="w-5 h-5 text-gray-300" />
                   <span class="text-[10px] text-gray-400 mt-1">Ajouter</span>
                   <input
                     type="file"
@@ -434,7 +474,7 @@ function formatDuration(min) {
     <Transition name="fade">
       <div v-if="gallery" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm" @click.self="gallery = null">
         <button @click="gallery = null" class="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors z-10">
-          <XMarkIcon class="w-7 h-7" />
+          <X class="w-7 h-7" />
         </button>
 
         <!-- Counter -->
@@ -449,7 +489,7 @@ function formatDuration(min) {
 
         <!-- Prev -->
         <button v-if="gallery.images.length > 1" @click="galleryPrev" class="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">
-          <ChevronLeftIcon class="w-6 h-6" />
+          <ChevronLeft class="w-6 h-6" />
         </button>
 
         <!-- Image -->
@@ -457,7 +497,7 @@ function formatDuration(min) {
 
         <!-- Next -->
         <button v-if="gallery.images.length > 1" @click="galleryNext" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">
-          <ChevronRightIcon class="w-6 h-6" />
+          <ChevronRight class="w-6 h-6" />
         </button>
 
         <!-- Thumbnails -->

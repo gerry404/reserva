@@ -8,29 +8,29 @@ import UserAvatar from '@/components/ui/UserAvatar.vue'
 import { describeStatus } from '@/constants/bookingStatus'
 import { RouterLink } from 'vue-router'
 import {
-  CalendarDaysIcon,
-  ClockIcon,
-  CurrencyDollarIcon,
-  CheckCircleIcon,
-  LinkIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  UserGroupIcon,
-  PlusIcon,
-  Squares2X2Icon,
-  Cog6ToothIcon,
-  ShareIcon,
-  CheckIcon,
-  XMarkIcon,
-  SparklesIcon,
-  RocketLaunchIcon,
-  ArrowRightIcon,
-  ArrowPathIcon,
-  BoltIcon,
-  ChartBarIcon,
-  FireIcon,
-  UsersIcon,
-} from '@heroicons/vue/24/outline'
+  CalendarDays,
+  Clock,
+  CircleDollarSign,
+  CircleCheck,
+  Link,
+  TrendingUp,
+  TrendingDown,
+  UsersRound,
+  Plus,
+  LayoutGrid,
+  Settings,
+  Share2,
+  Check,
+  X,
+  Sparkles,
+  Rocket,
+  ArrowRight,
+  RefreshCw,
+  Zap,
+  ChartColumn,
+  Flame,
+  Users,
+} from 'lucide-vue-next'
 import { format, parseISO } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
@@ -65,9 +65,9 @@ const onboarding = computed(() => {
   if (!auth.business) return []
   const b = auth.business
   return [
-    { id: 'profile',  label: 'Compléter le profil commerce', done: !!(b.description && b.address), to: '/dashboard/settings', icon: Cog6ToothIcon },
-    { id: 'services', label: 'Ajouter au moins un service',  done: stats.value?.has_services ?? false, to: '/dashboard/services', icon: Squares2X2Icon },
-    { id: 'share',    label: 'Partager votre lien de réservation', done: false, action: 'share', icon: ShareIcon },
+    { id: 'profile',  label: 'Compléter le profil commerce', done: !!(b.description && b.address), to: '/dashboard/settings', icon: Settings },
+    { id: 'services', label: 'Ajouter au moins un service',  done: stats.value?.has_services ?? false, to: '/dashboard/services', icon: LayoutGrid },
+    { id: 'share',    label: 'Partager votre lien de réservation', done: false, action: 'share', icon: Share2 },
   ]
 })
 const onboardingDone = computed(() => onboarding.value.filter(s => s.done).length)
@@ -92,7 +92,7 @@ async function loadDashboard() {
   try {
     // allSettled, not all: analytics is Pro-only and answers 402 on a free
     // plan. With Promise.all that single rejection blanked the whole dashboard
-    // — the free tier saw an error page instead of their bookings.
+    // the free tier saw an error page instead of their bookings.
     const [statsResult, upcomingResult, chartResult, analyticsResult] = await Promise.allSettled([
       dashboardApi.stats(),
       dashboardApi.upcoming(),
@@ -245,7 +245,7 @@ const greeting = computed(() => {
     <!-- Error -->
     <div v-if="error && !loading" class="card p-8 text-center">
       <div class="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
-        <XMarkIcon class="w-7 h-7 text-red-500" />
+        <X class="w-7 h-7 text-red-500" />
       </div>
       <h3 class="font-bold text-gray-900 mb-2">Erreur de chargement</h3>
       <p class="text-sm text-gray-500 mb-4">{{ error }}</p>
@@ -265,15 +265,15 @@ const greeting = computed(() => {
         </div>
         <div v-if="publicUrl" class="flex items-center gap-2">
           <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-500 max-w-[220px] overflow-hidden">
-            <LinkIcon class="w-4 h-4 shrink-0 text-primary-500" />
+            <Link class="w-4 h-4 shrink-0 text-primary-500" />
             <span class="truncate text-xs font-mono">{{ publicUrl.replace(/^https?:\/\//, '') }}</span>
           </div>
           <button @click="copyLink" class="btn-primary px-3 py-2 text-xs">
-            <template v-if="linkCopied"><CheckIcon class="w-3.5 h-3.5" /> Copié !</template>
+            <template v-if="linkCopied"><Check class="w-3.5 h-3.5" /> Copié !</template>
             <template v-else>Copier</template>
           </button>
           <button @click="shareLink" class="btn-secondary px-3 py-2 text-xs" title="Partager">
-            <ShareIcon class="w-3.5 h-3.5" />
+            <Share2 class="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -283,7 +283,7 @@ const greeting = computed(() => {
         <div class="bg-gradient-to-r from-primary-600 to-violet-600 px-6 py-4">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-              <RocketLaunchIcon class="w-5 h-5 text-white" />
+              <Rocket class="w-5 h-5 text-white" />
             </div>
             <div>
               <h3 class="font-bold text-white">Bienvenue sur Nuvo !</h3>
@@ -300,15 +300,15 @@ const greeting = computed(() => {
         <div class="divide-y divide-gray-50">
           <div v-for="step in onboarding" :key="step.id" class="flex items-center gap-4 px-6 py-4">
             <div :class="['w-8 h-8 rounded-full flex items-center justify-center shrink-0', step.done ? 'bg-emerald-100' : 'bg-gray-100']">
-              <CheckIcon v-if="step.done" class="w-4 h-4 text-emerald-600" />
+              <Check v-if="step.done" class="w-4 h-4 text-emerald-600" />
               <component v-else :is="step.icon" class="w-4 h-4 text-gray-400" />
             </div>
             <span :class="['flex-1 text-sm font-medium', step.done ? 'text-gray-400 line-through' : 'text-gray-700']">{{ step.label }}</span>
             <RouterLink v-if="step.to && !step.done" :to="step.to" class="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1">
-              Compléter <ArrowRightIcon class="w-3 h-3" />
+              Compléter <ArrowRight class="w-3 h-3" />
             </RouterLink>
             <button v-else-if="step.action === 'share' && !step.done" @click="shareLink" class="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1">
-              Partager <ArrowRightIcon class="w-3 h-3" />
+              Partager <ArrowRight class="w-3 h-3" />
             </button>
             <span v-else-if="step.done" class="text-xs text-emerald-600 font-semibold">Fait</span>
           </div>
@@ -337,10 +337,10 @@ const greeting = computed(() => {
           <div class="stat-card group hover:shadow-md transition-shadow">
             <div class="flex items-center justify-between">
               <div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                <CalendarDaysIcon class="w-5 h-5 text-blue-600" />
+                <CalendarDays class="w-5 h-5 text-blue-600" />
               </div>
               <div v-if="stats.monthly_trend !== 0" :class="['flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full', stats.monthly_trend >= 0 ? 'text-emerald-700 bg-emerald-50' : 'text-red-600 bg-red-50']">
-                <component :is="stats.monthly_trend >= 0 ? ArrowTrendingUpIcon : ArrowTrendingDownIcon" class="w-3 h-3" />
+                <component :is="stats.monthly_trend >= 0 ? TrendingUp : TrendingDown" class="w-3 h-3" />
                 {{ Math.abs(stats.monthly_trend) }}%
               </div>
             </div>
@@ -354,7 +354,7 @@ const greeting = computed(() => {
           <div class="stat-card group hover:shadow-md transition-shadow">
             <div class="flex items-center justify-between">
               <div class="w-10 h-10 rounded-2xl bg-violet-50 flex items-center justify-center group-hover:bg-violet-100 transition-colors">
-                <ClockIcon class="w-5 h-5 text-violet-600" />
+                <Clock class="w-5 h-5 text-violet-600" />
               </div>
               <span v-if="stats.today_bookings > 0" class="text-xs font-semibold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full">
                 Aujourd'hui
@@ -370,7 +370,7 @@ const greeting = computed(() => {
           <RouterLink to="/dashboard/bookings" class="stat-card group hover:shadow-md transition-shadow cursor-pointer">
             <div class="flex items-center justify-between">
               <div class="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
-                <UserGroupIcon class="w-5 h-5 text-amber-600" />
+                <UsersRound class="w-5 h-5 text-amber-600" />
               </div>
               <span v-if="stats.pending_bookings > 0" class="relative flex h-3 w-3">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
@@ -387,10 +387,10 @@ const greeting = computed(() => {
           <div class="stat-card group hover:shadow-md transition-shadow">
             <div class="flex items-center justify-between">
               <div class="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
-                <CurrencyDollarIcon class="w-5 h-5 text-emerald-600" />
+                <CircleDollarSign class="w-5 h-5 text-emerald-600" />
               </div>
               <div v-if="stats.revenue_trend !== 0" :class="['flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full', stats.revenue_trend >= 0 ? 'text-emerald-700 bg-emerald-50' : 'text-red-600 bg-red-50']">
-                <component :is="stats.revenue_trend >= 0 ? ArrowTrendingUpIcon : ArrowTrendingDownIcon" class="w-3 h-3" />
+                <component :is="stats.revenue_trend >= 0 ? TrendingUp : TrendingDown" class="w-3 h-3" />
                 {{ Math.abs(stats.revenue_trend) }}%
               </div>
             </div>
@@ -405,7 +405,7 @@ const greeting = computed(() => {
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="card px-4 py-3 flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
-              <UsersIcon class="w-4.5 h-4.5 text-indigo-600" />
+              <Users class="w-4.5 h-4.5 text-indigo-600" />
             </div>
             <div>
               <p class="text-lg font-black text-gray-900 numeric">{{ stats.total_clients }}</p>
@@ -414,7 +414,7 @@ const greeting = computed(() => {
           </div>
           <div class="card px-4 py-3 flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center">
-              <ArrowPathIcon class="w-4.5 h-4.5 text-pink-600" />
+              <RefreshCw class="w-4.5 h-4.5 text-pink-600" />
             </div>
             <div>
               <p class="text-lg font-black text-gray-900">{{ stats.returning_clients }}</p>
@@ -423,7 +423,7 @@ const greeting = computed(() => {
           </div>
           <div class="card px-4 py-3 flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
-              <CheckCircleIcon class="w-4.5 h-4.5 text-emerald-600" />
+              <CircleCheck class="w-4.5 h-4.5 text-emerald-600" />
             </div>
             <div>
               <p class="text-lg font-black text-gray-900">{{ stats.completion_rate }}%</p>
@@ -432,7 +432,7 @@ const greeting = computed(() => {
           </div>
           <div class="card px-4 py-3 flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
-              <XMarkIcon class="w-4.5 h-4.5 text-red-500" />
+              <X class="w-4.5 h-4.5 text-red-500" />
             </div>
             <div>
               <p class="text-lg font-black text-gray-900">{{ stats.cancellation_rate }}%</p>
@@ -454,7 +454,7 @@ const greeting = computed(() => {
                 </p>
               </div>
             </div>
-            <RouterLink to="/dashboard/billing" class="bg-clay-50 text-amber-700 font-bold text-xs px-4 py-2 rounded-xl hover:bg-amber-50 transition-colors shrink-0">
+            <RouterLink to="/dashboard/billing" class="bg-clay-50 text-amber-700 font-bold text-xs px-4 py-2 rounded-control hover:bg-amber-50 transition-colors shrink-0">
               Voir les plans
             </RouterLink>
           </div>
@@ -479,11 +479,11 @@ const greeting = computed(() => {
                 />
               </div>
               <p v-if="quotaIsTight" class="text-xs text-amber-600 mt-1.5 font-medium">
-                ⚠ Bientôt à la limite — au-delà, vos clients ne pourront plus réserver ce mois-ci.
+                ⚠ Bientôt à la limite : au-delà, vos clients ne pourront plus réserver ce mois-ci.
               </p>
             </div>
             <RouterLink to="/dashboard/billing" class="btn-primary text-xs px-4 py-2 whitespace-nowrap shrink-0">
-              <SparklesIcon class="w-3.5 h-3.5" /> Passer Pro
+              <Sparkles class="w-3.5 h-3.5" /> Passer Pro
             </RouterLink>
           </div>
         </div>
@@ -495,10 +495,10 @@ const greeting = computed(() => {
             <div class="flex items-center justify-between mb-6">
               <h3 class="font-bold text-gray-900">Réservations</h3>
               <div class="flex items-center bg-gray-100 rounded-lg p-0.5">
-                <button @click="chartTab = 'daily'" :class="['text-xs font-semibold px-3 py-1.5 rounded-md transition-all', chartTab === 'daily' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
+                <button @click="chartTab = 'daily'" :class="['text-xs font-semibold px-3 py-1.5 rounded-control transition-all', chartTab === 'daily' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
                   7 jours
                 </button>
-                <button @click="chartTab = 'monthly'" :class="['text-xs font-semibold px-3 py-1.5 rounded-md transition-all', chartTab === 'monthly' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
+                <button @click="chartTab = 'monthly'" :class="['text-xs font-semibold px-3 py-1.5 rounded-control transition-all', chartTab === 'monthly' ? 'bg-clay-50 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
                   6 mois
                 </button>
               </div>
@@ -518,7 +518,7 @@ const greeting = computed(() => {
 
             <div v-else class="h-48 flex flex-col items-center justify-center text-center">
               <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-3">
-                <ChartBarIcon class="w-7 h-7 text-gray-300" />
+                <ChartColumn class="w-7 h-7 text-gray-300" />
               </div>
               <p class="text-sm text-gray-400 font-medium mb-1">Aucune donnée pour cette période</p>
               <p class="text-xs text-gray-300">Partagez votre lien pour recevoir vos premières réservations</p>
@@ -565,7 +565,7 @@ const greeting = computed(() => {
 
             <div v-else class="h-48 flex flex-col items-center justify-center text-center">
               <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
-                <ChartBarIcon class="w-6 h-6 text-gray-300" />
+                <ChartColumn class="w-6 h-6 text-gray-300" />
               </div>
               <p class="text-sm text-gray-400">Pas encore de données</p>
             </div>
@@ -579,17 +579,17 @@ const greeting = computed(() => {
             <div class="flex items-center justify-between mb-5">
               <h3 class="font-bold text-gray-900">Prochaines réservations</h3>
               <RouterLink to="/dashboard/bookings" class="text-xs text-primary-600 font-semibold hover:text-primary-700 flex items-center gap-1">
-                Tout voir <ArrowRightIcon class="w-3 h-3" />
+                Tout voir <ArrowRight class="w-3 h-3" />
               </RouterLink>
             </div>
 
             <div v-if="upcoming.length === 0" class="flex flex-col items-center justify-center py-8 text-center">
               <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-3">
-                <CalendarDaysIcon class="w-7 h-7 text-gray-300" />
+                <CalendarDays class="w-7 h-7 text-gray-300" />
               </div>
               <p class="text-sm text-gray-400 font-medium mb-1">Aucune réservation à venir</p>
               <button @click="copyLink" v-if="publicUrl" class="btn-secondary text-xs mt-3">
-                <LinkIcon class="w-3.5 h-3.5" /> Copier mon lien
+                <Link class="w-3.5 h-3.5" /> Copier mon lien
               </button>
             </div>
 
@@ -619,12 +619,12 @@ const greeting = computed(() => {
                   <StatusBadge :status="b.status" compact />
                   <div v-if="b.status === 'pending'" class="hidden group-hover:flex items-center gap-1">
                     <button @click.stop="confirmBooking(b.id)" :disabled="actionLoading === b.id"
-                      class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 flex items-center justify-center transition-colors" title="Confirmer">
-                      <CheckIcon class="w-3.5 h-3.5 text-emerald-600" />
+                      class="w-7 h-7 rounded-control bg-emerald-50 hover:bg-emerald-100 flex items-center justify-center transition-colors" title="Confirmer">
+                      <Check class="w-3.5 h-3.5 text-emerald-600" />
                     </button>
                     <button @click.stop="cancelBooking(b.id)" :disabled="actionLoading === b.id"
-                      class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors" title="Annuler">
-                      <XMarkIcon class="w-3.5 h-3.5 text-red-500" />
+                      class="w-7 h-7 rounded-control bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors" title="Annuler">
+                      <X class="w-3.5 h-3.5 text-red-500" />
                     </button>
                   </div>
                 </div>
@@ -641,7 +641,7 @@ const greeting = computed(() => {
             <div class="flex items-center justify-between mb-5">
               <h3 class="font-bold text-gray-900">Services populaires</h3>
               <RouterLink to="/dashboard/services" class="text-xs text-primary-600 font-semibold hover:text-primary-700 flex items-center gap-1">
-                Gérer <ArrowRightIcon class="w-3 h-3" />
+                Gérer <ArrowRight class="w-3 h-3" />
               </RouterLink>
             </div>
 
@@ -666,7 +666,7 @@ const greeting = computed(() => {
 
             <div v-else class="flex flex-col items-center justify-center py-8 text-center">
               <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-3">
-                <Squares2X2Icon class="w-7 h-7 text-gray-300" />
+                <LayoutGrid class="w-7 h-7 text-gray-300" />
               </div>
               <p class="text-sm text-gray-400 font-medium">Aucune donnée encore</p>
             </div>
@@ -677,7 +677,7 @@ const greeting = computed(() => {
              plainly instead of leaving three empty cards on the page. -->
         <div v-if="!analytics" class="card p-8 text-center border-2 border-dashed border-primary-100 bg-primary-50/30">
           <div class="w-14 h-14 rounded-2xl bg-clay-50 flex items-center justify-center mx-auto mb-4 shadow-sm">
-            <ChartBarIcon class="w-7 h-7 text-primary-500" />
+            <ChartColumn class="w-7 h-7 text-primary-500" />
           </div>
           <h3 class="font-bold text-gray-900 mb-1.5">Statistiques avancées</h3>
           <p class="text-sm text-gray-500 max-w-md mx-auto leading-relaxed mb-5">
@@ -694,7 +694,7 @@ const greeting = computed(() => {
           <!-- Peak hours heatmap -->
           <div class="card p-6">
             <div class="flex items-center gap-2 mb-5">
-              <BoltIcon class="w-5 h-5 text-amber-500" />
+              <Zap class="w-5 h-5 text-amber-500" />
               <h3 class="font-bold text-gray-900">Heures de pointe</h3>
             </div>
 
@@ -725,7 +725,7 @@ const greeting = computed(() => {
           <!-- Peak days -->
           <div class="card p-6">
             <div class="flex items-center gap-2 mb-5">
-              <FireIcon class="w-5 h-5 text-orange-500" />
+              <Flame class="w-5 h-5 text-orange-500" />
               <h3 class="font-bold text-gray-900">Jours les plus actifs</h3>
             </div>
 
@@ -808,7 +808,7 @@ const greeting = computed(() => {
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <RouterLink to="/dashboard/services" class="card p-4 flex items-center gap-3 hover:shadow-md transition-all group cursor-pointer">
             <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center group-hover:bg-primary-100 transition-colors">
-              <PlusIcon class="w-5 h-5 text-primary-600" />
+              <Plus class="w-5 h-5 text-primary-600" />
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-900">Nouveau service</p>
@@ -818,7 +818,7 @@ const greeting = computed(() => {
 
           <RouterLink to="/dashboard/bookings" class="card p-4 flex items-center gap-3 hover:shadow-md transition-all group cursor-pointer">
             <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center group-hover:bg-violet-100 transition-colors">
-              <CalendarDaysIcon class="w-5 h-5 text-violet-600" />
+              <CalendarDays class="w-5 h-5 text-violet-600" />
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-900">Réservations</p>
@@ -828,7 +828,7 @@ const greeting = computed(() => {
 
           <RouterLink to="/dashboard/settings" class="card p-4 flex items-center gap-3 hover:shadow-md transition-all group cursor-pointer">
             <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
-              <Cog6ToothIcon class="w-5 h-5 text-amber-600" />
+              <Settings class="w-5 h-5 text-amber-600" />
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-900">Paramètres</p>
@@ -838,7 +838,7 @@ const greeting = computed(() => {
 
           <button @click="shareLink" class="card p-4 flex items-center gap-3 hover:shadow-md transition-all group cursor-pointer text-left">
             <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
-              <ShareIcon class="w-5 h-5 text-emerald-600" />
+              <Share2 class="w-5 h-5 text-emerald-600" />
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-900">Partager</p>

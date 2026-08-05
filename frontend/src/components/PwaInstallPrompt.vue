@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { Download, Share, X } from 'lucide-vue-next'
 
 const STORAGE_KEY = 'reserva_pwa_dismissed_at'
 const DISMISS_DAYS = 3 // re-propose après 3 jours
@@ -22,7 +23,7 @@ function shouldShow() {
 function handleBeforeInstall(e) {
   e.preventDefault()
   deferredPrompt = e
-  // Délai de 4 secondes avant d'afficher — laisse l'app se charger
+  // Délai de 4 secondes avant d'afficher, laisse l'app se charger
   setTimeout(() => {
     if (!installed.value && shouldShow()) {
       visible.value = true
@@ -62,7 +63,7 @@ onMounted(() => {
 
   if (isInStandalone.value) return
 
-  // iOS (Safari) — pas de beforeinstallprompt, guide manuel
+  // iOS (Safari) : pas de beforeinstallprompt, guide manuel
   const ua = window.navigator.userAgent
   isIos.value = /iphone|ipad|ipod/i.test(ua) && !/(chrome|crios|fxios)/i.test(ua)
 
@@ -107,9 +108,7 @@ onUnmounted(() => {
                 class="text-gray-300 hover:text-gray-500 transition-colors shrink-0 -mt-1 -mr-1 p-1"
                 aria-label="Fermer"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
+                <X class="w-5 h-5" />
               </button>
             </div>
 
@@ -126,9 +125,7 @@ onUnmounted(() => {
                 >
                   <span v-if="installing" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span v-else>
-                    <svg class="w-4 h-4 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                    </svg>
+                    <Download class="w-4 h-4 inline mr-1 -mt-0.5" />
                     Installer
                   </span>
                 </button>
@@ -142,7 +139,7 @@ onUnmounted(() => {
                 <ol class="space-y-1 text-xs list-none">
                   <li>1. Appuyez sur
                     <span class="inline-flex items-center gap-0.5 font-medium">
-                      <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a1 1 0 0 1 .707.293l4 4a1 1 0 0 1-1.414 1.414L13 5.414V16a1 1 0 0 1-2 0V5.414L8.707 7.707A1 1 0 0 1 7.293 6.293l4-4A1 1 0 0 1 12 2zM3 19a1 1 0 0 1 1-1h16a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1z"/></svg>
+                      <Share class="w-3.5 h-3.5" />
                       Partager
                     </span>
                   </li>

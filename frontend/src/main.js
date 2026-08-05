@@ -6,7 +6,7 @@ import './style.css'
 
 /*
  * L'instance Pinia est exportée pour être passée explicitement aux stores
- * consultés hors composant — le garde de navigation, notamment.
+ * consultés hors composant : le garde de navigation, notamment.
  *
  * Sans cela, useAuthStore() s'appuyait sur la pinia « active », une variable
  * globale que Vue installe au montage. Le garde s'exécutant pendant

@@ -41,7 +41,7 @@ php artisan storage:link
 php artisan serve            # http://localhost:8000
 ```
 
-Le worker de queue tourne à part — sans lui, les notifications restent en file :
+Le worker de queue tourne à part : sans lui, les notifications restent en file :
 
 ```bash
 php artisan queue:work
@@ -171,7 +171,7 @@ docker compose up -d --build
 ```
 
 Les migrations s'exécutent automatiquement au démarrage du conteneur `app`, et
-lui seul — trois processus qui migrent en même temps, c'est un schéma appliqué à
+lui seul ; trois processus qui migrent en même temps, c'est un schéma appliqué à
 moitié.
 
 ### Déploiements suivants
@@ -182,7 +182,7 @@ moitié.
 
 Le script sauvegarde la base, construit les images **avant** d'arrêter quoi que
 ce soit, déploie, puis attend que l'API réponde `healthy`. Si elle ne répond
-jamais, il affiche les logs et s'arrête — un déploiement à moitié fait qui
+jamais, il affiche les logs et s'arrête : un déploiement à moitié fait qui
 annonce « OK » est pire qu'un déploiement qui échoue bruyamment.
 
 ### Sauvegardes
@@ -203,12 +203,12 @@ Restauration : `./scripts/restore-db.sh backups/nuvo_2026-08-02_030000.sql.gz`
 
 ### Variables sensibles
 
-- `APP_KEY` — la générer une fois et ne plus y toucher : la changer invalide
+- `APP_KEY` : la générer une fois et ne plus y toucher : la changer invalide
   toutes les sessions et rend illisibles les valeurs chiffrées.
-- `FLW_WEBHOOK_HASH` — **obligatoire**. Sans elle, le webhook de paiement refuse
+- `FLW_WEBHOOK_HASH` : **obligatoire**. Sans elle, le webhook de paiement refuse
   toutes les requêtes, volontairement : c'est la seule chose qui distingue
   Flutterwave de n'importe qui ayant trouvé l'URL.
-- `MAIL_*` — sans transport réel, la réinitialisation de mot de passe ne peut
+- `MAIL_*` : sans transport réel, la réinitialisation de mot de passe ne peut
   pas fonctionner.
 
 ### Opérations courantes

@@ -9,7 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * The business as an anonymous visitor may see it.
  *
- * Everything internal — owner, plan, notification preferences, contact email —
+ * Everything internal (owner, plan, notification preferences, contact email)
  * stays out. What is here is only what the booking page needs to render.
  *
  * @mixin \App\Models\Business

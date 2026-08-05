@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Nuvo — edge configuration
+# Nuvo : edge configuration
 #
 # One origin for everything. The SPA, the API and the uploaded images all live
 # under the same hostname, which is why the app has no CORS configuration to
@@ -25,7 +25,7 @@
 	}
 
 	header {
-		# HSTS: only meaningful once TLS is confirmed working — a year is the
+		# HSTS: only meaningful once TLS is confirmed working; a year is the
 		# value browsers accept for preloading.
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
@@ -33,7 +33,7 @@
 		Referrer-Policy "strict-origin-when-cross-origin"
 		# The API is same-origin and the fonts are self-hosted, so the only
 		# third party the browser may reach is Google's sign-in script.
-		# font-src is 'self' alone — no CDN left to trust.
+		# font-src is 'self' alone: no CDN left to trust.
 		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src 'self' https://accounts.google.com; frame-src https://accounts.google.com; base-uri 'self'; form-action 'self'"
 		-Server
 	}

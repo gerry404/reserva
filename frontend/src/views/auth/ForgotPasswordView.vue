@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { authApi } from '@/api'
-import { EnvelopeIcon, CheckCircleIcon } from '@heroicons/vue/24/outline'
+import { Mail, CircleCheck } from 'lucide-vue-next'
 
 const email    = ref('')
 const sending  = ref(false)
@@ -72,7 +72,7 @@ async function submit() {
         <template v-else>
           <div class="text-center py-4">
             <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
-              <CheckCircleIcon class="w-7 h-7 text-emerald-500" />
+              <CircleCheck class="w-7 h-7 text-emerald-500" />
             </div>
             <h1 class="text-xl font-black text-gray-900 mb-2">Vérifiez votre boîte mail</h1>
             <p class="text-sm text-gray-500 leading-relaxed">
@@ -80,7 +80,7 @@ async function submit() {
               un lien de réinitialisation vient d'y être envoyé. Il est valable une heure.
             </p>
             <p class="text-xs text-gray-400 mt-4 flex items-center justify-center gap-1.5">
-              <EnvelopeIcon class="w-4 h-4" />
+              <Mail class="w-4 h-4" />
               Pensez à regarder dans les spams.
             </p>
           </div>

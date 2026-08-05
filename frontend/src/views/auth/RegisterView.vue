@@ -2,8 +2,19 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { EyeIcon, EyeSlashIcon, CheckIcon } from '@heroicons/vue/24/outline'
-import { usePhoneInput } from '@/composables/usePhoneInput'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronDown,
+  Eye,
+  EyeOff,
+  Star,
+  X,
+} from 'lucide-vue-next'
+import { usePhoneInput } from '@/composables/usePhoneInput'
+import BrandIcon from '@/components/ui/BrandIcon.vue'
+
 
 const auth     = useAuthStore()
 const showPass = ref(false)
@@ -187,7 +198,7 @@ onMounted(() => {
           <div class="space-y-4">
             <div v-for="(item, i) in benefits" :key="i" class="flex items-center gap-3">
               <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
-                <CheckIcon class="w-3.5 h-3.5 text-emerald-400" />
+                <Check class="w-3.5 h-3.5 text-emerald-400" />
               </div>
               <span class="text-gray-300 text-sm">{{ item }}</span>
             </div>
@@ -208,7 +219,7 @@ onMounted(() => {
               </div>
             </div>
             <div class="flex items-center gap-0.5">
-              <svg v-for="i in 5" :key="i" class="w-3.5 h-3.5 fill-amber-400 text-amber-400" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <Star v-for="i in 5" :key="i" class="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
             </div>
           </div>
           <p class="text-white/70 text-sm leading-relaxed">
@@ -231,7 +242,7 @@ onMounted(() => {
         <div class="flex items-center gap-3 mb-8">
           <div class="flex items-center gap-2 flex-1">
             <div :class="['w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300', step >= 1 ? 'bg-gradient-to-br from-primary-600 to-violet-600 text-white shadow-md shadow-primary-500/20' : 'bg-gray-100 text-gray-400']">
-              <CheckIcon v-if="step > 1" class="w-4 h-4" />
+              <Check v-if="step > 1" class="w-4 h-4" />
               <span v-else>1</span>
             </div>
             <span :class="['text-xs font-semibold transition-colors', step >= 1 ? 'text-gray-900' : 'text-gray-400']">Votre compte</span>
@@ -261,15 +272,10 @@ onMounted(() => {
         <!-- Google Sign-In (step 1 only) -->
         <div v-if="step === 1" class="mb-6">
           <button @click="registerWithGoogle" :disabled="googleLoading || auth.loading"
-            class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-clay-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-60 shadow-sm">
+            class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-clay-50 border border-gray-200 rounded-control text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-60 shadow-sm">
             <span v-if="googleLoading" class="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
             <template v-else>
-              <svg class="w-5 h-5" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
+              <BrandIcon name="google" class="w-5 h-5" />
               <span>S'inscrire avec Google</span>
             </template>
           </button>
@@ -307,7 +313,7 @@ onMounted(() => {
                       class="flex items-center gap-1.5 h-full px-3 bg-clay-50 border border-gray-200 border-r-0 rounded-l-xl hover:bg-gray-50 transition-colors text-sm min-w-[100px]">
                       <span class="text-lg leading-none">{{ selectedCountry.flag }}</span>
                       <span class="text-gray-700 font-medium">{{ selectedCountry.dial }}</span>
-                      <svg class="w-3.5 h-3.5 text-gray-400 shrink-0 ml-auto" :class="{ 'rotate-180': dropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                      <ChevronDown class="w-3.5 h-3.5 text-gray-400 shrink-0 ml-auto" :class="{ 'rotate-180': dropdownOpen }" />
                     </button>
 
                     <!-- Dropdown -->
@@ -325,7 +331,7 @@ onMounted(() => {
                             <span class="text-lg leading-none">{{ c.flag }}</span>
                             <span class="flex-1 text-gray-700">{{ c.name }}</span>
                             <span class="text-gray-400 text-xs font-mono">{{ c.dial }}</span>
-                            <svg v-if="selectedCountry.code === c.code" class="w-4 h-4 text-primary-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                            <Check v-if="selectedCountry.code === c.code" class="w-4 h-4 text-primary-600 shrink-0" />
                           </button>
                           <p v-if="filteredCountries.length === 0" class="px-3 py-4 text-sm text-gray-400 text-center">Aucun résultat</p>
                         </div>
@@ -344,7 +350,7 @@ onMounted(() => {
                 <div class="relative">
                   <input v-model="form.password" :type="showPass ? 'text' : 'password'" class="input-field pr-12" placeholder="8 caractères minimum" autocomplete="new-password" required minlength="8" />
                   <button type="button" @click="showPass = !showPass" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
-                    <component :is="showPass ? EyeSlashIcon : EyeIcon" class="w-5 h-5" />
+                    <component :is="showPass ? EyeOff : Eye" class="w-5 h-5" />
                   </button>
                 </div>
                 <p v-if="errors.password" class="text-red-500 text-xs mt-1.5">{{ errors.password[0] }}</p>
@@ -359,7 +365,7 @@ onMounted(() => {
                   </div>
                   <div class="grid grid-cols-2 gap-x-4 gap-y-1">
                     <div v-for="check in passwordChecks" :key="check.label" class="flex items-center gap-1.5">
-                      <svg v-if="check.pass" class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                      <Check v-if="check.pass" class="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                       <div v-else class="w-3.5 h-3.5 rounded-full border-2 border-gray-200 shrink-0" />
                       <span :class="['text-[11px]', check.pass ? 'text-emerald-600 font-medium' : 'text-gray-400']">{{ check.label }}</span>
                     </div>
@@ -372,15 +378,15 @@ onMounted(() => {
                 <div class="relative">
                   <input v-model="form.password_confirmation" :type="showConfirmPass ? 'text' : 'password'" :class="['input-field pr-12', passwordsMatch ? 'ring-2 ring-emerald-500/30 border-emerald-300' : '', passwordsMismatch ? 'ring-2 ring-red-500/30 border-red-300' : '']" placeholder="Répétez le mot de passe" autocomplete="new-password" required />
                   <button type="button" @click="showConfirmPass = !showConfirmPass" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
-                    <component :is="showConfirmPass ? EyeSlashIcon : EyeIcon" class="w-5 h-5" />
+                    <component :is="showConfirmPass ? EyeOff : Eye" class="w-5 h-5" />
                   </button>
                 </div>
                 <div v-if="passwordsMatch" class="flex items-center gap-1.5 mt-1.5">
-                  <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  <Check class="w-3.5 h-3.5 text-emerald-500" />
                   <span class="text-xs text-emerald-600 font-medium">Les mots de passe correspondent</span>
                 </div>
                 <div v-else-if="passwordsMismatch" class="flex items-center gap-1.5 mt-1.5">
-                  <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  <X class="w-3.5 h-3.5 text-red-500" />
                   <span class="text-xs text-red-500 font-medium">Les mots de passe ne correspondent pas</span>
                 </div>
               </div>
@@ -410,19 +416,19 @@ onMounted(() => {
               </div>
 
               <button type="button" @click="step = 1" class="w-full py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                <ArrowLeft class="w-4 h-4" />
                 Retour
               </button>
             </div>
           </Transition>
 
           <button type="submit"
-            class="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary-600 to-violet-600 text-white font-bold text-sm hover:shadow-lg hover:shadow-primary-500/25 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none flex items-center justify-center gap-2"
+            class="w-full py-3.5 rounded-control bg-gradient-to-r from-primary-600 to-violet-600 text-white font-bold text-sm hover:shadow-lg hover:shadow-primary-500/25 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none flex items-center justify-center gap-2"
             :disabled="auth.loading || googleLoading">
             <span v-if="auth.loading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             <template v-else>
               <span>{{ step === 1 ? 'Continuer' : 'Créer mon compte' }}</span>
-              <svg v-if="step === 1" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+              <ArrowRight v-if="step === 1" class="w-4 h-4" />
             </template>
           </button>
         </form>

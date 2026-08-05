@@ -35,7 +35,7 @@ class Payment extends Model
     public const CYCLES = [self::CYCLE_MONTHLY, self::CYCLE_YEARLY];
 
     /**
-     * Prices are held in the smallest unit of XAF, which has no minor unit —
+     * Prices are held in the smallest unit of XAF, which has no minor unit,
      * 2900 means 2 900 F CFA.
      */
     public const PLANS = [

@@ -186,7 +186,7 @@ class Business extends Model
     // ─── Presentation ────────────────────────────────────────────────────
 
     /**
-     * Image paths are storage-relative, but every client needs a URL — and that
+     * Image paths are storage-relative, but every client needs a URL, and that
      * URL differs between a local disk and an S3 bucket. Appending them keeps
      * the frontend from having to know which backend is in use, or from
      * concatenating a base URL by hand.

@@ -57,7 +57,7 @@ const style = computed(() => ({
 
 /*
  * Une rotation continue est exactement ce que « mouvement réduit » vise. On
- * garde un signal — la pulsation d'opacité — sans faire tourner quoi que ce
+ * garde un signal (la pulsation d'opacité) sans faire tourner quoi que ce
  * soit.
  */
 @media (prefers-reduced-motion: reduce) {

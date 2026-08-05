@@ -1,5 +1,5 @@
 /**
- * Génère les icônes PNG PWA — pur Node.js, zéro dépendance externe.
+ * Génère les icônes PNG PWA : pur Node.js, zéro dépendance externe.
  * Usage: npm run generate:icons
  */
 
@@ -55,7 +55,7 @@ function buildPNG(size, pixels /* Uint8Array, RGB triplets */) {
 /**
  * Dessine la marque Nuvo : un arc ouvert et son point.
  *
- * Même géométrie que public/favicon.svg, rasterisée à la main — ce script n'a
+ * Même géométrie que public/favicon.svg, rasterisée à la main, ce script n'a
  * aucune dépendance externe et Node ne sait pas rendre du SVG seul.
  */
 function drawIcon(size, maskable = false) {
@@ -69,7 +69,7 @@ function drawIcon(size, maskable = false) {
   const fromR = 0x1f, fromG = 0x7d, fromB = 0x57
   const toR   = 0x0e, toG   = 0x3e, toB   = 0x28
 
-  // Fractions du côté — l'échelle se réduit sur une maskable pour rester dans
+  // Fractions du côté : l'échelle se réduit sur une maskable pour rester dans
   // la zone sûre.
   const k        = maskable ? 0.80 : 1
   const RADIUS   = 0.281 * k   // rayon de l'arc, du centre à son axe

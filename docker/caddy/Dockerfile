@@ -3,7 +3,7 @@
 #
 # The frontend ships inside the proxy image rather than as a mounted volume, so
 # `docker compose up --build` always serves the bundle that matches the commit
-# being deployed — there is no way to end up with a stale dist/ on disk.
+# being deployed, so there is no way to end up with a stale dist/ on disk.
 # ─────────────────────────────────────────────────────────────────────────────
 
 FROM node:20-alpine AS build
@@ -16,7 +16,7 @@ RUN npm ci
 
 COPY frontend/ ./
 
-# Vite inlines these at build time — they cannot be changed at runtime.
+# Vite inlines these at build time: they cannot be changed at runtime.
 ARG VITE_SITE_URL
 ARG VITE_API_URL=/api
 ARG VITE_GOOGLE_CLIENT_ID=""

@@ -1,4 +1,5 @@
 <script setup>
+import { iconForService } from '@/constants/serviceIcons'
 import { computed, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { publicApi } from '@/api'
@@ -8,14 +9,16 @@ import { DAY_END, DAY_START } from '@/composables/useDuration'
 import DurationBar from '@/components/time/DurationBar.vue'
 import TimeRibbon from '@/components/time/TimeRibbon.vue'
 import {
-  CalendarDaysIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon,
-  ClockIcon, MapPinIcon,
-} from '@heroicons/vue/24/outline'
+  CalendarDays, CircleCheck, ChevronLeft, ChevronRight,
+  Clock, MapPin,
+} from 'lucide-vue-next'
 import {
   addMonths, eachDayOfInterval, endOfMonth, format, getDay, isBefore,
   isSameDay, isSameMonth, isToday, startOfMonth, subMonths,
 } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import { fr } from 'date-fns/locale'
+import BrandIcon from '@/components/ui/BrandIcon.vue'
+
 
 const route = useRoute()
 const slug  = computed(() => route.params.slug)
@@ -162,7 +165,7 @@ const freeBlocks = computed(() => {
 /**
  * Le complément : tout ce que la journée d'ouverture ne laisse pas libre.
  *
- * Déduit plutôt que demandé au serveur — l'API ne divulgue pas les rendez-vous
+ * Déduit plutôt que demandé au serveur : l'API ne divulgue pas les rendez-vous
  * d'autrui, et elle a raison. Ce qui n'est pas proposé est occupé ou fermé, et
  * dans les deux cas le client n'a rien à y faire.
  */
@@ -316,7 +319,7 @@ loadBusiness()
       Le motif de fond est calculé depuis les horaires réels du commerce : une
       bande par jour ouvert, dont la hauteur est l'amplitude d'ouverture. Deux
       établissements n'ont donc jamais le même en-tête, et le dessin dit quelque
-      chose de vrai — un salon ouvert 6 jours de 8h à 19h ne ressemble pas à un
+      chose de vrai : un salon ouvert 6 jours de 8h à 19h ne ressemble pas à un
       cabinet ouvert 4 jours de 9h à 17h.
 
       Confiné à l'en-tête : le corps de page reste neutre pour que le ruban et
@@ -335,7 +338,7 @@ loadBusiness()
         <h1 class="text-2xl font-black mb-1">{{ business.name }}</h1>
         <p class="opacity-80 text-sm">{{ business.category }}</p>
         <p v-if="business.city" class="flex items-center justify-center gap-1 mt-3 text-sm opacity-75">
-          <MapPinIcon class="w-4 h-4" /> {{ business.city }}
+          <MapPin class="w-4 h-4" /> {{ business.city }}
         </p>
         <p v-if="business.description" class="mt-4 opacity-80 text-sm max-w-md mx-auto leading-relaxed">
           {{ business.description }}
@@ -352,14 +355,14 @@ loadBusiness()
             :class="step > i ? 'bg-emerald-500 text-white' : step === i ? 'accent-bg' : 'bg-gray-200 text-gray-400'"
             :aria-current="step === i ? 'step' : undefined"
           >
-            <CheckCircleIcon v-if="step > i" class="w-4 h-4" />
+            <CircleCheck v-if="step > i" class="w-4 h-4" />
             <span v-else>{{ i }}</span>
           </li>
           <li v-if="i < 4" class="w-8 h-0.5" :class="step > i ? 'bg-emerald-400' : 'bg-gray-200'" />
         </template>
       </ol>
 
-      <!-- STEP 1 — service -->
+      <!-- STEP 1 : service -->
       <section v-if="step === STEPS.SERVICE" class="space-y-3">
         <h2 class="text-lg font-black text-gray-900 mb-4">Quel service souhaitez-vous réserver ?</h2>
 
@@ -382,9 +385,9 @@ loadBusiness()
           />
           <span
             v-else
-            class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shrink-0"
+            class="w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0"
             :style="{ backgroundColor: service.color }"
-          >✦</span>
+          ><component :is="iconForService(service)" :size="22" /></span>
 
           <span class="flex-1 min-w-0">
             <span class="flex items-baseline justify-between gap-3">
@@ -416,15 +419,15 @@ loadBusiness()
             </span>
           </span>
 
-          <ChevronRightIcon class="w-5 h-5 text-gray-300 shrink-0" />
+          <ChevronRight class="w-5 h-5 text-gray-300 shrink-0" />
         </button>
       </section>
 
-      <!-- STEP 2 — date -->
+      <!-- STEP 2 : date -->
       <section v-else-if="step === STEPS.DATE" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.SERVICE">
-            <ChevronLeftIcon class="w-5 h-5" />
+            <ChevronLeft class="w-5 h-5" />
           </button>
           <h2 class="text-lg font-black text-gray-900">Choisissez une date</h2>
         </div>
@@ -433,7 +436,7 @@ loadBusiness()
           <span
             class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
             :style="{ backgroundColor: selected.service?.color }"
-          >✦</span>
+          ><component :is="iconForService(selected.service)" :size="19" /></span>
           <span>
             <span class="block font-semibold text-gray-900 text-sm">{{ selected.service?.name }}</span>
             <span class="block text-xs text-gray-500 numeric-inline">
@@ -451,7 +454,7 @@ loadBusiness()
               aria-label="Mois précédent"
               @click="currentMonth = subMonths(currentMonth, 1)"
             >
-              <ChevronLeftIcon class="w-4 h-4" />
+              <ChevronLeft class="w-4 h-4" />
             </button>
             <h3 class="font-semibold text-gray-900 capitalize">
               {{ format(currentMonth, 'MMMM yyyy', { locale: fr }) }}
@@ -462,7 +465,7 @@ loadBusiness()
               aria-label="Mois suivant"
               @click="currentMonth = addMonths(currentMonth, 1)"
             >
-              <ChevronRightIcon class="w-4 h-4" />
+              <ChevronRight class="w-4 h-4" />
             </button>
           </div>
 
@@ -497,17 +500,17 @@ loadBusiness()
         </div>
       </section>
 
-      <!-- STEP 3 — time -->
+      <!-- STEP 3 : time -->
       <section v-else-if="step === STEPS.TIME" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.DATE">
-            <ChevronLeftIcon class="w-5 h-5" />
+            <ChevronLeft class="w-5 h-5" />
           </button>
           <h2 class="text-lg font-black text-gray-900">Choisissez un horaire</h2>
         </div>
 
         <p class="text-sm text-gray-500 flex items-center gap-2 capitalize">
-          <CalendarDaysIcon class="w-4 h-4" />
+          <CalendarDays class="w-4 h-4" />
           {{ selected.date ? format(selected.date, 'EEEE d MMMM yyyy', { locale: fr }) : '' }}
         </p>
 
@@ -538,10 +541,10 @@ loadBusiness()
         </div>
 
         <div v-else-if="!slots.length" class="card p-8 text-center">
-          <ClockIcon class="w-12 h-12 text-gray-200 mx-auto mb-3" />
+          <Clock class="w-12 h-12 text-gray-200 mx-auto mb-3" />
           <p class="text-gray-500 font-medium">Aucun créneau disponible</p>
           <p class="text-gray-400 text-sm mt-1">
-            Ce service dure {{ selected.service?.formatted_duration }} — essayez une autre date.
+            Ce service dure {{ selected.service?.formatted_duration }}. Essayez une autre date.
           </p>
           <button type="button" class="btn-secondary mt-4 mx-auto text-sm" @click="step = STEPS.DATE">
             ← Changer de date
@@ -574,11 +577,11 @@ loadBusiness()
         </template>
       </section>
 
-      <!-- STEP 4 — details -->
+      <!-- STEP 4 : details -->
       <section v-else-if="step === STEPS.DETAILS" class="space-y-4">
         <div class="flex items-center gap-3 mb-6">
           <button type="button" class="btn-ghost p-2" aria-label="Retour" @click="step = STEPS.TIME">
-            <ChevronLeftIcon class="w-5 h-5" />
+            <ChevronLeft class="w-5 h-5" />
           </button>
           <h2 class="text-lg font-black text-gray-900">Vos coordonnées</h2>
         </div>
@@ -654,7 +657,7 @@ loadBusiness()
             <input id="website" v-model="form.website" type="text" tabindex="-1" autocomplete="off" />
           </div>
 
-          <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-base accent-bg disabled:opacity-60"
+          <button type="submit" class="w-full py-3.5 rounded-control font-bold text-base accent-bg disabled:opacity-60"
             :disabled="submitting">
             <span v-if="submitting" class="flex items-center justify-center gap-2">
               <span class="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
@@ -669,10 +672,10 @@ loadBusiness()
         </form>
       </section>
 
-      <!-- STEP 5 — done -->
+      <!-- STEP 5 : done -->
       <section v-else-if="booking" class="text-center py-8 space-y-6">
         <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto">
-          <CheckCircleIcon class="w-10 h-10 text-emerald-500" />
+          <CircleCheck class="w-10 h-10 text-emerald-500" />
         </div>
 
         <div>
@@ -703,7 +706,7 @@ loadBusiness()
           <p class="text-sm text-gray-500">Prévenez le commerçant directement :</p>
           <a :href="whatsappLink" target="_blank" rel="noopener"
             class="btn-whatsapp py-3.5 px-6 shadow-lg">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+            <BrandIcon name="whatsapp" class="w-5 h-5" />
             Envoyer sur WhatsApp
           </a>
         </div>
@@ -730,8 +733,8 @@ loadBusiness()
  * Interaction states are CSS, not inline mouse handlers.
  *
  * The previous version bound :onmouseover/:onmouseleave on every calendar cell
- * and time button. Those never fire on a touchscreen — which is where nearly
- * every customer opens this page — so the whole grid felt dead on mobile.
+ * and time button. Those never fire on a touchscreen, which is where nearly
+ * every customer opens this page, so the whole grid felt dead on mobile.
  */
 .accent-gradient {
   background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));
@@ -741,7 +744,7 @@ loadBusiness()
 /*
  * Le motif se superpose au dégradé sans toucher au contenu : il vit dans un
  * pseudo-élément, donc le texte conserve exactement le contraste calculé par
- * useAccent. Opacité basse et masque en fondu — une signature se remarque, elle
+ * useAccent. Opacité basse et masque en fondu : une signature se remarque, elle
  * ne se lit pas.
  */
 .signature {
@@ -763,7 +766,7 @@ loadBusiness()
   /*
    * Masque radial plutôt que fondu vertical.
    *
-   * Un fondu de haut en bas effaçait le bas des bandes — précisément là où
+   * Un fondu de haut en bas effaçait le bas des bandes, précisément là où
    * l'amplitude d'ouverture se lit : toutes commencent en haut, seule leur
    * longueur varie. En dégageant le centre, on protège le logo et le nom tout
    * en laissant les bandes entières visibles sur les côtés.
@@ -779,7 +782,7 @@ loadBusiness()
 
 .day-cell {
   aspect-ratio: 1;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-control);
   font-size: 0.875rem;
   font-weight: 500;
   transition: background-color 0.15s, color 0.15s, transform 0.15s;
@@ -839,7 +842,7 @@ loadBusiness()
 
 .slot-button {
   padding: 0.625rem 0;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-control);
   border: 2px solid #e5e7eb;
   font-size: 0.875rem;
   font-weight: 600;

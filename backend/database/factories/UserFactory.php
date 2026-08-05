@@ -40,7 +40,7 @@ class UserFactory extends Factory
         ]);
     }
 
-    /** A paid plan whose term has run out — should behave exactly like free. */
+    /** A paid plan whose term has run out: should behave exactly like free. */
     public function expired(): static
     {
         return $this->state([

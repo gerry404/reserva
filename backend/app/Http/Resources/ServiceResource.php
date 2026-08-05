@@ -22,12 +22,13 @@ class ServiceResource extends JsonResource
             'formatted_price'    => $this->formatted_price,
             'formatted_duration' => $this->formatted_duration,
             'color'              => $this->color,
+            'icon'               => $this->icon,
             'category'           => $this->category,
             'is_active'          => $this->is_active,
             /*
              * Both halves, deliberately.
              *
-             * `url` is what an <img> needs and only the server can build it —
+             * `url` is what an <img> needs and only the server can build it,
              * it depends on whether uploads sit on a local disk or in a bucket.
              * `path` is the identifier the edit form sends back in
              * `existing_images` to say which pictures to keep. Returning URLs

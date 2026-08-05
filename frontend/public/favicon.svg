@@ -4,13 +4,13 @@
 
     L'arc ouvert est le cadran dont on n'a gardé que la course ; le point plein
     est l'instant retenu, posé dans l'ouverture. L'aiguille, courte, pointe vers
-    lui sans le toucher — c'est elle qui fait basculer la lecture de l'anneau
+    lui sans le toucher, c'est elle qui fait basculer la lecture de l'anneau
     abstrait vers le rendez-vous, sans dessiner une horloge complète qui rendrait
     la marque banale.
 
     Les écarts comptent autant que les formes : aiguille jointe au point, on lit
     une épingle ; arc refermé dessus, une masse. Ce fichier est engendré depuis
-    les mêmes constantes que scripts/generate-icons.mjs — les deux ne peuvent
+    les mêmes constantes que scripts/generate-icons.mjs, les deux ne peuvent
     donc pas diverger.
   -->
   <defs>

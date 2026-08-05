@@ -9,7 +9,7 @@ const route = useRoute()
  * The install prompt belongs to merchants, not to their customers.
  *
  * It used to render on every route, so someone booking a haircut was invited to
- * install "Nuvo" — an app whose start_url is a dashboard they have no
+ * install "Nuvo", an app whose start_url is a dashboard they have no
  * account for. It now appears only inside the merchant area.
  */
 const showInstallPrompt = computed(() => route.path.startsWith('/dashboard'))

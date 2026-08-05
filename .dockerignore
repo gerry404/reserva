@@ -1,5 +1,5 @@
 # Context for the edge image (docker/caddy/Dockerfile), which needs frontend/
-# sources plus the Caddyfile — and nothing else.
+# sources plus the Caddyfile, and nothing else.
 
 .git
 .gitignore

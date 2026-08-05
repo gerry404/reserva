@@ -9,7 +9,7 @@
 #
 #   0 3 * * * cd /srv/nuvo && ./scripts/backup-db.sh >> /var/log/nuvo-backup.log 2>&1
 #
-# A backup you have never restored is a hypothesis, not a backup — restore one
+# A backup you have never restored is a hypothesis, not a backup; restore one
 # into a scratch database occasionally (see restore-db.sh).
 set -euo pipefail
 
@@ -38,11 +38,11 @@ docker compose exec -T -e PGPASSWORD="$DB_PASSWORD" postgres \
     | gzip -9 > "$target"
 
 # gzip of an empty stream is still ~20 bytes, so a tiny file means pg_dump
-# produced nothing — better to fail now than to discover it during a restore.
+# produced nothing; better to fail now than to discover it during a restore.
 size="$(wc -c < "$target")"
 if [ "$size" -lt 1000 ]; then
     rm -f "$target"
-    printf '\033[0;31m✗ Backup looks empty (%s bytes) — aborted.\033[0m\n' "$size" >&2
+    printf '\033[0;31m✗ Backup looks empty (%s bytes), aborted.\033[0m\n' "$size" >&2
     exit 1
 fi
 

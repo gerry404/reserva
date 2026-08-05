@@ -5,7 +5,7 @@ import { computed, unref } from 'vue'
  *
  * Toute l'identité visuelle de Nuvo repose sur une règle unique : ce qui dure
  * longtemps occupe plus d'espace. Une prestation de trois heures n'est pas une
- * étiquette « 3h » à côté d'une étiquette « 30 min » — elle est six fois plus
+ * étiquette « 3h » à côté d'une étiquette « 30 min » : elle est six fois plus
  * longue à l'écran.
  *
  * Ce n'est pas décoratif. Le défaut central que ce produit a corrigé était
@@ -35,12 +35,12 @@ export const FULL_WIDTH_MINUTES = 240
  * Largeur relative d'une durée, en pourcentage.
  *
  * Compromis entre deux échecs. En linéaire, une manucure de 30 min face à un
- * plafond de 4 h donne 12 % — un trait qu'on ne voit plus. En racine carrée,
+ * plafond de 4 h donne 12 %, un trait qu'on ne voit plus. En racine carrée,
  * l'inverse : tout se tasse entre 40 % et 100 % et une prestation de 30 min
  * paraît presque aussi longue qu'une de 4 h, ce qui détruit l'idée même.
  *
  * L'exposant 0,72 garde les courtes durées lisibles tout en préservant un
- * écart franc entre les extrêmes — 30 min tombe autour de 30 %, 4 h à 100 %.
+ * écart franc entre les extrêmes : 30 min tombe autour de 30 %, 4 h à 100 %.
  */
 const CURVE = 0.72
 
@@ -89,8 +89,8 @@ export function rulerTicks() {
  * Composable pour une durée réactive.
  *
  * Accepte un nombre, une ref ou un getter. `unref` seul ne déballe pas une
- * fonction : passer `() => props.minutes` — la forme idiomatique pour rester
- * réactif sur une prop — donnait silencieusement 0.
+ * fonction : passer `() => props.minutes` (la forme idiomatique pour rester
+ * réactif sur une prop) donnait silencieusement 0.
  *
  * @param {import('vue').Ref<number>|(() => number)|number} minutes
  */

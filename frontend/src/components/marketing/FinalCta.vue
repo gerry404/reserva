@@ -1,5 +1,6 @@
 <script setup>
-import { RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
+import { ArrowRight } from 'lucide-vue-next'
 
 /*
  * ── La semaine qui se remplit, en fond du dernier appel à l'action ──
@@ -10,11 +11,11 @@ import { RouterLink } from 'vue-router'
  * Le temps court à l'horizontale, comme dans le ruban de la page de
  * réservation et comme dans les barres de durée : une prestation longue est
  * un bloc long. En colonnes, les blocs devenaient des carrés et se lisaient
- * comme des cartes — la durée ne se voyait plus, et le langage du produit
+ * comme des cartes : la durée ne se voyait plus, et le langage du produit
  * était contredit à l'endroit même où il devrait convaincre.
  *
  * Les positions sont fixes plutôt que tirées au sort : un tirage donnerait un
- * agenda différent — parfois incohérent — à chaque visite, là où ce dessin
+ * agenda différent (parfois incohérent) à chaque visite, là où ce dessin
  * ressemble à une vraie semaine, avec des matinées denses, un creux à midi et
  * un dimanche fermé.
  */
@@ -53,8 +54,8 @@ const ctaWeek = (() => {
       Refonte complète. L'ancienne version cumulait ce que les pages qui
       convertissent évitent : deux boutons qui se disputent l'attention, une
       accroche interchangeable (« passer au niveau supérieur » ne veut rien
-      dire), et une décoration abondante — trois polygones en rotation, deux
-      halos, une trame hexagonale — sans rapport avec le produit.
+      dire), et une décoration abondante (trois polygones en rotation, deux
+      halos, une trame hexagonale) sans rapport avec le produit.
 
       Trois partis pris :
 
@@ -76,7 +77,7 @@ const ctaWeek = (() => {
           La semaine du commerce, qui se remplit.
 
           Les créneaux apparaissent en cascade, décalés par un délai calculé
-          depuis leur position — l'effet est celui d'un agenda qui prend, pas
+          depuis leur position : l'effet est celui d'un agenda qui prend, pas
           d'une animation décorative. Purement CSS : rien à charger, rien à
           exécuter en JavaScript sur un téléphone d'entrée de gamme.
         -->
@@ -100,8 +101,6 @@ const ctaWeek = (() => {
       </div>
 
       <div class="cta__content">
-        <p class="cta__eyebrow">Votre page en 5 minutes</p>
-
         <h2 class="cta__title">
           Vos clients réservent.<br />
           <span class="cta__title-accent">Vous travaillez.</span>
@@ -115,10 +114,7 @@ const ctaWeek = (() => {
 
         <RouterLink to="/register" class="cta__button">
           <span>Créer ma page</span>
-          <svg class="cta__arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M4 10h11m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
+          <ArrowRight class="cta__arrow" />
         </RouterLink>
 
         <p class="cta__reassurance">
@@ -240,20 +236,6 @@ const ctaWeek = (() => {
   text-align: center;
 }
 
-.cta__eyebrow {
-  display: inline-block;
-  margin: 0 0 22px;
-  padding: 5px 14px;
-  border-radius: 999px;
-  border: 1px solid rgb(255 255 255 / 0.14);
-  background: rgb(255 255 255 / 0.05);
-  backdrop-filter: blur(6px);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: rgb(255 255 255 / 0.72);
-}
-
 .cta__title {
   margin: 0 0 20px;
   font-size: clamp(29px, 6.4vw, 56px);
@@ -284,7 +266,7 @@ const ctaWeek = (() => {
   align-items: center;
   gap: 10px;
   padding: 17px 34px;
-  border-radius: 14px;
+  border-radius: var(--radius-control);
   background: var(--clay-50);
   color: var(--forest-900);
   font-weight: 700;
@@ -324,7 +306,7 @@ const ctaWeek = (() => {
  *
  * Deux boutons de même poids se disputaient l'attention ; une page qui ne
  * propose qu'une action convertit nettement mieux. Le contact reste accessible
- * — il cesse simplement de concurrencer l'inscription.
+ * il cesse simplement de concurrencer l'inscription.
  */
 .cta__secondary {
   margin: 34px 0 0;

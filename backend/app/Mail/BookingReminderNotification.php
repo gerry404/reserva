@@ -22,7 +22,7 @@ class BookingReminderNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '⏰ Rappel — Votre réservation demain chez ' . $this->business->name,
+            subject: '⏰ Rappel : votre réservation demain chez ' . $this->business->name,
         );
     }
 

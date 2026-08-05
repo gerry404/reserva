@@ -12,7 +12,7 @@ use Tests\TestCase;
  * The demo data has to obey the same rules as real data.
  *
  * A seeder that can create states the application refuses to create is a seeder
- * that hides bugs — the old one wrote overlapping bookings straight to the
+ * that hides bugs: the old one wrote overlapping bookings straight to the
  * table, which is precisely the defect it should have exposed.
  */
 class SeederTest extends TestCase

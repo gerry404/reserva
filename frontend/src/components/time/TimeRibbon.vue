@@ -132,7 +132,7 @@ function position(block) {
 }
 
 /* Occupé : une matière dense, hachurée. La texture dit « plein » sans
-   dépendre de la couleur seule — lisible aussi en daltonisme. */
+   dépendre de la couleur seule, lisible aussi en daltonisme. */
 .ribbon__block--busy {
   background: repeating-linear-gradient(
     -45deg,

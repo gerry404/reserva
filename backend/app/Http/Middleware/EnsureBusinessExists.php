@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Guarantees $request->user()->business is present.
  *
  * Signing up with Google creates an account with no business attached, and
- * every dashboard controller used to reach straight for ->business->id — so
+ * every dashboard controller used to reach straight for ->business->id, so
  * that account hit a null-property fatal on its very first request. Rather
  * than sprinkle null checks, the routes that need a business say so.
  */

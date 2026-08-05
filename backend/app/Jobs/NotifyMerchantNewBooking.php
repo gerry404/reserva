@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Mail;
  *
  * One channel failing must not stop the others: a merchant with WhatsApp *and*
  * email switched on should still get the email while Twilio is down. Retries are
- * spaced out because the failure mode is almost always a provider outage — the
+ * spaced out because the failure mode is almost always a provider outage, and the
  * booking itself is safely stored either way.
  */
 class NotifyMerchantNewBooking implements ShouldQueue

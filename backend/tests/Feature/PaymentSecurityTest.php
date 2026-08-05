@@ -12,7 +12,7 @@ use Tests\TestCase;
  * The payment path, from the attacker's point of view.
  *
  * The original webhook re-verified whatever transaction id the caller supplied
- * and granted a plan whenever that came back successful — never checking that
+ * and granted a plan whenever that came back successful, never checking that
  * the transaction belonged to the payment being settled. One genuine 2 900 F
  * payment, replayed, bought a subscription forever. These tests pin the
  * conditions that closed it.
@@ -26,7 +26,7 @@ class PaymentSecurityTest extends TestCase
     /**
      * What the fake gateway reports for a given tx_ref.
      *
-     * One stub, registered once, reading this map — stacking Http::fake() calls
+     * One stub, registered once, reading this map; stacking Http::fake() calls
      * would not work here, because the earliest matching stub wins and later
      * ones are silently ignored.
      *

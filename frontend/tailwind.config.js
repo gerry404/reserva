@@ -12,20 +12,30 @@ export default {
         // phrases. Roboto est neutre et couvre le français en entier.
         sans: ['Roboto', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
 
-        // Titres et marque — là où le caractère de Dekatron se voit.
+        // Titres et marque : là où le caractère de Dekatron se voit.
         display: ['"Dekatron"', 'Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
 
-        // Chiffres en vedette — heures, prix, compteurs. Roboto en repli :
+        // Chiffres en vedette : heures, prix, compteurs. Roboto en repli :
         // Yuzo ne dessine pas les accents, mais aucun chiffre n'en porte.
         numeric: ['"Yuzo"', 'Roboto', 'ui-monospace', 'monospace'],
       },
       /*
-       * Les couleurs viennent de src/design/tokens.js — l'unique source.
+       * Les couleurs viennent de src/design/tokens.js, l'unique source.
        *
        * Rien n'est défini ici : ce fichier ne fait que brancher les jetons sur
        * les classes Tailwind. Pour changer la palette, éditer les jetons.
        */
       colors: tokens.colors,
+
+      /*
+       * `rounded-control` sur tout ce qui se clique, `rounded-surface` sur les
+       * cartes. Les deux viennent des mêmes jetons, pour qu'un changement de
+       * rayon ne demande pas de repasser sur trente fichiers.
+       */
+      borderRadius: {
+        control: tokens.radii.control,
+        surface: tokens.radii.surface,
+      },
 
       animation: {
         'fade-in':   'fadeIn 0.3s ease-in-out',
@@ -55,8 +65,8 @@ export default {
     /*
      * Expose les jetons en variables CSS sur :root.
      *
-     * Les composants qui stylent hors Tailwind — les blocs du ruban, la barre
-     * de durée, le bouton WhatsApp — lisent var(--forest-600) plutôt que de
+     * Les composants qui stylent hors Tailwind (les blocs du ruban, la barre
+     * de durée, le bouton WhatsApp) lisent var(--forest-600) plutôt que de
      * recopier une valeur. Un seul fichier reste la source, quelle que soit la
      * manière dont la couleur est consommée.
      */
