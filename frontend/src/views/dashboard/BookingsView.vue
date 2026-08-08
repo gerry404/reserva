@@ -1,432 +1,389 @@
 <script setup>
-import BaseSelect from '@/components/ui/BaseSelect.vue'
-import BaseDateField from '@/components/ui/BaseDateField.vue'
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
-import { useBookingsStore } from '@/stores/bookings'
-import {
-  Search,
-  Funnel,
-  Download,
-  Check,
-  X,
-  Ellipsis,
-  CalendarDays,
-  Phone,
-  Clock,
-  Mail,
-  MessageCircle,
-} from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue'
 import { format, parseISO } from 'date-fns'
+import { fr } from 'date-fns/locale'
+import {
+  CalendarDays, Check, Download, Ellipsis, Mail, MessageCircle, Phone, X,
+} from 'lucide-vue-next'
+
+import { useBookingsStore } from '@/stores/bookings'
+import { ACTIONABLE_STATUSES, describeStatus } from '@/constants/bookingStatus'
+import { iconForService } from '@/constants/serviceIcons'
+import BookingFilters from '@/components/dashboard/BookingFilters.vue'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import DurationBar from '@/components/time/DurationBar.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
-import { defaultAccent } from '@/design/tokens'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
-import BaseSpinner from '@/components/ui/BaseSpinner.vue'
-import { STATUS_FILTER_OPTIONS, describeStatus } from '@/constants/bookingStatus'
-
-/** Les libellés et couleurs viennent de constants/bookingStatus. */
-const statusOptions = STATUS_FILTER_OPTIONS
-import { fr } from 'date-fns/locale'
 import BrandIcon from '@/components/ui/BrandIcon.vue'
 
+/**
+ * La liste des réservations.
+ *
+ * Elle était rendue en cartes empilées, sans tri possible et avec une
+ * pagination réduite à deux boutons. Le commerçant ne pouvait ni classer par
+ * montant, ni remonter au premier rendez-vous d'une série : il lui restait
+ * l'export CSV et un tableur.
+ *
+ * `v-data-table-server` trie et pagine côté serveur. Le tri local aurait
+ * réordonné les vingt lignes de la page courante et répondu faux à « ma plus
+ * grosse réservation », puisque les autres pages ne sont pas chargées.
+ */
 
-const store       = useBookingsStore()
-const actionMenu  = ref(null)
-const confirmModal = ref(null)
-const viewDetail  = ref(null)
-const toast        = ref(null) // { message, whatsappLink }
+const store = useBookingsStore()
 
-onMounted(() => store.fetchBookings())
+const detail = ref(null)
+const confirmation = ref(null)
+const enCours = ref(false)
+const toast = ref(null)
 
-let searchTimeout = null
-watch(() => store.filters.search, () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => store.fetchBookings(), 400)
-})
-watch(() => [store.filters.status, store.filters.date], () => store.fetchBookings())
-
-
-function formatDate(d) {
-  try { return format(parseISO(d), 'EEE d MMM', { locale: fr }) }
-  catch { return d }
-}
-
-function formatDateLong(d) {
-  try { return format(parseISO(d), 'EEEE d MMMM yyyy', { locale: fr }) }
-  catch { return d }
-}
-
-async function changeStatus(id, status) {
-  confirmModal.value = null
-  actionMenu.value   = null
-  const response = await store.updateStatus(id, status)
-  const booking  = response.booking.data ?? response.booking
-
-  if (status === 'confirmed' && response.whatsapp_link) {
-    const name = booking.customer_name || 'le client'
-    toast.value = {
-      message: booking.customer_email
-        ? `✅ Confirmé ! Un email a été envoyé à ${name}.`
-        : `✅ Confirmé ! Prévenez ${name} via WhatsApp :`,
-      whatsappLink: response.whatsapp_link,
-    }
-    setTimeout(() => { toast.value = null }, 15000)
-  }
-}
-
-async function cancelBooking(id) {
-  await store.cancelBooking(id)
-  confirmModal.value = null
-  actionMenu.value   = null
-}
-
-function openConfirm(bookingId, action) {
-  confirmModal.value = { bookingId, action }
-  actionMenu.value   = null
-}
-
-function goToPage(page) {
-  store.fetchBookings({ page })
-}
-
-// Dropdown positioning
-const menuStyle = ref({})
-
-function toggleMenu(id, event) {
-  if (actionMenu.value === id) {
-    actionMenu.value = null
-    return
-  }
-  const btn = event.currentTarget
-  const rect = btn.getBoundingClientRect()
-  const spaceBelow = window.innerHeight - rect.bottom
-  const menuHeight = 160
-
-  if (spaceBelow > menuHeight) {
-    menuStyle.value = { top: rect.bottom + 4 + 'px', left: (rect.right - 192) + 'px' }
-  } else {
-    menuStyle.value = { top: (rect.top - menuHeight - 4) + 'px', left: (rect.right - 192) + 'px' }
-  }
-  actionMenu.value = id
-}
-
-function onClickOutside(e) {
-  if (actionMenu.value && !e.target.closest('[data-menu-trigger]')) {
-    actionMenu.value = null
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', onClickOutside, true)
-})
-onUnmounted(() => {
-  document.removeEventListener('click', onClickOutside, true)
-})
+const headers = [
+  { title: 'Client', key: 'customer_name', minWidth: '220' },
+  { title: 'Prestation', key: 'service', sortable: false, minWidth: '200' },
+  { title: 'Quand', key: 'date', minWidth: '170' },
+  { title: 'Montant', key: 'price', align: 'end', minWidth: '110' },
+  { title: 'Statut', key: 'status', align: 'center', minWidth: '130' },
+  { title: '', key: 'actions', sortable: false, align: 'end', width: 60 },
+]
 
 /**
- * Les compteurs viennent du serveur, jamais de `store.bookings`.
+ * Le tableau annonce ses changements de page et de tri d'un seul coup.
  *
- * Cette liste est paginée et déjà filtrée : y compter les statuts affichait
- * zéro « en attente » dès qu'on filtrait sur « confirmé », et ne voyait de
- * toute façon jamais au-delà de la première page.
+ * Vuetify émet `update:options` pour les trois à la fois. Écouter chaque prop
+ * séparément déclenchait trois requêtes pour un seul clic sur un en-tête.
  */
-const stats = computed(() => store.counts)
+function onOptions({ page, itemsPerPage, sortBy }) {
+  store.query.page = page
+  store.query.perPage = itemsPerPage
+  store.query.sort = sortBy?.[0]?.key ?? 'date'
+  store.query.direction = sortBy?.[0]?.order ?? 'desc'
+  store.fetchBookings()
+}
 
-/** Un second clic sur la même pastille relâche le filtre. */
-function basculerStatut(statut) {
-  store.filters.status = store.filters.status === statut ? '' : statut
+/*
+ * Les filtres repartent toujours de la première page : filtrer alors qu'on est
+ * en page 3 renvoyait une page vide, qui se lisait comme « aucun résultat ».
+ */
+let rechercheTimer = null
+watch(() => store.filters.search, () => {
+  clearTimeout(rechercheTimer)
+  rechercheTimer = setTimeout(() => {
+    store.query.page = 1
+    store.fetchBookings()
+  }, 400)
+})
+
+watch(() => [store.filters.status, store.filters.date], () => {
+  store.query.page = 1
+  store.fetchBookings()
+})
+
+const sortBy = computed(() => [{ key: store.query.sort, order: store.query.direction }])
+
+function jourCourt(iso) {
+  try { return format(parseISO(iso), 'EEE d MMM', { locale: fr }) } catch { return iso }
+}
+
+function jourLong(iso) {
+  try { return format(parseISO(iso), 'EEEE d MMMM yyyy', { locale: fr }) } catch { return iso }
+}
+
+/** Les transitions offertes pour une réservation, selon son statut courant. */
+function transitions(booking) {
+  const libelles = {
+    confirmed: { label: 'Confirmer', icon: Check, tone: 'success' },
+    completed: { label: 'Marquer terminée', icon: Check, tone: 'info' },
+    no_show:   { label: 'Noter non présentée', icon: X, tone: 'warning' },
+    cancelled: { label: 'Annuler', icon: X, tone: 'error' },
+  }
+
+  return ACTIONABLE_STATUSES
+    .filter((statut) => statut !== booking.status)
+    .map((statut) => ({ statut, ...libelles[statut] }))
+}
+
+function demander(booking, statut) {
+  const { customer } = describeStatus(statut)
+  confirmation.value = {
+    booking,
+    statut,
+    titre: `Passer la réservation en « ${customer} » ?`,
+    destructif: statut === 'cancelled',
+  }
+}
+
+async function appliquer() {
+  const { booking, statut } = confirmation.value
+  enCours.value = true
+
+  try {
+    if (statut === 'cancelled') {
+      await store.cancelBooking(booking.id)
+    } else {
+      const reponse = await store.updateStatus(booking.id, statut)
+      const ligne = reponse.booking.data ?? reponse.booking
+
+      if (statut === 'confirmed' && reponse.whatsapp_link) {
+        toast.value = {
+          message: ligne.customer_email
+            ? `Confirmée. Un email est parti chez ${ligne.customer_name}.`
+            : `Confirmée. Prévenez ${ligne.customer_name} sur WhatsApp :`,
+          lien: reponse.whatsapp_link,
+        }
+      }
+    }
+
+    // Les compteurs par statut viennent du serveur : sans ce rechargement,
+    // les pastilles annonceraient encore l'ancienne répartition.
+    await store.fetchBookings()
+    confirmation.value = null
+  } finally {
+    enCours.value = false
+  }
 }
 </script>
 
 <template>
-  <div class="space-y-6 animate-fade-in">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div class="d-flex flex-column ga-6">
+    <div class="d-flex flex-wrap align-center justify-space-between ga-4">
       <div>
-        <h2 class="text-xl font-black text-gray-900">Réservations</h2>
-        <p class="text-sm text-gray-500 mt-0.5">Gérez et suivez toutes vos réservations</p>
+        <h2 class="page__title">Réservations</h2>
+        <p class="text-body-2 text-medium-emphasis mb-0">
+          Gérez et suivez toutes vos réservations
+        </p>
       </div>
-      <button @click="store.exportCsv()" class="btn-secondary text-sm">
-        <Download class="w-4 h-4" />
+      <v-btn variant="tonal" color="primary" class="text-none" @click="store.exportCsv()">
+        <Download :size="16" class="mr-2" />
         Exporter CSV
-      </button>
+      </v-btn>
     </div>
 
-    <!-- Confirmation toast with WhatsApp link -->
-    <Transition name="fade">
-      <div v-if="toast" class="relative flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-        <button @click="toast = null" class="absolute top-2 right-2 text-emerald-400 hover:text-emerald-600">
-          <X class="w-4 h-4" />
-        </button>
-        <p class="text-sm text-emerald-800 font-medium pr-6">{{ toast.message }}</p>
-        <a
-          :href="toast.whatsappLink"
+    <v-alert
+      v-if="toast"
+      type="success"
+      closable
+      @click:close="toast = null"
+    >
+      <div class="d-flex flex-wrap align-center ga-3">
+        <span class="text-body-2">{{ toast.message }}</span>
+        <v-btn
+          v-if="toast.lien"
+          :href="toast.lien"
           target="_blank"
-          class="btn-whatsapp shrink-0 px-4 py-2 text-sm shadow-sm"
+          size="small"
+          class="btn-whatsapp px-4 text-none"
         >
-          <BrandIcon name="whatsapp" class="w-4 h-4" />
+          <BrandIcon name="whatsapp" class="mr-2" style="width: 16px; height: 16px" />
           Envoyer sur WhatsApp
-        </a>
+        </v-btn>
       </div>
-    </Transition>
+    </v-alert>
 
-    <!-- Mini stat pills -->
-    <div class="flex flex-wrap gap-2">
-      <button
-        @click="store.filters.status = ''"
-        :class="['flex items-center gap-2 px-3.5 py-2 border rounded-control text-sm transition-colors',
-                 store.filters.status === '' ? 'bg-gray-900 border-gray-900 text-white' : 'bg-clay-50 border-gray-100 hover:bg-gray-100']">
-        <span class="font-bold">{{ stats.all }}</span>
-        <span :class="store.filters.status === '' ? 'text-white/70' : 'text-gray-400'">au total</span>
-      </button>
-      <button
-        @click="basculerStatut('pending')"
-        :class="['flex items-center gap-2 px-3.5 py-2 border rounded-control text-sm transition-colors',
-                 store.filters.status === 'pending' ? 'bg-amber-500 border-amber-500 text-white' : 'bg-amber-50 border-amber-100 hover:bg-amber-100']">
-        <span :class="['w-2 h-2 rounded-full', store.filters.status === 'pending' ? 'bg-white' : 'bg-amber-400']" />
-        <span :class="['font-bold', store.filters.status === 'pending' ? 'text-white' : 'text-amber-700']">{{ stats.pending }}</span>
-        <span :class="store.filters.status === 'pending' ? 'text-white/75' : 'text-amber-600/70'">en attente</span>
-      </button>
-      <button
-        @click="basculerStatut('confirmed')"
-        :class="['flex items-center gap-2 px-3.5 py-2 border rounded-control text-sm transition-colors',
-                 store.filters.status === 'confirmed' ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-emerald-50 border-emerald-100 hover:bg-emerald-100']">
-        <span :class="['w-2 h-2 rounded-full', store.filters.status === 'confirmed' ? 'bg-white' : 'bg-emerald-400']" />
-        <span :class="['font-bold', store.filters.status === 'confirmed' ? 'text-white' : 'text-emerald-700']">{{ stats.confirmed }}</span>
-        <span :class="store.filters.status === 'confirmed' ? 'text-white/75' : 'text-emerald-600/70'">confirmés</span>
-      </button>
-    </div>
+    <BookingFilters
+      :filters="store.filters"
+      :counts="store.counts"
+      @reset="store.resetFilters(); store.fetchBookings()"
+    />
 
-    <!-- Filters -->
-    <div class="flex flex-wrap gap-3 items-center">
-      <div class="relative flex-1 min-w-[220px]">
-        <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input
-          v-model="store.filters.search"
-          type="search"
-          class="input-field pl-10"
-          placeholder="Rechercher un client, une référence…"
-        />
-      </div>
-
-      <div class="sm:w-48">
-        <BaseSelect
-          v-model="store.filters.status"
-          :options="statusOptions"
-          placeholder="Tous les statuts"
-          aria-label="Filtrer par statut"
-        />
-      </div>
-
-      <div class="sm:w-52">
-        <BaseDateField v-model="store.filters.date" aria-label="Filtrer par date" />
-      </div>
-
-      <button v-if="store.filters.search || store.filters.status || store.filters.date" @click="store.resetFilters(); store.fetchBookings()" class="btn-ghost text-sm">
-        <X class="w-4 h-4" /> Réinitialiser
-      </button>
-    </div>
-
-    <!-- Loading skeleton -->
-    <div v-if="store.loading" class="space-y-3">
-      <div v-for="i in 5" :key="i" class="card p-4 flex items-center gap-4 animate-pulse">
-        <div class="w-11 h-11 bg-gray-100 rounded-full shrink-0" />
-        <div class="flex-1 space-y-2">
-          <div class="h-4 bg-gray-100 rounded w-32" />
-          <div class="h-3 bg-gray-100 rounded w-48" />
-        </div>
-        <div class="h-6 bg-gray-100 rounded-full w-20" />
-      </div>
-    </div>
-
-    <!-- Empty state -->
-    <div v-else-if="store.bookings.length === 0" class="card p-16 text-center">
-      <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-        <CalendarDays class="w-8 h-8 text-gray-300" />
-      </div>
-      <h3 class="font-bold text-gray-900 mb-2">Aucune réservation trouvée</h3>
-      <p class="text-gray-400 text-sm">Essayez de modifier les filtres ou attendez vos prochaines réservations</p>
-    </div>
-
-    <!-- Booking cards -->
-    <div v-else class="space-y-2">
-      <div
-        v-for="b in store.bookings"
-        :key="b.id"
-        class="card hover:shadow-md transition-all duration-200 group cursor-pointer"
-        @click="viewDetail = viewDetail?.id === b.id ? null : b"
+    <v-card>
+      <v-data-table-server
+        :headers="headers"
+        :items="store.bookings"
+        :items-length="store.pagination?.total ?? 0"
+        :loading="store.loading"
+        :page="store.query.page"
+        :items-per-page="store.query.perPage"
+        :sort-by="sortBy"
+        :items-per-page-options="[10, 20, 50, 100]"
+        item-value="id"
+        must-sort
+        items-per-page-text="Par page"
+        no-data-text="Aucune réservation ne correspond à ces filtres."
+        loading-text="Chargement…"
+        @update:options="onOptions"
       >
-        <div class="flex items-center gap-4 p-4">
-          <UserAvatar :name="b.customer_name" :color="b.service?.color" size="lg" />
-
-          <!-- Main info -->
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2">
-              <p class="font-bold text-gray-900 truncate">{{ b.customer_name }}</p>
-              <span class="font-mono text-[10px] text-gray-300 hidden sm:inline">{{ b.reference }}</span>
+        <template #[`item.customer_name`]="{ item }">
+          <div class="d-flex align-center ga-3 py-2">
+            <UserAvatar :name="item.customer_name" :color="item.service?.color" size="sm" />
+            <div class="min-width-0">
+              <p class="text-body-2 font-weight-bold text-truncate mb-0">{{ item.customer_name }}</p>
+              <p class="cell__ref mb-0">{{ item.reference }}</p>
             </div>
-            <div class="flex items-center gap-3 mt-0.5 text-xs text-gray-400">
-              <span v-if="b.service" class="flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full shrink-0" :style="{ backgroundColor: b.service.color ?? defaultAccent }" />
-                {{ b.service.name }}
-              </span>
-              <span class="flex items-center gap-1">
-                <CalendarDays class="w-3 h-3" />
-                {{ formatDate(b.date) }} ·
-                <span class="numeric">{{ b.time_slot }}–{{ b.ends_at_time }}</span>
-              </span>
-            </div>
+          </div>
+        </template>
 
-            <!-- Même barre que sur la page publique et le tableau de bord :
-                 une seule échelle de temps dans tout le produit. -->
+        <template #[`item.service`]="{ item }">
+          <div v-if="item.service" class="py-2">
+            <div class="d-flex align-center ga-2">
+              <component
+                :is="iconForService(item.service)"
+                :size="15"
+                :style="{ color: item.service.color }"
+              />
+              <span class="text-body-2 text-truncate">{{ item.service.name }}</span>
+            </div>
+            <!-- La même barre que sur la page publique : une seule échelle de
+                 temps dans tout le produit. -->
             <DurationBar
-              :minutes="b.duration"
-              :color="b.service?.color"
+              :minutes="item.duration"
+              :color="item.service.color"
               size="sm"
-              class="mt-2 max-w-[160px]"
+              class="mt-1"
+              style="max-width: 150px"
             />
           </div>
+          <span v-else class="text-medium-emphasis text-body-2">Service supprimé</span>
+        </template>
 
-          <!-- Status badge -->
-          <StatusBadge :status="b.status" class="shrink-0" />
-
-          <!-- Action button -->
-          <div data-menu-trigger>
-            <button @click.stop="toggleMenu(b.id, $event)" class="p-2 rounded-control text-gray-300 hover:text-gray-600 hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100">
-              <Ellipsis class="w-5 h-5" />
-            </button>
+        <template #[`item.date`]="{ item }">
+          <div class="py-2">
+            <p class="text-body-2 mb-0">{{ jourCourt(item.date) }}</p>
+            <p class="numeric text-caption text-medium-emphasis mb-0">
+              {{ item.time_slot }} – {{ item.ends_at_time }}
+            </p>
           </div>
+        </template>
 
-          <!-- Teleported dropdown -->
-          <Teleport to="body">
-            <Transition name="menu">
-              <div
-                v-if="actionMenu === b.id"
-                class="fixed w-48 bg-clay-50 rounded-xl shadow-2xl shadow-black/15 border border-gray-100 overflow-hidden z-[9999]"
-                :style="menuStyle"
+        <template #[`item.price`]="{ item }">
+          <span class="numeric text-body-2 font-weight-semibold">{{ item.formatted_price }}</span>
+        </template>
+
+        <template #[`item.status`]="{ item }">
+          <StatusBadge :status="item.status" />
+        </template>
+
+        <template #[`item.actions`]="{ item }">
+          <v-menu location="bottom end">
+            <template #activator="{ props: activator }">
+              <v-btn
+                v-bind="activator"
+                icon
+                variant="text"
+                size="small"
+                :aria-label="`Actions pour ${item.customer_name}`"
               >
-                <template v-if="b.status === 'pending'">
-                  <button @click="openConfirm(b.id, 'confirm')" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-emerald-700 hover:bg-emerald-50 transition-colors">
-                    <Check class="w-4 h-4" /> Confirmer
-                  </button>
-                </template>
-                <template v-if="['pending', 'confirmed'].includes(b.status)">
-                  <button @click="openConfirm(b.id, 'complete')" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-blue-700 hover:bg-blue-50 transition-colors">
-                    <Check class="w-4 h-4" /> Marquer terminé
-                  </button>
-                  <button @click="openConfirm(b.id, 'cancel')" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                    <X class="w-4 h-4" /> Annuler
-                  </button>
-                </template>
-                <button @click="actionMenu = null" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 transition-colors border-t border-gray-50">
-                  <X class="w-4 h-4" /> Fermer
-                </button>
-              </div>
-            </Transition>
-          </Teleport>
-        </div>
+                <Ellipsis :size="18" />
+              </v-btn>
+            </template>
 
-        <!-- Expanded detail -->
-        <Transition name="expand">
-          <div v-if="viewDetail?.id === b.id" class="border-t border-gray-50 px-4 pb-4 pt-3">
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div>
-                <p class="text-[11px] text-gray-400 font-medium mb-0.5">Téléphone</p>
-                <a :href="'tel:' + b.customer_phone" class="text-sm font-semibold text-gray-900 flex items-center gap-1 hover:text-primary-600">
-                  <Phone class="w-3.5 h-3.5 text-gray-400" /> {{ b.customer_phone }}
-                </a>
-              </div>
-              <div v-if="b.customer_email">
-                <p class="text-[11px] text-gray-400 font-medium mb-0.5">Email</p>
-                <a :href="'mailto:' + b.customer_email" class="text-sm font-semibold text-gray-900 flex items-center gap-1 hover:text-primary-600 truncate">
-                  <Mail class="w-3.5 h-3.5 text-gray-400 shrink-0" /> {{ b.customer_email }}
-                </a>
-              </div>
-              <div>
-                <p class="text-[11px] text-gray-400 font-medium mb-0.5">Date complète</p>
-                <p class="text-sm font-semibold text-gray-900 capitalize">{{ formatDateLong(b.date) }}</p>
-              </div>
-              <div>
-                <p class="text-[11px] text-gray-400 font-medium mb-0.5">Référence</p>
-                <p class="text-sm font-mono font-bold text-primary-600">{{ b.reference }}</p>
-              </div>
-            </div>
-            <div v-if="b.notes" class="mt-3 p-3 bg-gray-50 rounded-xl">
-              <p class="text-[11px] text-gray-400 font-medium mb-1 flex items-center gap-1">
-                <MessageCircle class="w-3 h-3" /> Notes du client
-              </p>
-              <p class="text-sm text-gray-600">{{ b.notes }}</p>
-            </div>
+            <v-list density="compact" nav min-width="220">
+              <v-list-item
+                rounded="control"
+                @click="detail = detail?.id === item.id ? null : item"
+              >
+                <v-list-item-title class="text-body-2">
+                  {{ detail?.id === item.id ? 'Masquer le détail' : 'Voir le détail' }}
+                </v-list-item-title>
+              </v-list-item>
 
-            <!-- Quick actions -->
-            <div v-if="b.status === 'pending'" class="flex gap-2 mt-3">
-              <button @click.stop="openConfirm(b.id, 'confirm')" class="btn-primary text-xs py-2 flex-1">
-                <Check class="w-3.5 h-3.5" /> Confirmer
-              </button>
-              <button @click.stop="openConfirm(b.id, 'cancel')" class="btn-danger text-xs py-2 flex-1">
-                <X class="w-3.5 h-3.5" /> Annuler
-              </button>
-            </div>
-          </div>
-        </Transition>
-      </div>
-    </div>
+              <v-divider class="my-1" />
 
-    <!-- Pagination -->
-    <div v-if="store.pagination && store.pagination.lastPage > 1" class="flex items-center justify-between text-sm">
-      <p class="text-gray-400">
-        Page {{ store.pagination.currentPage }} sur {{ store.pagination.lastPage }}
-        <span class="text-gray-300 ml-1">({{ store.pagination.total }} résultats)</span>
-      </p>
-      <div class="flex gap-2">
-        <button
-          :disabled="store.pagination.currentPage <= 1"
-          @click="goToPage(store.pagination.currentPage - 1)"
-          class="btn-secondary text-xs px-3 py-1.5 disabled:opacity-40"
-        >← Précédent</button>
-        <button
-          :disabled="store.pagination.currentPage >= store.pagination.lastPage"
-          @click="goToPage(store.pagination.currentPage + 1)"
-          class="btn-secondary text-xs px-3 py-1.5 disabled:opacity-40"
-        >Suivant →</button>
-      </div>
-    </div>
-  </div>
+              <v-list-item
+                v-for="t in transitions(item)"
+                :key="t.statut"
+                rounded="control"
+                :base-color="t.tone"
+                @click="demander(item, t.statut)"
+              >
+                <template #prepend><component :is="t.icon" :size="16" class="mr-3" /></template>
+                <v-list-item-title class="text-body-2">{{ t.label }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </template>
+      </v-data-table-server>
+    </v-card>
 
-  <!-- Confirmation modal -->
-  <Teleport to="body">
-    <Transition name="fade">
-      <div v-if="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-        <div class="bg-clay-50 rounded-2xl shadow-xl p-6 w-full max-w-sm animate-slide-up">
-          <h3 class="font-bold text-gray-900 text-lg mb-2">
-            {{ confirmModal.action === 'cancel' ? 'Annuler la réservation ?' : confirmModal.action === 'confirm' ? 'Confirmer la réservation ?' : 'Marquer comme terminée ?' }}
+    <!-- Le détail, sous le tableau plutôt qu'inséré dans une ligne : glissé
+         entre deux lignes, il décalait tout ce qui suit à chaque ouverture. -->
+    <v-expand-transition>
+      <v-card v-if="detail" class="pa-5">
+        <div class="d-flex align-center justify-space-between ga-4 mb-4">
+          <h3 class="text-subtitle-1 font-weight-bold mb-0">
+            {{ detail.customer_name }}
           </h3>
-          <p class="text-sm text-gray-500 mb-6">Cette action sera notifiée au client.</p>
-          <div class="flex gap-3">
-            <button @click="confirmModal = null" class="btn-secondary flex-1">Annuler</button>
-            <button
-              @click="confirmModal.action === 'cancel' ? cancelBooking(confirmModal.bookingId) : changeStatus(confirmModal.bookingId, confirmModal.action === 'confirm' ? 'confirmed' : 'completed')"
-              :class="['flex-1', confirmModal.action === 'cancel' ? 'btn-danger' : 'btn-primary']"
-            >
-              Confirmer
-            </button>
-          </div>
+          <v-btn icon variant="text" size="small" aria-label="Fermer le détail" @click="detail = null">
+            <X :size="18" />
+          </v-btn>
         </div>
-      </div>
-    </Transition>
-  </Teleport>
+
+        <v-row dense>
+          <v-col cols="12" sm="6" md="3">
+            <p class="detail__label">Téléphone</p>
+            <a :href="`tel:${detail.customer_phone}`" class="detail__value">
+              <Phone :size="14" class="mr-1 text-medium-emphasis" />{{ detail.customer_phone }}
+            </a>
+          </v-col>
+          <v-col v-if="detail.customer_email" cols="12" sm="6" md="3">
+            <p class="detail__label">Email</p>
+            <a :href="`mailto:${detail.customer_email}`" class="detail__value text-truncate">
+              <Mail :size="14" class="mr-1 text-medium-emphasis" />{{ detail.customer_email }}
+            </a>
+          </v-col>
+          <v-col cols="12" sm="6" md="3">
+            <p class="detail__label">Date complète</p>
+            <p class="detail__value text-capitalize">{{ jourLong(detail.date) }}</p>
+          </v-col>
+          <v-col cols="12" sm="6" md="3">
+            <p class="detail__label">Référence</p>
+            <p class="detail__value numeric text-primary">{{ detail.reference }}</p>
+          </v-col>
+        </v-row>
+
+        <v-alert v-if="detail.notes" variant="tonal" color="clay-600" class="mt-4">
+          <p class="detail__label mb-1">
+            <MessageCircle :size="13" class="mr-1" />Notes du client
+          </p>
+          <p class="text-body-2 mb-0">{{ detail.notes }}</p>
+        </v-alert>
+      </v-card>
+    </v-expand-transition>
+
+    <ConfirmDialog
+      :model-value="Boolean(confirmation)"
+      :title="confirmation?.titre ?? ''"
+      message="Le client en sera informé."
+      :tone="confirmation?.destructif ? 'error' : 'primary'"
+      :loading="enCours"
+      @update:model-value="confirmation = null"
+      @confirm="appliquer"
+    />
+  </div>
 </template>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.15s; }
-.fade-enter-from, .fade-leave-to       { opacity: 0; }
+.page__title {
+  font-family: 'Dekatron', Roboto, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--forest-950);
+  margin: 0 0 2px;
+}
 
-.menu-enter-active { transition: all 0.12s ease-out; }
-.menu-leave-active { transition: all 0.1s ease-in; }
-.menu-enter-from, .menu-leave-to { opacity: 0; transform: scale(0.95) translateY(-4px); }
+.cell__ref {
+  font-family: 'Yuzo', Roboto, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--clay-400);
+}
 
-.expand-enter-active { transition: all 0.2s ease-out; }
-.expand-leave-active { transition: all 0.15s ease-in; }
-.expand-enter-from { opacity: 0; max-height: 0; }
-.expand-leave-to { opacity: 0; max-height: 0; }
+.detail__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--clay-400);
+  margin-bottom: 2px;
+}
+
+.detail__value {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--forest-950);
+  text-decoration: none;
+}
+
+a.detail__value:hover { color: var(--forest-600); }
+
+.min-width-0 { min-width: 0; }
 </style>

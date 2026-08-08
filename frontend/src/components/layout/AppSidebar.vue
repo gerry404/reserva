@@ -1,174 +1,140 @@
 <script setup>
 import { computed } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute } from 'vue-router'
+import { ExternalLink } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
-import {
-  House,
-  CalendarDays,
-  LayoutGrid,
-  Settings,
-  CreditCard,
-  ExternalLink,
-  X,
-} from 'lucide-vue-next'
+import { NAV_ITEMS } from '@/constants/navigation'
+import UserAvatar from '@/components/ui/UserAvatar.vue'
 
-const props = defineProps({ open: Boolean })
-const emit  = defineEmits(['close'])
+/**
+ * Le contenu du tiroir de navigation.
+ *
+ * Ce fichier portait le même balisage deux fois, une version bureau et une
+ * version mobile, avec leurs propres classes de position et leur propre
+ * transition. `v-navigation-drawer` gère le passage en superposition sous le
+ * point de rupture, ce qui rend la seconde copie inutile.
+ */
 
 const route = useRoute()
-const auth  = useAuthStore()
-
-const navItems = [
-  { name: 'Tableau de bord', to: '/dashboard',          icon: House },
-  { name: 'Réservations',    to: '/dashboard/bookings', icon: CalendarDays },
-  { name: 'Services',        to: '/dashboard/services', icon: LayoutGrid },
-  { name: 'Paramètres',      to: '/dashboard/settings', icon: Settings },
-  { name: 'Abonnement',     to: '/dashboard/billing',  icon: CreditCard },
-]
+const auth = useAuthStore()
 
 const publicUrl = computed(() => {
   const slug = auth.business?.slug
   return slug ? `/b/${slug}` : null
 })
 
+/**
+ * Le palier d'abonnement affiché sous le nom.
+ *
+ * Les couleurs viennent du thème plutôt que de classes écrites à la main :
+ * le palier Business portait `bg-violet-100`, un reste de l'ancienne identité
+ * que le remappage des jetons rendait vert sans que le nom le dise.
+ */
 const planBadge = computed(() => ({
-  free:     { label: 'Gratuit', cls: 'bg-gray-100 text-gray-600' },
-  pro:      { label: 'Pro',     cls: 'bg-primary-100 text-primary-700' },
-  business: { label: 'Business',cls: 'bg-violet-100 text-violet-700' },
+  free:     { label: 'Découverte', color: 'clay-200',  text: 'clay-700' },
+  pro:      { label: 'Pro',        color: 'forest-100', text: 'forest-800' },
+  business: { label: 'Business',   color: 'forest-700', text: 'white' },
 }[auth.user?.plan ?? 'free']))
 
-function isActive(path) {
-  if (path === '/dashboard') return route.path === '/dashboard'
-  return route.path.startsWith(path)
-}
-
-function onNav() {
-  emit('close')
+function isActive(item) {
+  if (item.to === '/dashboard') return route.path === '/dashboard'
+  return route.path.startsWith(item.to)
 }
 </script>
 
 <template>
-  <!-- Desktop sidebar -->
-  <aside class="hidden lg:flex flex-col w-64 bg-clay-50 border-r border-gray-100 h-full shrink-0">
-    <div class="flex flex-col flex-1 overflow-hidden">
-      <!-- Logo -->
-      <div class="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100">
-        <img src="/logo.svg" alt="Nuvo" class="w-9 h-9 shrink-0" />
-        <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Nuvo</span>
-      </div>
+  <div class="d-flex flex-column h-100">
+    <div class="sidebar__brand">
+      <img src="/logo.svg" alt="" class="sidebar__logo" />
+      <span class="sidebar__name">Nuvo</span>
+    </div>
 
-      <!-- Nav -->
-      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        <RouterLink
-          v-for="item in navItems"
-          :key="item.to"
-          :to="item.to"
-          :class="[
-            'flex items-center gap-3 px-3 py-2.5 rounded-control text-sm font-medium transition-all duration-200',
-            isActive(item.to)
-              ? 'bg-primary-50 text-primary-700 font-semibold shadow-sm'
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-          ]"
-        >
-          <component :is="item.icon" :class="['w-5 h-5 shrink-0', isActive(item.to) ? 'text-primary-600' : 'text-gray-400']" />
-          {{ item.name }}
-        </RouterLink>
-      </nav>
+    <v-list nav class="flex-grow-1 pa-3">
+      <v-list-item
+        v-for="item in NAV_ITEMS"
+        :key="item.to"
+        :to="item.to"
+        :active="isActive(item)"
+        active-color="primary"
+        rounded="control"
+        class="mb-1"
+      >
+        <template #prepend>
+          <component
+            :is="item.icon"
+            :size="19"
+            :stroke-width="isActive(item) ? 2.3 : 1.9"
+            class="mr-3"
+          />
+        </template>
+        <v-list-item-title class="text-body-2 font-weight-medium">
+          {{ item.label }}
+        </v-list-item-title>
+      </v-list-item>
+    </v-list>
 
-      <!-- Public link -->
-      <div v-if="publicUrl" class="px-3 py-3 border-t border-gray-100">
-        <a
-          :href="publicUrl"
-          target="_blank"
-          class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-control transition-colors"
-        >
-          <ExternalLink class="w-4 h-4 shrink-0" />
-          <span class="truncate">Ma page publique</span>
-        </a>
-      </div>
+    <div v-if="publicUrl" class="pa-3 sidebar__section">
+      <v-btn
+        :href="publicUrl"
+        target="_blank"
+        variant="tonal"
+        color="primary"
+        block
+        class="justify-start text-none"
+      >
+        <ExternalLink :size="16" class="mr-2" />
+        Ma page publique
+      </v-btn>
+    </div>
 
-      <!-- User info -->
-      <div class="px-3 py-4 border-t border-gray-100">
-        <div class="flex items-center gap-3 px-3 py-2">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center shrink-0">
-            <span class="text-white font-semibold text-sm">{{ auth.user?.name?.charAt(0) }}</span>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-gray-900 truncate">{{ auth.user?.name }}</p>
-            <span :class="['text-xs font-medium px-1.5 py-0.5 rounded-full', planBadge?.cls]">
-              {{ planBadge?.label }}
-            </span>
-          </div>
+    <div class="pa-3 sidebar__section">
+      <div class="d-flex align-center ga-3 px-2 py-1">
+        <UserAvatar :name="auth.user?.name" size="sm" />
+        <div class="flex-grow-1 min-width-0">
+          <p class="text-body-2 font-weight-bold text-truncate mb-1">{{ auth.user?.name }}</p>
+          <v-chip
+            :color="planBadge?.color"
+            :text-color="planBadge?.text"
+            size="x-small"
+            variant="flat"
+            class="font-weight-bold"
+          >
+            {{ planBadge?.label }}
+          </v-chip>
         </div>
       </div>
     </div>
-  </aside>
-
-  <!-- Mobile drawer -->
-  <Transition name="slide-in">
-    <aside
-      v-if="open"
-      class="fixed inset-y-0 left-0 z-30 w-72 bg-clay-50 shadow-2xl flex flex-col lg:hidden"
-    >
-      <!-- Mobile header -->
-      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <div class="flex items-center gap-2.5">
-          <img src="/logo.svg" alt="Nuvo" class="w-8 h-8" />
-          <span class="font-display font-extrabold text-gray-900 text-lg tracking-tight">Nuvo</span>
-        </div>
-        <button @click="emit('close')" class="p-1.5 rounded-control text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
-          <X class="w-5 h-5" />
-        </button>
-      </div>
-
-      <!-- Mobile nav -->
-      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        <RouterLink
-          v-for="item in navItems"
-          :key="item.to"
-          :to="item.to"
-          :class="[
-            'flex items-center gap-3 px-3 py-2.5 rounded-control text-sm font-medium transition-all duration-200',
-            isActive(item.to)
-              ? 'bg-primary-50 text-primary-700 font-semibold'
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-          ]"
-          @click="onNav"
-        >
-          <component :is="item.icon" :class="['w-5 h-5 shrink-0', isActive(item.to) ? 'text-primary-600' : 'text-gray-400']" />
-          {{ item.name }}
-        </RouterLink>
-      </nav>
-
-      <!-- Public link (mobile) -->
-      <div v-if="publicUrl" class="px-3 py-3 border-t border-gray-100">
-        <a :href="publicUrl" target="_blank"
-          class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-control transition-colors">
-          <ExternalLink class="w-4 h-4 shrink-0" />
-          <span class="truncate">Ma page publique</span>
-        </a>
-      </div>
-
-      <!-- User info (mobile) -->
-      <div class="px-3 py-4 border-t border-gray-100">
-        <div class="flex items-center gap-3 px-3 py-2">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center shrink-0">
-            <span class="text-white font-semibold text-sm">{{ auth.user?.name?.charAt(0) }}</span>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-gray-900 truncate">{{ auth.user?.name }}</p>
-            <span :class="['text-xs font-medium px-1.5 py-0.5 rounded-full', planBadge?.cls]">
-              {{ planBadge?.label }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </aside>
-  </Transition>
+  </div>
 </template>
 
 <style scoped>
-.slide-in-enter-active { transition: transform 0.25s ease-out; }
-.slide-in-leave-active { transition: transform 0.2s ease-in; }
-.slide-in-enter-from, .slide-in-leave-to { transform: translateX(-100%); }
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  border-bottom: 1px solid var(--clay-200);
+}
+
+.sidebar__logo {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.sidebar__name {
+  font-family: 'Dekatron', Roboto, sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  color: var(--forest-950);
+}
+
+.sidebar__section {
+  border-top: 1px solid var(--clay-200);
+}
+
+.min-width-0 {
+  min-width: 0;
+}
 </style>

@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
+import vuetify from 'vite-plugin-vuetify'
 import { fileURLToPath, URL } from 'node:url'
 
 /**
@@ -25,6 +26,15 @@ export default defineConfig(({ mode }) => {
   return {
   plugins: [
     vue(),
+
+    /*
+     * Vuetify n'entre dans le bundle que par les composants réellement
+     * employés. Sans cette importation à la demande, la bibliothèque entière
+     * partirait dans le fichier initial, y compris pour un visiteur qui ne voit
+     * que la landing et n'ouvrira jamais le tableau de bord.
+     */
+    vuetify({ autoImport: true }),
+
     siteUrlPlugin(siteUrl),
     VitePWA({
       registerType: 'autoUpdate',

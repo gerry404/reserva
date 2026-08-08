@@ -1,165 +1,172 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
+import { CircleUser, LogOut, Settings, Sparkles } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
-import {
-  Menu,
-  LogOut,
-  Settings,
-  CircleUser,
-  Sparkles,
-} from 'lucide-vue-next'
+import { titleForRoute } from '@/constants/navigation'
+import UserAvatar from '@/components/ui/UserAvatar.vue'
 
-const emit = defineEmits(['toggle-sidebar'])
+/**
+ * La barre du tableau de bord.
+ *
+ * Le menu de compte était un `<div>` positionné à la main, avec son propre
+ * écouteur de clic extérieur, sa propre transition et aucun piège à focus.
+ * `v-menu` fait les trois, et rend le tout au niveau du document plutôt que
+ * dans le flux, ce qui supprime les conflits d'empilement avec la barre.
+ */
+
+defineProps({ rail: Boolean })
+const emit = defineEmits(['toggle-drawer'])
+
 const route = useRoute()
-const auth  = useAuthStore()
-const showMenu = ref(false)
-const menuRef = ref(null)
+const auth = useAuthStore()
+const menu = ref(false)
 
-const pageTitle = {
-  dashboard: 'Tableau de bord',
-  bookings:  'Réservations',
-  services:  'Services',
-  settings:  'Paramètres',
-}
+const title = computed(() => titleForRoute(route.name))
 
-function getTitle() {
-  return pageTitle[route.name] ?? 'Nuvo'
-}
-
-async function handleLogout() {
-  showMenu.value = false
+async function logout() {
+  menu.value = false
   await auth.logout()
 }
-
-// Click outside handler
-function onClickOutside(e) {
-  if (menuRef.value && !menuRef.value.contains(e.target)) {
-    showMenu.value = false
-  }
-}
-
-onMounted(() => document.addEventListener('click', onClickOutside, true))
-onUnmounted(() => document.removeEventListener('click', onClickOutside, true))
 </script>
 
 <template>
-  <header class="bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4 shrink-0 sticky top-0 z-30">
-    <!-- Mobile menu toggle -->
-    <button
-      @click="emit('toggle-sidebar')"
-      class="p-2 -ml-2 rounded-control text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors lg:hidden"
-      aria-label="Menu"
+  <div class="d-flex align-center ga-3 w-100">
+    <v-app-bar-nav-icon
+      class="d-lg-none"
+      aria-label="Ouvrir le menu"
+      @click="emit('toggle-drawer')"
+    />
+
+    <div class="d-flex d-lg-none align-center ga-2">
+      <img src="/logo.svg" alt="" width="26" height="26" />
+      <span class="header__brand">Nuvo</span>
+    </div>
+
+    <div class="d-none d-lg-flex align-center ga-3 flex-grow-1 min-width-0">
+      <h1 class="header__title">{{ title }}</h1>
+      <template v-if="auth.business?.name">
+        <span class="text-disabled">·</span>
+        <span class="text-body-2 text-medium-emphasis text-truncate">{{ auth.business.name }}</span>
+      </template>
+    </div>
+
+    <v-spacer class="d-lg-none" />
+
+    <!--
+      Le compte à rebours d'essai, puis l'incitation à passer Pro. Les deux
+      pointent vers la facturation, où la bascule a réellement lieu.
+    -->
+    <v-chip
+      v-if="auth.onTrial"
+      :to="{ name: 'billing' }"
+      color="warning"
+      variant="tonal"
+      size="small"
+      class="d-none d-sm-flex font-weight-bold"
     >
-      <Menu class="w-5 h-5" />
-    </button>
+      <Sparkles :size="14" class="mr-1" />
+      Essai Pro · {{ auth.trialDaysLeft }} j
+    </v-chip>
+    <v-chip
+      v-else-if="!auth.isPro"
+      :to="{ name: 'billing' }"
+      color="primary"
+      variant="tonal"
+      size="small"
+      class="d-none d-sm-flex font-weight-bold"
+    >
+      <Sparkles :size="14" class="mr-1" />
+      Passer Pro
+    </v-chip>
 
-    <!-- Logo (visible on mobile when sidebar hidden) -->
-    <div class="flex items-center gap-2 lg:hidden">
-      <img src="/logo.svg" alt="Nuvo" class="w-7 h-7" />
-      <span class="font-display font-extrabold text-gray-900 text-base tracking-tight">Nuvo</span>
-    </div>
+    <!--
+      La cloche de notifications vivait ici, avec un point rouge qui pulsait en
+      permanence sans qu'aucun système de notification existe. Retirée plutôt
+      que simulée : un indicateur qui ne signifie jamais rien apprend au
+      commerçant à ne plus le regarder.
+    -->
 
-    <!-- Page title + business name -->
-    <div class="flex-1 hidden lg:flex items-center gap-3">
-      <h1 class="font-display font-bold text-gray-900 text-lg">{{ getTitle() }}</h1>
-      <span v-if="auth.business?.name" class="text-gray-300">·</span>
-      <span v-if="auth.business?.name" class="text-sm text-gray-400 truncate max-w-[200px]">{{ auth.business.name }}</span>
-    </div>
-    <div class="flex-1 lg:hidden" />
-
-    <!-- Actions -->
-    <div class="flex items-center gap-1.5">
-      <!-- Trial countdown, then the upgrade nudge. Pointing at billing, where
-           the upgrade actually happens, rather than at settings. -->
-      <RouterLink
-        v-if="auth.onTrial"
-        :to="{ name: 'billing' }"
-        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-full transition-colors"
-      >
-        <Sparkles class="w-3.5 h-3.5" />
-        Essai Pro · {{ auth.trialDaysLeft }} j
-      </RouterLink>
-      <RouterLink
-        v-else-if="!auth.isPro"
-        :to="{ name: 'billing' }"
-        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-full transition-colors"
-      >
-        <Sparkles class="w-3.5 h-3.5" />
-        Passer Pro
-      </RouterLink>
-
-      <!--
-        The notification bell used to live here with a permanently pulsing red
-        dot behind no notification system at all. Removed rather than faked: an
-        indicator that never means anything trains merchants to ignore it.
-      -->
-
-      <!-- Avatar menu -->
-      <div ref="menuRef" class="relative">
-        <button
-          @click.stop="showMenu = !showMenu"
-          class="w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:ring-offset-2"
-        >
-          {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
+    <v-menu v-model="menu" location="bottom end" offset="10" :close-on-content-click="false">
+      <template #activator="{ props: activator }">
+        <button v-bind="activator" class="header__avatar" aria-label="Mon compte">
+          <UserAvatar :name="auth.user?.name" size="sm" />
         </button>
+      </template>
 
-        <Transition name="menu">
-          <div
-            v-if="showMenu"
-            class="absolute right-0 mt-2.5 w-64 bg-clay-50 rounded-2xl shadow-2xl shadow-black/12 border border-gray-100 overflow-hidden z-50"
-          >
-            <!-- User info -->
-            <div class="px-4 py-4 border-b border-gray-50 bg-gray-50/50">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                  {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
-                </div>
-                <div class="min-w-0">
-                  <p class="font-bold text-gray-900 text-sm truncate">{{ auth.user?.name }}</p>
-                  <p class="text-xs text-gray-500 truncate">{{ auth.user?.email }}</p>
-                </div>
-              </div>
-              <div v-if="auth.business?.name" class="mt-2.5 px-2.5 py-1.5 bg-clay-50 rounded-lg border border-gray-100">
-                <p class="text-[11px] text-gray-400 font-medium">Commerce</p>
-                <p class="text-xs font-semibold text-gray-700 truncate">{{ auth.business.name }}</p>
-              </div>
-            </div>
-
-            <!-- Menu links -->
-            <div class="py-1.5">
-              <RouterLink @click="showMenu = false" to="/dashboard/settings"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                <Settings class="w-4 h-4 text-gray-400" />
-                Paramètres
-              </RouterLink>
-              <RouterLink @click="showMenu = false" to="/"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                <CircleUser class="w-4 h-4 text-gray-400" />
-                Voir le site
-              </RouterLink>
-            </div>
-
-            <!-- Logout -->
-            <div class="border-t border-gray-50 py-1.5">
-              <button
-                @click="handleLogout"
-                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-              >
-                <LogOut class="w-4 h-4" />
-                Se déconnecter
-              </button>
+      <v-card min-width="264" rounded="surface">
+        <div class="pa-4 header__menu-head">
+          <div class="d-flex align-center ga-3">
+            <UserAvatar :name="auth.user?.name" size="md" />
+            <div class="min-width-0">
+              <p class="text-body-2 font-weight-bold text-truncate mb-0">{{ auth.user?.name }}</p>
+              <p class="text-caption text-medium-emphasis text-truncate mb-0">{{ auth.user?.email }}</p>
             </div>
           </div>
-        </Transition>
-      </div>
-    </div>
-  </header>
+
+          <div v-if="auth.business?.name" class="header__business mt-3">
+            <p class="text-caption text-medium-emphasis mb-0">Commerce</p>
+            <p class="text-body-2 font-weight-semibold text-truncate mb-0">{{ auth.business.name }}</p>
+          </div>
+        </div>
+
+        <v-list density="comfortable" nav class="py-2">
+          <v-list-item :to="{ name: 'settings' }" rounded="control" @click="menu = false">
+            <template #prepend><Settings :size="17" class="mr-3 text-medium-emphasis" /></template>
+            <v-list-item-title class="text-body-2">Paramètres</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/" rounded="control" @click="menu = false">
+            <template #prepend><CircleUser :size="17" class="mr-3 text-medium-emphasis" /></template>
+            <v-list-item-title class="text-body-2">Voir le site</v-list-item-title>
+          </v-list-item>
+        </v-list>
+
+        <v-divider />
+
+        <v-list density="comfortable" nav class="py-2">
+          <v-list-item rounded="control" base-color="error" @click="logout">
+            <template #prepend><LogOut :size="17" class="mr-3" /></template>
+            <v-list-item-title class="text-body-2">Se déconnecter</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-card>
+    </v-menu>
+  </div>
 </template>
 
 <style scoped>
-.menu-enter-active { transition: all 0.15s ease-out; }
-.menu-leave-active { transition: all 0.1s ease-in; }
-.menu-enter-from   { opacity: 0; transform: scale(0.95) translateY(-4px); }
-.menu-leave-to     { opacity: 0; transform: scale(0.95) translateY(-4px); }
+.header__brand,
+.header__title {
+  font-family: 'Dekatron', Roboto, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--forest-950);
+}
+
+.header__brand { font-size: 16px; }
+.header__title { font-size: 18px; margin: 0; }
+
+.header__avatar {
+  border-radius: 999px;
+  line-height: 0;
+  transition: opacity 0.15s ease;
+}
+
+.header__avatar:hover { opacity: 0.85; }
+
+.header__avatar:focus-visible {
+  outline: 2px solid var(--forest-500);
+  outline-offset: 2px;
+}
+
+.header__menu-head { border-bottom: 1px solid var(--clay-200); }
+
+.header__business {
+  padding: 8px 10px;
+  border: 1px solid var(--clay-200);
+  border-radius: 10px;
+  background: var(--clay-100);
+}
+
+.min-width-0 { min-width: 0; }
 </style>

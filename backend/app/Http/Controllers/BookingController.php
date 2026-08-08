@@ -18,6 +18,21 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class BookingController extends Controller
 {
+    /**
+     * Les colonnes de tri offertes, et la colonne réelle derrière chacune.
+     *
+     * La clé est ce que le client envoie, la valeur ce que la base trie. Le
+     * client demande `date` et obtient `starts_at`, qui porte l'heure en plus
+     * du jour : trier sur `date` seul mélangeait l'ordre des rendez-vous d'une
+     * même journée à chaque requête.
+     */
+    private const SORTABLE = [
+        'customer_name' => 'customer_name',
+        'date'          => 'starts_at',
+        'price'         => 'price',
+        'status'        => 'status',
+    ];
+
     public function index(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -27,6 +42,11 @@ class BookingController extends Controller
             'to'       => ['nullable', 'date_format:Y-m-d', 'after_or_equal:from'],
             'search'   => ['nullable', 'string', 'max:100'],
             'per_page' => ['nullable', 'integer', 'min:5', 'max:100'],
+
+            // Le tri est validé contre une liste fermée. Une colonne venue du
+            // client et passée telle quelle à orderBy serait une injection.
+            'sort'      => ['nullable', 'string', 'in:' . implode(',', array_keys(self::SORTABLE))],
+            'direction' => ['nullable', 'string', 'in:asc,desc'],
         ]);
 
         // Tout sauf le statut. Les compteurs par statut se lisent sur cette
@@ -53,7 +73,14 @@ class BookingController extends Controller
             // or it is one extra query per row.
             ->with('service.business', 'business')
             ->when($validated['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
-            ->orderByDesc('starts_at')
+            ->orderBy(
+                self::SORTABLE[$validated['sort'] ?? 'date'],
+                $validated['direction'] ?? 'desc',
+            )
+            // Départage stable : deux rendez-vous au même instant sortaient dans
+            // un ordre que le moteur ne garantit pas, et une même page pouvait
+            // rendre deux résultats différents d'un chargement à l'autre.
+            ->orderBy('id')
             ->paginate($validated['per_page'] ?? 20)
             ->withQueryString();
 
