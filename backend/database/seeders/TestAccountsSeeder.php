@@ -216,13 +216,16 @@ class TestAccountsSeeder extends Seeder
     /** @return array<int, Service> */
     private function services(Business $business, int $combien): array
     {
+        // Les couleurs sont explicites : sans elles, les prestations prenaient
+        // le défaut de la colonne, et tout le tableau de bord affichait la
+        // même teinte. Elles sortent du nuancier de src/design/tokens.js.
         $catalogue = [
-            ['name' => 'Coupe simple',     'duration' => 30,  'price' => 3000],
-            ['name' => 'Coupe + barbe',    'duration' => 45,  'price' => 5000],
-            ['name' => 'Soin capillaire',  'duration' => 60,  'price' => 6000],
-            ['name' => 'Défrisage',        'duration' => 90,  'price' => 8000],
-            ['name' => 'Tresses',          'duration' => 180, 'price' => 15000],
-            ['name' => 'Massage détente',  'duration' => 120, 'price' => 12000],
+            ['name' => 'Coupe simple',     'duration' => 30,  'price' => 3000,  'color' => '#14603C'],
+            ['name' => 'Coupe + barbe',    'duration' => 45,  'price' => 5000,  'color' => '#0EA5E9'],
+            ['name' => 'Soin capillaire',  'duration' => 60,  'price' => 6000,  'color' => '#06B6D4'],
+            ['name' => 'Défrisage',        'duration' => 90,  'price' => 8000,  'color' => '#F59E0B'],
+            ['name' => 'Tresses',          'duration' => 180, 'price' => 15000, 'color' => '#EC4899'],
+            ['name' => 'Massage détente',  'duration' => 120, 'price' => 12000, 'color' => '#F97316'],
         ];
 
         return array_map(
