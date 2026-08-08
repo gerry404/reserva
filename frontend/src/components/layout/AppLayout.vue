@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import AppSidebar from './AppSidebar.vue'
 import AppHeader from './AppHeader.vue'
@@ -17,7 +17,21 @@ import AppHeader from './AppHeader.vue'
  */
 
 const { lgAndUp } = useDisplay()
-const drawer = ref(true)
+
+/*
+ * Ouvert sur grand écran, fermé sinon.
+ *
+ * Initialisé à `true` sans condition, le tiroir s'ouvrait par-dessus le
+ * contenu au premier chargement sur téléphone : le commerçant arrivait sur son
+ * tableau de bord masqué par le menu.
+ *
+ * Il suit ensuite les changements de largeur, mais seulement quand on franchit
+ * le seuil : le forcer à chaque redimensionnement aurait refermé le tiroir
+ * qu'on venait d'ouvrir à la main.
+ */
+const drawer = ref(lgAndUp.value)
+
+watch(lgAndUp, (grand) => { drawer.value = grand })
 </script>
 
 <template>

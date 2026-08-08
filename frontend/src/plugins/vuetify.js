@@ -2,6 +2,7 @@ import { h } from 'vue'
 import { createVuetify } from 'vuetify'
 import {
   Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, CircleAlert,
+  Menu as MenuIcon,
   CircleCheck, CircleX, Info, Minus, Paperclip, Square, SquareCheck, SquareMinus,
   Star, TriangleAlert, X,
 } from 'lucide-vue-next'
@@ -50,7 +51,7 @@ const aliases = {
   sortAsc: ChevronUp,
   sortDesc: ChevronDown,
   expand: ChevronDown,
-  menu: ChevronDown,
+  menu: MenuIcon,
   subgroup: ChevronDown,
   dropdown: ChevronDown,
   radioOn: CircleCheck,
@@ -249,11 +250,3 @@ export default createVuetify({
     sets: { lucide },
   },
 })
-
-/** Les rayons Vuetify, à poser en CSS : l'API JS ne les expose pas. */
-export const radiusRules = `
-.rounded-control { border-radius: ${radii.control} !important; }
-.rounded-surface { border-radius: ${radii.surface} !important; }
-`
-
-export { tokens }
